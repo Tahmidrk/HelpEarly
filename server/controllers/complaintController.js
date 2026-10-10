@@ -50,7 +50,7 @@ exports.createComplaint = async (req, res) => {
   try {
     const { accused_id, subject, description } = req.body;
 
-    if (!accused_id || !subject || !description) {
+    if (!accused_id || !subject?.trim() || !description?.trim()) {
       return res.status(400).json({ message: 'Accused user, subject, and details are required' });
     }
 
@@ -64,6 +64,25 @@ exports.createComplaint = async (req, res) => {
     );
     if (accused.rows.length === 0) {
       return res.status(404).json({ message: 'User is unavailable' });
+    }
+
+    const relationship = await pool.query(`
+      SELECT 1
+      FROM bookings b
+      JOIN helpers h ON h.id = b.helper_id
+      WHERE (b.user_id = $1 AND h.user_id = $2)
+         OR (b.user_id = $2 AND h.user_id = $1)
+      UNION ALL
+      SELECT 1
+      FROM job_applications ja
+      JOIN jobs j ON j.id = ja.job_id
+      JOIN helpers h ON h.id = ja.helper_id
+      WHERE ja.status = 'accepted'
+        AND ((j.user_id = $1 AND h.user_id = $2) OR (j.user_id = $2 AND h.user_id = $1))
+      LIMIT 1
+    `, [req.user.id, accused_id]);
+    if (relationship.rows.length === 0) {
+      return res.status(403).json({ message: 'Complaints can only be filed about someone you booked or worked with' });
     }
 
     const result = await pool.query(
@@ -134,6 +153,10 @@ exports.updateComplaint = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, admin_notes } = req.body;
+
+    if (status !== undefined && !['open', 'reviewing', 'resolved', 'dismissed'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid complaint status' });
+    }
 
     const result = await pool.query(
       `UPDATE complaints

@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { assertBookingSlot } = require('../utils/bookingAvailability');
 
 async function getHelperProfile(userId) {
   const helperResult = await pool.query('SELECT id FROM helpers WHERE user_id = $1', [userId]);
@@ -7,7 +8,7 @@ async function getHelperProfile(userId) {
 
 async function getHelperCategoryIds(helperId) {
   const categoriesResult = await pool.query(
-    'SELECT DISTINCT category_id FROM helper_services WHERE helper_id = $1',
+    'SELECT category_id FROM helper_categories WHERE helper_id = $1 UNION SELECT category_id FROM helper_services WHERE helper_id = $1',
     [helperId]
   );
 
@@ -17,12 +18,30 @@ async function getHelperCategoryIds(helperId) {
 // Create a job posting (household only)
 exports.createJob = async (req, res) => {
   try {
-    const { category_id, title, description, budget, location, latitude, longitude, preferred_date } = req.body;
+    let { category_id, category, title, description, budget, location, latitude, longitude, preferred_date } = req.body;
+
+    // Resolve numeric category_id if text category name is sent
+    if (!category_id && (category || req.body.category_name)) {
+      const catName = category || req.body.category_name;
+      const catRes = await pool.query('SELECT id FROM categories WHERE name ILIKE $1 LIMIT 1', [catName]);
+      if (catRes.rows.length > 0) {
+        category_id = catRes.rows[0].id;
+      }
+    }
+
+    const preferredDate = new Date(preferred_date);
+    if (!category_id || !title?.trim() || !description?.trim() || !Number.isFinite(Number(budget)) || Number(budget) <= 0 || Number.isNaN(preferredDate.getTime())) {
+      return res.status(400).json({ message: 'Category, title, description, a positive budget, and preferred date are required' });
+    }
+
+    // Collect uploaded photo paths (relative URLs the client can fetch)
+    const photoPaths = (req.files || []).map(f => `/uploads/${f.filename}`);
+    const photosJson = photoPaths.length > 0 ? JSON.stringify(photoPaths) : null;
 
     const result = await pool.query(
-      `INSERT INTO jobs (user_id, category_id, title, description, budget, location, latitude, longitude, preferred_date)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-      [req.user.id, category_id, title, description, budget, location, latitude, longitude, preferred_date]
+      `INSERT INTO jobs (user_id, category_id, title, description, budget, location, latitude, longitude, preferred_date, photos)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [req.user.id, category_id, title, description, budget, location, latitude, longitude, preferredDate, photosJson]
     );
 
     res.status(201).json(result.rows[0]);
@@ -32,6 +51,7 @@ exports.createJob = async (req, res) => {
   }
 };
 
+
 // Get all jobs with filters
 exports.getJobs = async (req, res) => {
   try {
@@ -40,27 +60,10 @@ exports.getJobs = async (req, res) => {
     const conditions = ['j.status = $1'];
     const params = [status];
 
-    if (req.user?.role === 'household') {
+    if ((req.activeRole === 'helper' || req.user?.role === 'helper') && !conditions.some(c => c.includes('user_id'))) {
       params.push(req.user.id);
-      conditions.push(`j.user_id = $${params.length}`);
+      conditions.push(`j.user_id <> $${params.length}`);
     }
-
-    if (req.user?.role === 'helper') {
-      const helper = await getHelperProfile(req.user.id);
-      if (!helper) {
-        return res.status(400).json({ message: 'Helper profile not found' });
-      }
-
-      const helperCategoryIds = await getHelperCategoryIds(helper.id);
-      if (helperCategoryIds.length === 0) {
-        return res.json([]);
-      }
-
-      const helperPlaceholders = helperCategoryIds.map((_, index) => `$${params.length + index + 1}`).join(', ');
-      conditions.push(`j.category_id IN (${helperPlaceholders})`);
-      params.push(...helperCategoryIds);
-    }
-
     if (category) {
       params.push(category);
       conditions.push(`j.category_id = $${params.length}`);
@@ -111,6 +114,10 @@ exports.getJobsForHelper = async (req, res) => {
     conditions.push(`j.category_id IN (${helperPlaceholders})`);
     params.push(...helperCategoryIds);
 
+    if ((req.activeRole === 'helper' || req.user?.role === 'helper') && !conditions.some(c => c.includes('user_id'))) {
+      params.push(req.user.id);
+      conditions.push(`j.user_id <> $${params.length}`);
+    }
     if (category) {
       params.push(category);
       conditions.push(`j.category_id = $${params.length}`);
@@ -138,7 +145,7 @@ exports.getJob = async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(`
-      SELECT j.*, u.id as poster_id, u.name as poster_name, u.avatar_url as poster_avatar, u.phone as poster_phone,
+      SELECT j.*, u.id as poster_id, u.name as poster_name, u.avatar_url as poster_avatar,
              c.name as category_name, c.icon as category_icon
       FROM jobs j
       JOIN users u ON j.user_id = u.id
@@ -152,13 +159,13 @@ exports.getJob = async (req, res) => {
 
     const job = result.rows[0];
 
-    if (req.user?.role === 'household' && job.user_id !== req.user.id) {
+    if (req.activeRole === 'household' && job.user_id !== req.user.id) {
       return res.status(403).json({ message: 'You can only view your own job offers' });
     }
 
     let viewerApplication = null;
 
-    if (req.user?.role === 'helper') {
+    if (req.activeRole === 'helper') {
       const helper = await getHelperProfile(req.user.id);
       if (!helper) {
         return res.status(400).json({ message: 'Helper profile not found' });
@@ -206,6 +213,10 @@ exports.getMyJobs = async (req, res) => {
     const params = [req.user.id];
     const conditions = ['j.user_id = $1'];
 
+    if ((req.activeRole === 'helper' || req.user?.role === 'helper') && !conditions.some(c => c.includes('user_id'))) {
+      params.push(req.user.id);
+      conditions.push(`j.user_id <> $${params.length}`);
+    }
     if (category) {
       params.push(category);
       conditions.push(`j.category_id = $${params.length}`);
@@ -238,6 +249,7 @@ exports.applyForJob = async (req, res) => {
   try {
     const { id } = req.params;
     const { cover_message, proposed_price } = req.body;
+    if (proposed_price !== undefined && (!Number.isFinite(Number(proposed_price)) || Number(proposed_price)<=0)) return res.status(400).json({message:'Offer a positive proposal price'});
 
     const helper = await getHelperProfile(req.user.id);
     if (!helper) {
@@ -245,7 +257,7 @@ exports.applyForJob = async (req, res) => {
     }
 
     const jobResult = await pool.query(
-      `SELECT j.id, j.category_id, j.status
+      `SELECT j.id, j.user_id, j.category_id, j.status
        FROM jobs j
        JOIN users u ON j.user_id = u.id
        WHERE j.id = $1 AND u.is_active = true`,
@@ -257,6 +269,7 @@ exports.applyForJob = async (req, res) => {
     }
 
     const job = jobResult.rows[0];
+    if (job.user_id === req.user.id) return res.status(400).json({ message: 'You cannot apply to your own job' });
     if (job.status !== 'open') {
       return res.status(400).json({ message: 'This job is no longer open for applications' });
     }
@@ -268,10 +281,11 @@ exports.applyForJob = async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO job_applications (job_id, helper_id, cover_message, proposed_price)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
+       SELECT $1, $2, $3, $4 FROM (SELECT id FROM jobs WHERE id=$1 AND status='open' FOR UPDATE) locked_job RETURNING *`,
       [id, helper.id, cover_message, proposed_price]
     );
 
+    if (!result.rows.length) return res.status(409).json({message:'This job is no longer open'});
     res.status(201).json(result.rows[0]);
   } catch (error) {
     if (error.code === '23505') {
@@ -288,38 +302,68 @@ exports.updateApplication = async (req, res) => {
     const { applicationId } = req.params;
     const { status } = req.body;
 
-    const applicationResult = await pool.query(`
-      SELECT ja.*, j.user_id
+    if (!['accepted', 'rejected'].includes(status)) {
+      return res.status(400).json({ message: 'Application status must be accepted or rejected' });
+    }
+
+    const db = await pool.connect();
+    try {
+      await db.query('BEGIN');
+      // Lock the shared job before individual proposals to avoid cross-proposal deadlocks.
+      await db.query('SELECT id FROM jobs WHERE id=(SELECT job_id FROM job_applications WHERE id=$1) FOR UPDATE',[applicationId]);
+      const applicationResult = await db.query(`
+      SELECT ja.*, j.user_id, j.title, j.description, j.budget, j.location, j.preferred_date, j.status AS job_status
       FROM job_applications ja
       JOIN jobs j ON ja.job_id = j.id
       WHERE ja.id = $1
+      FOR UPDATE OF ja, j
     `, [applicationId]);
 
     if (applicationResult.rows.length === 0) {
+      await db.query('ROLLBACK');
       return res.status(404).json({ message: 'Application not found' });
     }
 
-    if (applicationResult.rows[0].user_id !== req.user.id) {
+    const application = applicationResult.rows[0];
+    if (application.user_id !== req.user.id) {
+      await db.query('ROLLBACK');
       return res.status(403).json({ message: 'You can only manage applications for your own jobs' });
     }
-
-    const result = await pool.query(
-      `UPDATE job_applications SET status = $1 WHERE id = $2 RETURNING *`,
-      [status, applicationId]
-    );
-
-    // If accepted, update job status
-    if (status === 'accepted') {
-      await pool.query(
-        `UPDATE jobs SET status = 'in_progress' WHERE id = $1`,
-        [result.rows[0].job_id]
-      );
+    if (application.status !== 'pending') {
+      await db.query('ROLLBACK');
+      return res.status(409).json({ message: 'This application has already been decided' });
+    }
+    if (status === 'rejected') {
+      const result = await db.query('UPDATE job_applications SET status = $1 WHERE id = $2 RETURNING *', [status, applicationId]);
+      await db.query('COMMIT');
+      return res.json(result.rows[0]);
+    }
+    if (application.job_status !== 'open') {
+      await db.query('ROLLBACK');
+      return res.status(409).json({ message: 'This job is no longer open for applications' });
     }
 
-    res.json(result.rows[0]);
+    const { startsAt, endsAt } = await assertBookingSlot(db, application.helper_id, application.preferred_date || new Date(), null);
+    const booking = await db.query(
+      `INSERT INTO bookings (user_id, helper_id, booking_date, end_date, status, notes, total_price, address, service_description, job_application_id)
+       VALUES ($1, $2, $3, $4, 'confirmed', $5, $6, $7, $8, $9)
+       RETURNING *`,
+      [req.user.id, application.helper_id, startsAt, endsAt, application.cover_message || '', application.proposed_price || application.budget, application.location || '', `${application.title}: ${application.description}`, application.id]
+    );
+    const result = await db.query('UPDATE job_applications SET status = $1 WHERE id = $2 RETURNING *', ['accepted', applicationId]);
+    await db.query(`UPDATE job_applications SET status = 'rejected' WHERE job_id = $1 AND id <> $2 AND status = 'pending'`, [application.job_id, applicationId]);
+    await db.query(`UPDATE jobs SET status = 'in_progress', updated_at = CURRENT_TIMESTAMP WHERE id = $1`, [application.job_id]);
+    await db.query('COMMIT');
+    res.json({ ...result.rows[0], booking: booking.rows[0] });
+    } catch (error) {
+      await db.query('ROLLBACK');
+      throw error;
+    } finally {
+      db.release();
+    }
   } catch (error) {
     console.error('UpdateApplication error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(error.status || 500).json({ message: error.status ? error.message : 'Application could not be updated' });
   }
 };
 

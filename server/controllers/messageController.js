@@ -1,4 +1,18 @@
 const pool = require('../config/db');
+const { getIO } = require('../socket/chat');
+
+async function conversationFor(first, second) {
+  const db = await pool.connect();
+  try {
+    await db.query('BEGIN');
+    await db.query('SELECT pg_advisory_xact_lock(hashtext($1))', [[Number(first),Number(second)].sort((a,b)=>a-b).join(':')]);
+    let result = await db.query('SELECT * FROM conversations WHERE (user1_id=$1 AND user2_id=$2) OR (user1_id=$2 AND user2_id=$1) ORDER BY id LIMIT 1',[first,second]);
+    if (!result.rows.length) result = await db.query('INSERT INTO conversations(user1_id,user2_id) VALUES($1,$2) RETURNING *',[first,second]);
+    await db.query('COMMIT');
+    return result.rows[0];
+  } catch(error) { await db.query('ROLLBACK'); throw error; }
+  finally { db.release(); }
+}
 
 // Get user's conversations
 exports.getConversations = async (req, res) => {
@@ -25,7 +39,7 @@ exports.getConversations = async (req, res) => {
       LEFT JOIN helpers h1 ON h1.user_id = u1.id
       LEFT JOIN helpers h2 ON h2.user_id = u2.id
       LEFT JOIN messages m ON m.id = (
-        SELECT id FROM messages WHERE conversation_id = c.id ORDER BY created_at DESC LIMIT 1
+        SELECT id FROM messages WHERE conversation_id = c.id ORDER BY created_at DESC,id DESC LIMIT 1
       )
       WHERE c.user1_id = $1 OR c.user2_id = $1
       ORDER BY c.last_message_at DESC
@@ -62,12 +76,12 @@ exports.getMessages = async (req, res) => {
     );
 
     const result = await pool.query(`
-      SELECT m.*, u.name as sender_name, u.avatar_url as sender_avatar
+      SELECT * FROM (SELECT m.*, u.name as sender_name, u.avatar_url as sender_avatar
       FROM messages m
       JOIN users u ON m.sender_id = u.id
       WHERE m.conversation_id = $1
-      ORDER BY m.created_at ASC
-      LIMIT $2 OFFSET $3
+      ORDER BY m.created_at DESC,m.id DESC
+      LIMIT $2 OFFSET $3) recent ORDER BY created_at ASC,id ASC
     `, [conversationId, parseInt(limit), parseInt(offset)]);
 
     res.json(result.rows);
@@ -82,6 +96,13 @@ exports.sendMessage = async (req, res) => {
   try {
     const { recipient_id, content } = req.body;
 
+    if (Number(recipient_id) === req.user.id) {
+      return res.status(400).json({ message: 'You cannot message yourself' });
+    }
+    if (!Number.isInteger(Number(recipient_id)) || typeof content !== 'string' || !content.trim() || content.length>10000) {
+      return res.status(400).json({ message: 'Message cannot be empty' });
+    }
+
     const recipient = await pool.query(
       'SELECT id FROM users WHERE id = $1 AND is_active = true',
       [recipient_id]
@@ -91,33 +112,13 @@ exports.sendMessage = async (req, res) => {
     }
 
     // Find or create conversation
-    let conv = await pool.query(
-      `SELECT * FROM conversations
-       WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)`,
-      [req.user.id, recipient_id]
-    );
-
-    let conversationId;
-    if (conv.rows.length === 0) {
-      const newConv = await pool.query(
-        `INSERT INTO conversations (user1_id, user2_id, last_message_at)
-         VALUES ($1, $2, CURRENT_TIMESTAMP) RETURNING id`,
-        [req.user.id, recipient_id]
-      );
-      conversationId = newConv.rows[0].id;
-    } else {
-      conversationId = conv.rows[0].id;
-      await pool.query(
-        'UPDATE conversations SET last_message_at = CURRENT_TIMESTAMP WHERE id = $1',
-        [conversationId]
-      );
-    }
+    const conversationId = (await conversationFor(req.user.id,recipient_id)).id;
 
     // Insert message
     const result = await pool.query(
       `INSERT INTO messages (conversation_id, sender_id, content)
        VALUES ($1, $2, $3) RETURNING *`,
-      [conversationId, req.user.id, content]
+      [conversationId, req.user.id, content.trim()]
     );
 
     // Get sender info
@@ -128,7 +129,8 @@ exports.sendMessage = async (req, res) => {
       sender_name: sender.rows[0].name,
       sender_avatar: sender.rows[0].avatar_url,
     };
-
+    await pool.query('UPDATE conversations SET last_message_at=CURRENT_TIMESTAMP WHERE id=$1',[conversationId]);
+    getIO()?.to(`user_${recipient_id}`).to(`user_${req.user.id}`).emit('new_message',message);
     res.status(201).json({ message, conversationId });
   } catch (error) {
     console.error('SendMessage error:', error);
@@ -140,6 +142,10 @@ exports.sendMessage = async (req, res) => {
 exports.getOrCreateConversation = async (req, res) => {
   try {
     const { userId } = req.params;
+
+    if (Number(userId) === req.user.id) {
+      return res.status(400).json({ message: 'You cannot start a conversation with yourself' });
+    }
 
     const otherUser = await pool.query(
       `SELECT u.id, u.name, u.avatar_url, u.role, u.is_active, h.id as helper_profile_id
@@ -164,10 +170,7 @@ exports.getOrCreateConversation = async (req, res) => {
         return res.status(403).json({ message: 'This user is unavailable' });
       }
 
-      conv = await pool.query(
-        `INSERT INTO conversations (user1_id, user2_id) VALUES ($1, $2) RETURNING *`,
-        [req.user.id, userId]
-      );
+      conv = { rows: [await conversationFor(req.user.id,userId)] };
     }
 
     res.json({

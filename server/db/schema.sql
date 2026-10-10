@@ -13,8 +13,9 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
+    nid_number VARCHAR(50),
     avatar_url VARCHAR(500),
-    role VARCHAR(20) NOT NULL DEFAULT 'household' CHECK (role IN ('household', 'helper', 'admin')),
+    role VARCHAR(20) NOT NULL DEFAULT 'household' CHECK (role IN ('household', 'helper', 'admin', 'both')),
     location VARCHAR(255),
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
@@ -43,7 +44,7 @@ CREATE TABLE IF NOT EXISTS helpers (
     bio TEXT,
     hourly_rate DECIMAL(10, 2) DEFAULT 0,
     is_verified BOOLEAN DEFAULT false,
-    avg_rating DECIMAL(3, 2) DEFAULT 0,
+    avg_rating DECIMAL(3, 2),
     total_reviews INTEGER DEFAULT 0,
     is_available BOOLEAN DEFAULT true,
     experience_years INTEGER DEFAULT 0,
@@ -78,6 +79,9 @@ CREATE TABLE IF NOT EXISTS bookings (
     notes TEXT,
     total_price DECIMAL(10, 2),
     address VARCHAR(500),
+    photos TEXT,
+    service_description TEXT NOT NULL,
+    job_application_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -119,6 +123,14 @@ CREATE TABLE IF NOT EXISTS messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS ai_messages (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role TEXT NOT NULL CHECK (role IN ('user', 'model')),
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ============================================
 -- JOBS TABLE (Household job postings)
 -- ============================================
@@ -134,6 +146,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     longitude DECIMAL(11, 8),
     status VARCHAR(20) DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'completed', 'cancelled')),
     preferred_date TIMESTAMP,
+    photos TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -151,6 +164,15 @@ CREATE TABLE IF NOT EXISTS job_applications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(job_id, helper_id)
 );
+
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS job_application_id INTEGER;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'bookings_job_application_fk') THEN
+    ALTER TABLE bookings ADD CONSTRAINT bookings_job_application_fk
+      FOREIGN KEY (job_application_id) REFERENCES job_applications(id) ON DELETE SET NULL;
+  END IF;
+END $$;
 
 -- ============================================
 -- HELPER CATEGORIES TABLE (Many-to-Many)
@@ -194,6 +216,20 @@ CREATE TABLE IF NOT EXISTS complaints (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS emergency_requests (
+    id SERIAL PRIMARY KEY,
+    household_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
+    description TEXT NOT NULL,
+    location TEXT NOT NULL,
+    contact_phone VARCHAR(50) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'cancelled')),
+    helper_id INTEGER REFERENCES helpers(id) ON DELETE SET NULL,
+    booking_id INTEGER REFERENCES bookings(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ============================================
 -- INDEXES
 -- ============================================
@@ -204,7 +240,10 @@ CREATE INDEX IF NOT EXISTS idx_helper_services_helper_id ON helper_services(help
 CREATE INDEX IF NOT EXISTS idx_helper_services_category_id ON helper_services(category_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_helper_id ON bookings(helper_id);
+CREATE UNIQUE INDEX IF NOT EXISTS bookings_job_application_once ON bookings(job_application_id) WHERE job_application_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_reviews_helper_id ON reviews(helper_id);
+CREATE UNIQUE INDEX IF NOT EXISTS reviews_booking_once ON reviews(booking_id) WHERE booking_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ai_messages_user_id ON ai_messages(user_id);
 CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_jobs_user_id ON jobs(user_id);
 CREATE INDEX IF NOT EXISTS idx_jobs_category_id ON jobs(category_id);
@@ -215,3 +254,5 @@ CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_complaints_complainant_id ON complaints(complainant_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_accused_id ON complaints(accused_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_status ON complaints(status);
+CREATE INDEX IF NOT EXISTS idx_emergency_requests_household ON emergency_requests(household_id);
+CREATE INDEX IF NOT EXISTS idx_emergency_requests_status ON emergency_requests(status);

@@ -5,27 +5,9 @@ exports.createReview = async (req, res) => {
   try {
     const { helper_id, booking_id, rating, comment } = req.body;
 
-    // Check if booking exists and is completed
-    if (booking_id) {
-      const booking = await pool.query(
-        'SELECT * FROM bookings WHERE id = $1 AND user_id = $2',
-        [booking_id, req.user.id]
-      );
-      if (booking.rows.length === 0) {
-        return res.status(400).json({ message: 'Invalid booking' });
-      }
-    }
-
-    // Check duplicate review
-    if (booking_id) {
-      const existing = await pool.query(
-        'SELECT id FROM reviews WHERE booking_id = $1 AND user_id = $2',
-        [booking_id, req.user.id]
-      );
-      if (existing.rows.length > 0) {
-        return res.status(400).json({ message: 'You already reviewed this booking' });
-      }
-    }
+    if (!booking_id || !Number.isInteger(rating) || rating < 1 || rating > 5 || !['household','both'].includes(req.user.role) || req.activeRole === 'helper') return res.status(400).json({ message: 'Rate a completed booking from household mode with 1 to 5 stars' });
+    const booking = await pool.query(`SELECT b.id FROM bookings b JOIN helpers h ON h.id=b.helper_id WHERE b.id=$1 AND b.user_id=$2 AND b.helper_id=$3 AND b.status='completed' AND h.user_id<>$2`, [booking_id,req.user.id,helper_id]);
+    if (!booking.rows.length) return res.status(400).json({ message: 'You can only review your own completed booking with another worker' });
 
     const result = await pool.query(
       `INSERT INTO reviews (user_id, helper_id, booking_id, rating, comment)
@@ -33,19 +15,9 @@ exports.createReview = async (req, res) => {
       [req.user.id, helper_id, booking_id, rating, comment]
     );
 
-    // Update helper's average rating
-    const ratingResult = await pool.query(
-      `SELECT AVG(rating)::DECIMAL(3,2) as avg_rating, COUNT(*) as total_reviews
-       FROM reviews WHERE helper_id = $1`,
-      [helper_id]
-    );
-    await pool.query(
-      `UPDATE helpers SET avg_rating = $1, total_reviews = $2 WHERE id = $3`,
-      [ratingResult.rows[0].avg_rating, ratingResult.rows[0].total_reviews, helper_id]
-    );
-
     res.status(201).json(result.rows[0]);
   } catch (error) {
+    if (error.code === '23505') return res.status(409).json({ message: 'You already reviewed this booking' });
     console.error('CreateReview error:', error);
     res.status(500).json({ message: 'Server error' });
   }

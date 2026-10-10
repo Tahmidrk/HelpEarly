@@ -7,7 +7,11 @@ exports.getHelpers = async (req, res) => {
     const offset = (page - 1) * limit;
 
     let query = `
-      SELECT h.*, u.name, u.email, u.phone, u.location, u.avatar_url, u.latitude, u.longitude,
+      SELECT h.*, u.name, u.location, u.avatar_url, u.latitude, u.longitude,
+             COALESCE(
+               (SELECT c2.name FROM helper_categories hc2 JOIN categories c2 ON hc2.category_id = c2.id WHERE hc2.helper_id = h.id LIMIT 1),
+               (SELECT c3.name FROM helper_services hs3 JOIN categories c3 ON hs3.category_id = c3.id WHERE hs3.helper_id = h.id LIMIT 1)
+             ) as primary_category,
              COALESCE(json_agg(DISTINCT jsonb_build_object(
                'id', hs.id, 'service_name', hs.service_name, 'price', hs.price,
                'category_id', hs.category_id, 'category_name', c.name, 'category_icon', c.icon
@@ -21,6 +25,11 @@ exports.getHelpers = async (req, res) => {
     const params = [];
     let paramCount = 0;
 
+    if (req.user) {
+      params.push(req.user.id);
+      query += ` AND h.user_id <> $${++paramCount}`;
+    }
+
     // Search by name or service
     if (search) {
       paramCount++;
@@ -31,7 +40,7 @@ exports.getHelpers = async (req, res) => {
     // Filter by category
     if (category) {
       paramCount++;
-      query += ` AND hs.category_id = $${paramCount}`;
+      query += ` AND (EXISTS (SELECT 1 FROM helper_categories hc WHERE hc.helper_id = h.id AND hc.category_id = $${paramCount}) OR EXISTS (SELECT 1 FROM helper_services sx WHERE sx.helper_id = h.id AND sx.category_id = $${paramCount}))`;
       params.push(category);
     }
 
@@ -80,15 +89,8 @@ exports.getHelpers = async (req, res) => {
     }
 
     // Count total
-    const countQuery = `
-      SELECT COUNT(DISTINCT h.id)
-      FROM helpers h
-      JOIN users u ON h.user_id = u.id
-      LEFT JOIN helper_services hs ON hs.helper_id = h.id
-      WHERE u.is_active = true
-      ${search ? `AND (u.name ILIKE '%${search}%' OR hs.service_name ILIKE '%${search}%')` : ''}
-      ${category ? `AND hs.category_id = ${category}` : ''}
-    `;
+    const countQuery = `SELECT COUNT(*) FROM (${query}) matched`;
+    const countParams = [...params];
 
     paramCount++;
     query += ` LIMIT $${paramCount}`;
@@ -99,7 +101,7 @@ exports.getHelpers = async (req, res) => {
 
     const [helpersResult, countResult] = await Promise.all([
       pool.query(query, params),
-      pool.query(countQuery)
+      pool.query(countQuery, countParams)
     ]);
 
     res.json({
@@ -120,7 +122,7 @@ exports.getHelper = async (req, res) => {
     const { id } = req.params;
 
     const helperResult = await pool.query(`
-      SELECT h.*, u.name, u.email, u.phone, u.location, u.avatar_url, u.latitude, u.longitude
+      SELECT h.*, u.name, u.location, u.avatar_url, u.latitude, u.longitude
       FROM helpers h
       JOIN users u ON h.user_id = u.id
       WHERE h.id = $1 AND u.is_active = true
@@ -131,6 +133,9 @@ exports.getHelper = async (req, res) => {
     }
 
     const helper = helperResult.rows[0];
+    if (req.user && Number(helper.user_id) === Number(req.user.id)) {
+      return res.status(404).json({ message: 'Your worker profile is not shown to your household account' });
+    }
 
     // Get services
     const servicesResult = await pool.query(`
@@ -150,6 +155,9 @@ exports.getHelper = async (req, res) => {
       LIMIT 20
     `, [id]);
 
+    const cats = await pool.query('SELECT c.* FROM categories c JOIN helper_categories hc ON c.id = hc.category_id WHERE hc.helper_id = $1 ORDER BY c.id', [helper.id]);
+    helper.categories = cats.rows;
+    helper.primary_category = cats.rows[0]?.name || null;
     helper.services = servicesResult.rows;
     helper.reviews = reviewsResult.rows;
 
@@ -164,6 +172,7 @@ exports.getHelper = async (req, res) => {
 exports.updateHelper = async (req, res) => {
   try {
     const { bio, hourly_rate, is_available, experience_years } = req.body;
+    if((hourly_rate!==undefined && (!Number.isFinite(Number(hourly_rate)) || Number(hourly_rate)<0)) || (experience_years!==undefined && (!Number.isInteger(Number(experience_years)) || Number(experience_years)<0)) || (is_available!==undefined && typeof is_available!=='boolean')) return res.status(400).json({message:'Valid rate, experience and availability are required'});
 
     const result = await pool.query(`
       UPDATE helpers SET bio = COALESCE($1, bio), hourly_rate = COALESCE($2, hourly_rate),
@@ -188,6 +197,7 @@ exports.updateHelper = async (req, res) => {
 exports.addService = async (req, res) => {
   try {
     const { category_id, service_name, description, price } = req.body;
+    if(!category_id || typeof service_name!=='string' || !service_name.trim() || !Number.isFinite(Number(price)) || Number(price)<0) return res.status(400).json({message:'Category, service name and a valid nonnegative price are required'});
 
     // Get helper id from user id
     const helperResult = await pool.query('SELECT id FROM helpers WHERE user_id = $1', [req.user.id]);
@@ -252,6 +262,9 @@ exports.getMyHelperProfile = async (req, res) => {
       WHERE hs.helper_id = $1
     `, [helper.id]);
 
+    const cats = await pool.query('SELECT c.* FROM categories c JOIN helper_categories hc ON c.id = hc.category_id WHERE hc.helper_id = $1 ORDER BY c.id', [helper.id]);
+    helper.categories = cats.rows;
+    helper.primary_category = cats.rows[0]?.name || null;
     helper.services = servicesResult.rows;
     res.json(helper);
   } catch (error) {

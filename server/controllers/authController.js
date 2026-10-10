@@ -1,14 +1,26 @@
+const { attachHelper } = require('../db/profile');
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Register a new user
 exports.register = async (req, res) => {
+  const db = await pool.connect();
   try {
-    const { name, email, password, phone, role, location, latitude, longitude } = req.body;
+    await db.query('BEGIN');
+    const { name, email, password, phone, nid_number, role, location, latitude, longitude } = req.body;
+    const cleanEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+    const cleanName = typeof name === 'string' ? name.trim() : '';
+
+    if (!cleanName || cleanName.length>100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) || cleanEmail.length>255 || typeof password !== 'string' || password.length < 6 || Buffer.byteLength(password)>72 || !['household', 'helper', 'both'].includes(role)) {
+      return res.status(400).json({ message: 'Valid name, email, password (6+ characters), and user role are required' });
+    }
+    if (!nid_number) {
+      return res.status(400).json({ message: 'NID card number is required for security verification' });
+    }
 
     // Check if user exists
-    const existingUser = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    const existingUser = await db.query('SELECT id FROM users WHERE LOWER(TRIM(email)) = $1', [cleanEmail]);
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ message: 'Email already registered' });
     }
@@ -18,19 +30,29 @@ exports.register = async (req, res) => {
     const password_hash = await bcrypt.hash(password, salt);
 
     // Insert user
-    const result = await pool.query(
-      `INSERT INTO users (name, email, password_hash, phone, role, location, latitude, longitude)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING id, name, email, phone, role, location, avatar_url, created_at`,
-      [name, email, password_hash, phone, role || 'household', location, latitude, longitude]
+    const result = await db.query(
+      `INSERT INTO users (name, email, password_hash, phone, nid_number, role, location, latitude, longitude)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING id, name, email, phone, nid_number, role, location, avatar_url, created_at`,
+      [cleanName, cleanEmail, password_hash, phone, nid_number, role || 'household', location, latitude, longitude]
     );
 
-    const user = result.rows[0];
+    let user = result.rows[0];
 
-    // If helper role, create helper profile
-    if (role === 'helper') {
-      const { bio, hourly_rate, experience_years, selectedCategories } = req.body;
-      const helperResult = await pool.query(
+    // If helper or dual role, create helper profile
+    if (role === 'helper' || role === 'both') {
+      const { bio, hourly_rate, experience_years } = req.body;
+      let selectedCategories = req.body.selectedCategories;
+      if (!selectedCategories && req.body.category) {
+        const category = await db.query('SELECT id FROM categories WHERE LOWER(name) = LOWER($1)', [req.body.category]);
+        selectedCategories = category.rows.map(c => c.id);
+      }
+      if (!Array.isArray(selectedCategories) || !selectedCategories.length || selectedCategories.some(id => !Number.isInteger(Number(id)))) {
+        return res.status(400).json({ message: 'Select a valid work category' });
+      }
+      const valid = await db.query('SELECT id FROM categories WHERE id = ANY($1::int[])', [selectedCategories]);
+      if (valid.rows.length !== new Set(selectedCategories.map(Number)).size) return res.status(400).json({ message: 'Unknown work category' });
+      const helperResult = await db.query(
         `INSERT INTO helpers (user_id, bio, hourly_rate, experience_years)
          VALUES ($1, $2, $3, $4) RETURNING id`,
         [user.id, bio || '', hourly_rate || 0, experience_years || 0]
@@ -40,7 +62,7 @@ exports.register = async (req, res) => {
       const helperId = helperResult.rows[0].id;
       if (selectedCategories && selectedCategories.length > 0) {
         for (const catId of selectedCategories) {
-          await pool.query(
+          await db.query(
             `INSERT INTO helper_categories (helper_id, category_id, experience_years, hourly_rate)
              VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING`,
             [helperId, catId, experience_years || 0, hourly_rate || 0]
@@ -56,10 +78,15 @@ exports.register = async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    user = await attachHelper(user, db);
+    await db.query('COMMIT');
     res.status(201).json({ token, user });
   } catch (error) {
-    console.error('Register error:', error);
-    res.status(500).json({ message: 'Server error during registration' });
+    console.error('Register error:', error.code || error.name);
+    res.status(error.code === '23505' ? 400 : 500).json({ message: error.code === '23505' ? 'Email already registered' : 'Registration could not be saved' });
+  } finally {
+    await db.query('ROLLBACK');
+    db.release();
   }
 };
 
@@ -67,11 +94,14 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const cleanEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+    const cleanPassword = typeof password === 'string' ? password.trim() : '';
+
 
     // Find user
     const result = await pool.query(
-      'SELECT id, name, email, password_hash, phone, role, location, avatar_url, is_active FROM users WHERE email = $1',
-      [email]
+      'SELECT id, name, email, password_hash, phone, role, location, avatar_url, is_active FROM users WHERE LOWER(TRIM(email)) = $1',
+      [cleanEmail]
     );
 
     if (result.rows.length === 0) {
@@ -84,8 +114,8 @@ exports.login = async (req, res) => {
       return res.status(403).json({ message: 'Account has been deactivated' });
     }
 
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password_hash);
+    const isMatch = (await bcrypt.compare(cleanPassword, user.password_hash)) || (await bcrypt.compare(password || '', user.password_hash));
+
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
@@ -100,9 +130,9 @@ exports.login = async (req, res) => {
     // Remove password_hash from response
     delete user.password_hash;
 
-    res.json({ token, user });
+    res.json({ token, user: await attachHelper(user) });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login error:', error.code || error.name);
     res.status(500).json({ message: 'Server error during login' });
   }
 };
@@ -122,18 +152,7 @@ exports.getMe = async (req, res) => {
 
     const user = result.rows[0];
 
-    // If helper, include helper profile
-    if (user.role === 'helper') {
-      const helperResult = await pool.query(
-        'SELECT * FROM helpers WHERE user_id = $1',
-        [user.id]
-      );
-      if (helperResult.rows.length > 0) {
-        user.helperProfile = helperResult.rows[0];
-      }
-    }
-
-    res.json(user);
+    res.json(await attachHelper(user));
   } catch (error) {
     console.error('GetMe error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -144,6 +163,7 @@ exports.getMe = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const { name, phone, location, latitude, longitude } = req.body;
+    if((name!==undefined && !name.trim()) || (req.body.hourly_rate!==undefined && (!Number.isFinite(Number(req.body.hourly_rate)) || Number(req.body.hourly_rate)<0)) || (req.body.experience_years!==undefined && (!Number.isInteger(Number(req.body.experience_years)) || Number(req.body.experience_years)<0)) || (req.body.is_available!==undefined && typeof req.body.is_available!=='boolean')) return res.status(400).json({message:'Valid profile name, rate, experience and availability are required'});
     const avatar_url = req.file ? `/uploads/${req.file.filename}` : undefined;
 
     let query = `UPDATE users SET name = COALESCE($1, name), phone = COALESCE($2, phone),
@@ -162,7 +182,7 @@ exports.updateProfile = async (req, res) => {
     const result = await pool.query(query, params);
 
     // If helper, update helper-specific fields
-    if (req.user.role === 'helper') {
+    if (['helper', 'both'].includes(req.user.role)) {
       const { bio, hourly_rate, is_available, experience_years } = req.body;
       await pool.query(
         `UPDATE helpers SET bio = COALESCE($1, bio), hourly_rate = COALESCE($2, hourly_rate),
@@ -188,7 +208,7 @@ exports.changePassword = async (req, res) => {
       return res.status(400).json({ message: 'Current password and new password are required' });
     }
 
-    if (new_password.length < 6) {
+    if (typeof new_password!=='string' || new_password.length < 6 || Buffer.byteLength(new_password)>72) {
       return res.status(400).json({ message: 'New password must be at least 6 characters' });
     }
 

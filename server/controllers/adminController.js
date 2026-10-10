@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const {getIO}=require('../socket/chat');
 
 // Get platform statistics
 exports.getStats = async (req, res) => {
@@ -87,8 +88,8 @@ exports.getUsers = async (req, res) => {
     const offset = (page - 1) * limit;
 
     let query = `
-      SELECT u.id, u.name, u.email, u.phone, u.role, u.location, u.avatar_url, u.is_active,
-             u.created_at, h.id as helper_profile_id
+      SELECT u.id, u.name, u.email, u.phone, u.nid_number, u.role, u.location, u.avatar_url, u.is_active,
+             u.created_at, h.id as helper_profile_id, h.is_verified
       FROM users u
       LEFT JOIN helpers h ON h.user_id = u.id
       WHERE 1=1`;
@@ -139,6 +140,8 @@ exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
     const { is_active, role } = req.body;
+    if((is_active!==undefined && typeof is_active!=='boolean') || (role!==undefined && !['household','helper','both','admin'].includes(role))) return res.status(400).json({message:'Invalid account update'});
+    if(Number(id)===req.user.id && (is_active===false || (role && role!=='admin'))) return res.status(400).json({message:'You cannot disable your own admin access'});
 
     const result = await pool.query(
       `UPDATE users SET is_active = COALESCE($1, is_active), role = COALESCE($2, role), updated_at = CURRENT_TIMESTAMP
@@ -150,6 +153,7 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    if(is_active===false) getIO()?.in(`user_${id}`).disconnectSockets(true);
     res.json(result.rows[0]);
   } catch (error) {
     console.error('UpdateUser error:', error);
@@ -161,9 +165,11 @@ exports.updateUser = async (req, res) => {
 exports.verifyHelper = async (req, res) => {
   try {
     const { id } = req.params;
+    const isVerified = req.body.is_verified !== undefined ? Boolean(req.body.is_verified) : true;
+    if(req.body.is_verified!==undefined && typeof req.body.is_verified!=='boolean') return res.status(400).json({message:'Verification must be true or false'});
     const result = await pool.query(
-      'UPDATE helpers SET is_verified = true WHERE id = $1 RETURNING *',
-      [id]
+      'UPDATE helpers SET is_verified = $1 WHERE id = $2 RETURNING *',
+      [isVerified, id]
     );
 
     if (result.rows.length === 0) {
@@ -185,6 +191,30 @@ exports.deleteUser = async (req, res) => {
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('DeleteUser error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Delete job post (content moderation)
+exports.deleteJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM jobs WHERE id = $1', [id]);
+    res.json({ message: 'Job post deleted by admin' });
+  } catch (error) {
+    console.error('DeleteJob error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Delete review (content moderation)
+exports.deleteReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM reviews WHERE id = $1', [id]);
+    res.json({ message: 'Review deleted by admin' });
+  } catch (error) {
+    console.error('DeleteReview error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
