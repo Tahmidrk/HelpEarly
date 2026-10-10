@@ -1,6 +1,8 @@
 # HelpEarly setup, deployment, backup and rollback
 
-No production domain, EAS project, FCM key or cloud host has been configured. These instructions use your actual values; no fictitious URL or credential is embedded in the application. Local PostgreSQL remains the working database.
+Existing production frontend: `https://atyour-service.vercel.app/`. Existing Supabase project: `at-your-service`. The production architecture audit in `docs/PRODUCTION_AUDIT.md` found the frontend's configured Railway API unavailable and the Supabase schema older than local source. Local Express still uses local PostgreSQL. EAS/FCM and a working hosted API remain unverified.
+
+For this existing deployment, preserve the current Vercel project and Supabase records. Follow the existing-stack recovery order in the audit. **Do not restore the local database dump over the existing Supabase database.** The standalone Compose instructions below are an optional alternative template, not instructions to replace this existing architecture.
 
 ## Local development
 

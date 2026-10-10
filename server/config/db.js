@@ -2,6 +2,9 @@ const { Pool } = require('pg');
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 
 const databaseUrl=process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL) : null;
+if((databaseUrl?.hostname || process.env.DB_HOST || '').endsWith('.pooler.supabase.com') && String(databaseUrl ? databaseUrl.port || 5432 : process.env.DB_PORT || 5432)==='6543') {
+  throw new Error('HelpEarly requires a Supabase session-pooler connection on port 5432 or a direct connection; notification advisory locks require a persistent database session.');
+}
 // Connection-string SSL parameters replace pg's explicit ssl object; keep policy centralized.
 for(const option of ['ssl','sslmode','sslcert','sslkey','sslrootcert']) databaseUrl?.searchParams.delete(option);
 const hostname=databaseUrl?.hostname || process.env.DB_HOST || 'localhost';

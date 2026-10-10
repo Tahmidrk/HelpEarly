@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { chatbotAPI } from '../utils/api';
 
 const QUICK_PROMPTS = [
   'How do I find a plumber?',
@@ -44,10 +44,8 @@ export default function AIChatbot() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
-    fetch(`${API_BASE}/api/chatbot`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Could not load chat history');
+    chatbotAPI.history()
+      .then((data) => {
         if (data.length) {
           setMessages(data.map((item) => ({ role: item.role === 'model' ? 'assistant' : 'user', text: item.content })));
           setShowQuick(false);
@@ -74,21 +72,7 @@ export default function AIChatbot() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/api/chatbot`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          'X-Active-Role': localStorage.getItem('activeRole') || '',
-        },
-        body: JSON.stringify({ message: userText }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || data.error || 'Failed to get a response.');
-      }
+      const data = await chatbotAPI.send(userText);
 
       setMessages((prev) => [...prev, { role: 'assistant', text: data.reply }]);
     } catch (err) {

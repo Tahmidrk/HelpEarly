@@ -11,6 +11,7 @@
     "dev": "node --watch server.js",
     "test:mvp": "node tests/mvpFlows.js",
     "test:production": "node tests/productionFlows.js",
+    "test:config": "node tests/databaseConfig.js",
     "db:create": "node db/createDatabase.js",
     "db:init": "node db/init.js"
   },

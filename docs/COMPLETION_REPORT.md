@@ -1,5 +1,7 @@
 # HelpEarly completion and release report
 
+This records the local completion checkpoint. The subsequent `docs/PRODUCTION_AUDIT.md` confirms the existing Vercel frontend and Supabase project and supersedes earlier unverified hosting assumptions below; it identifies the unavailable Railway API, older live schema and direct-access security gap.
+
 Verified locally on 10 October 2026 with Node 24.14.1, PostgreSQL 17 and Expo SDK 57. This checkpoint preserves the existing application and earlier uncommitted MVP work. It is **not a claim of production deployment or physical Android approval**.
 
 ## A. Completion summary

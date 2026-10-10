@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { helpersAPI } from '../utils/api';
+import { helpersAPI, getMediaUrl } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import StarRating from '../components/StarRating';
 import ReviewCard from '../components/ReviewCard';
@@ -51,7 +51,7 @@ export default function HelperProfile() {
           <div className="profile-top">
             <div className="profile-avatar-section">
               {helper.avatar_url ? (
-                <img src={helper.avatar_url} alt={helper.name} className="avatar avatar-xl" />
+                <img src={getMediaUrl(helper.avatar_url)} alt={helper.name} className="avatar avatar-xl" />
               ) : (
                 <div className="avatar avatar-xl avatar-placeholder">{initial}</div>
               )}

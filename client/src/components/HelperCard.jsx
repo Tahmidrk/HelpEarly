@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { getMediaUrl } from '../utils/api';
 import StarRating from './StarRating';
 import ProfileLink from './ProfileLink';
 import { getCategoryIcon } from '../utils/iconMap';
@@ -24,7 +25,7 @@ export default function HelperCard({ helper }) {
       <div className="helper-card-header">
         <div className="helper-avatar">
           {helper.avatar_url ? (
-            <img src={helper.avatar_url} alt={name} className="avatar avatar-lg" />
+            <img src={getMediaUrl(helper.avatar_url)} alt={name} className="avatar avatar-lg" />
           ) : (
             <div className="avatar avatar-lg avatar-placeholder">{initial}</div>
           )}

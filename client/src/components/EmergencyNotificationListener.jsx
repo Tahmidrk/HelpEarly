@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { io } from 'socket.io-client';
-import { emergencyAPI } from '../utils/api';
-
-const rawSocketUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || '';
-const SOCKET_URL = rawSocketUrl
-  ? rawSocketUrl.replace(/\/api\/?$/, '').replace(/\/$/, '')
-  : undefined;
+import { emergencyAPI, SOCKET_URL } from '../utils/api';
 
 export default function EmergencyNotificationListener() {
   const { user, activeRole } = useAuth();

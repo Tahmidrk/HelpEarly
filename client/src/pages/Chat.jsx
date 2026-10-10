@@ -1,15 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { messagesAPI } from '../utils/api';
+import { messagesAPI, SOCKET_URL } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { io } from 'socket.io-client';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProfileLink from '../components/ProfileLink';
-
-const rawSocketUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || '';
-const SOCKET_URL = rawSocketUrl
-  ? rawSocketUrl.replace(/\/api\/?$/, '').replace(/\/$/, '')
-  : undefined;
 
 export default function Chat() {
   const { user } = useAuth();

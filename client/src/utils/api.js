@@ -1,8 +1,11 @@
 const rawApiUrl = import.meta.env.VITE_API_URL || '';
 const normalizedApiUrl = rawApiUrl.replace(/\/$/, '');
-const API_BASE = normalizedApiUrl
+export const API_BASE = normalizedApiUrl
   ? `${normalizedApiUrl.replace(/\/api$/, '')}/api`
   : '/api';
+const apiOrigin = normalizedApiUrl.replace(/\/api$/, '');
+export const SOCKET_URL = (import.meta.env.VITE_SOCKET_URL || apiOrigin).replace(/\/api\/?$/, '').replace(/\/$/, '') || undefined;
+export const getMediaUrl = value => !value || /^(https?:|data:|blob:)/i.test(value) ? value : `${apiOrigin}/${value.replace(/^\/+/, '')}`;
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem('token');
@@ -22,7 +25,9 @@ async function request(endpoint, options = {}) {
   }
 
   const res = await fetch(`${API_BASE}${endpoint}`, config);
-  const data = await res.json();
+  let data;
+  try {data=await res.json();}
+  catch {throw new Error('API returned an invalid response. Check backend deployment and VITE_API_URL.');}
 
   if (!res.ok) {
     throw new Error(data.message || 'Something went wrong');
@@ -43,6 +48,11 @@ export const authAPI = {
     }
     return request('/auth/profile', { method: 'PUT', body: JSON.stringify(data) });
   },
+};
+
+export const chatbotAPI = {
+  history: () => request('/chatbot'),
+  send: message => request('/chatbot', {method:'POST',body:JSON.stringify({message})}),
 };
 
 // Helpers

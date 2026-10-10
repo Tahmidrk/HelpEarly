@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { usersAPI } from '../utils/api';
+import { usersAPI, getMediaUrl } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import AddressMap from '../components/AddressMap';
@@ -56,7 +56,7 @@ export default function UserProfile() {
           <div className="profile-main">
             <div className="profile-avatar-section">
               {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt={profile.name} className="avatar avatar-xl" />
+                <img src={getMediaUrl(profile.avatar_url)} alt={profile.name} className="avatar avatar-xl" />
               ) : (
                 <div className="avatar avatar-xl avatar-placeholder">{initial}</div>
               )}

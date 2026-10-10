@@ -158,7 +158,7 @@ at-your-service/
 
 ## API Endpoints (Summary)
 
-Production setup and verification: [Deployment guide](docs/DEPLOYMENT.md), [Physical Android checklist](docs/ANDROID_CHECKLIST.md), [Completion report](docs/COMPLETION_REPORT.md). No cloud deployment or real push delivery is claimed. Uploaded photos require a persistent volume; do not use an ephemeral API filesystem for production.
+Production setup and verification: [Current production audit](docs/PRODUCTION_AUDIT.md), [Deployment guide](docs/DEPLOYMENT.md), [Physical Android checklist](docs/ANDROID_CHECKLIST.md), [Local completion report](docs/COMPLETION_REPORT.md). Existing Vercel frontend and Supabase database are confirmed; the frontend's configured Railway API is unavailable. Latest local changes and real push delivery are not deployed/verified. Uploaded photos require persistent storage; do not use an ephemeral API filesystem for production.
 
 | Method | Endpoint | Description |
 |---|---|---|
