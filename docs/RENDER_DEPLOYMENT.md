@@ -1,6 +1,6 @@
 # HelpEarly Render deployment execution report
 
-Updated 2026-10-11. **Render Free backend is live and tested.** Existing Supabase data was preserved through the approved migration. Existing Vercel website has not been redeployed; deployment is approved and access to the Vercel account owning atyour-service.vercel.app remains pending. No paid service, disk, new database or payment card was added. Android visuals are unchanged.
+Updated 2026-10-11. **Render Free backend is live and tested.** Existing Supabase data was preserved through the approved migration. Existing Vercel project `client` now serves the latest frontend on atyour-service.vercel.app and retains client-sigma-dun-96.vercel.app. [Completed Vercel release, actual browser checks and rollback](VERCEL_DEPLOYMENT.md). No paid service, disk, new database or payment card was added. Android visuals are unchanged.
 
 | Check | Actual result |
 |---|---|
@@ -14,7 +14,7 @@ Updated 2026-10-11. **Render Free backend is live and tested.** Existing Supabas
 | CORS | PASS: existing Vercel origin preflight HTTP 204 and correct allow-origin; untrusted origin gets no CORS permission |
 | Authentication/Socket.IO | PASS: tokenless REST denied, normal login/role guards work, actual external authenticated WSS connects; missing token and untrusted socket origin rejected |
 | Production schema/media | PASS: owner-approved schema 2/22 tables, RLS/direct grant remediation and private bucket; original records preserved |
-| Vercel release | APPROVED, PROJECT ACCESS PENDING: existing website retained; latest production build with the Render origin passed |
+| Vercel release | LIVE: owner-confirmed existing project `client`, both production domains verified; actual browser registration/photo booking/relogin passed |
 | Android | PASS: clean Hermes export contains Render URL; real API-module pairing passed. Signed APK/AAB, physical phone and FCM remain pending |
 | Branding | Deferred until operational completion and explicit owner approval |
 
@@ -34,11 +34,11 @@ Client/server configuration checks passed again after the templates were updated
 
 ## Configuration and safe fixes
 
-Render uses `NODE_ENV=production`, `CLIENT_URL=https://atyour-service.vercel.app`, `DB_POOL_MAX=5`, verified TLS, official `DB_SSL_CA`, Supabase provider/existing project URL/private bucket, request logging, proxy trust 1 and durable database-backed worker. Render supplies PORT. Existing JWT_SECRET remains privately generated and unchanged. Real DATABASE_URL and Storage service-role key were saved only in ignored `server/.env.audit` and approved Render settings; no key/password appears in Git or client bundles. Development `server/.env` remains unchanged. Push stays disabled until Expo/FCM setup. Health is `/api/ready`; auto-deploy/PR previews are off.
+Render uses `NODE_ENV=production`, `CLIENT_URL=https://atyour-service.vercel.app,https://client-sigma-dun-96.vercel.app`, `DB_POOL_MAX=5`, verified TLS, official `DB_SSL_CA`, Supabase provider/existing project URL/private bucket, request logging, proxy trust 1 and durable database-backed worker. Render supplies PORT. Existing JWT_SECRET remains privately generated and unchanged. Real DATABASE_URL and Storage service-role key were saved only in ignored `server/.env.audit` and approved Render settings; no key/password appears in Git or client bundles. Development `server/.env` remains unchanged. Push stays disabled until Expo/FCM setup. Health is `/api/ready`; auto-deploy/PR previews are off.
 
 Initial deploy `dep-db597r942hec738525t0` built successfully but failed safely because production secrets were absent. After obtaining the owner's existing password, TLS initially reported `SELF_SIGNED_CERT_IN_CHAIN`; the official dashboard CA resolved it without weakening verification. No password reset occurred. The owner then approved saving PostgreSQL/Storage/CA settings on the existing Render service and redeploying. Node was selected instead of initial Docker autodetection, Free replaced the paid default before creation, and the Blueprint was aligned with service name, origin/TLS and CA configuration. Reuse this service rather than creating another.
 
-Local Git `origin` points to the owner's fork; `upstream` points to the original repository. Original repository `main` and its Vercel deployment source were not overwritten. React production artifact is `client/dist/assets/index-BH9vB0Ja.js` and includes the Render origin. Android export is `H:\apps\HelpEarly-test-tools\android-render-export`, Hermes `index-b18cafc124f476fa2a1c80bde15c2d7b.hbc`, verified to include the same origin. The first cached Android export retained the earlier URL; rerunning `expo export --clear` fixed the artifact. Clear Metro cache after changing public build environment values. Hermes export is not an installable APK.
+Local Git `origin` points to the owner's fork; `upstream` points to the original repository. Original repository `main` and its Vercel deployment source were not overwritten. Latest hosted React artifact is `/assets/index-DI4o7ysn.js` and includes the Render origin. Android export is `H:\apps\HelpEarly-test-tools\android-render-export`, Hermes `index-b18cafc124f476fa2a1c80bde15c2d7b.hbc`, verified to include the same origin. The first cached Android export retained the earlier URL; rerunning `expo export --clear` fixed the artifact. Clear Metro cache after changing public build environment values. Hermes export is not an installable APK.
 
 ## Backup, approved migration and preservation
 
@@ -48,15 +48,13 @@ The exact reviewed migration and private bucket were applied only after the owne
 
 Security advisor's old RLS-disabled errors are resolved. Its 22 no-policy INFO findings are intentional for the Express-only model; six mutable function-search-path WARN findings remain for separately reviewed hardening, not silently applied SQL. [Advisor explanation](https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable). Privileged DB/service credentials, dependency advisories, least-privilege roles, monitoring and scaling/load tests still need commercial hardening.
 
-## Vercel account access check
+## Completed Vercel release
 
-On 2026-10-11 the owner signed in successfully as `tahmidrk758-3108`. The team picker lists only `tahmidrk758-3108's projects` (Hobby), containing one existing project, `client`. Its production domain is `client-sigma-dun-96.vercel.app`, not the approved `atyour-service.vercel.app`. No project, deployment, Git connection or domain was changed. Access to the actual owning account/project is required before deploying the tested build. Do not replace the unrelated client project or transfer the existing production domain without a separate reviewed request.
-
-![Observed Vercel project access](test-results/vercel-account-access-20261011.jpg)
+The owner confirmed the existing `client` project as HelpEarly and approved domain assignment/deployment and official CLI access. Domain assignment succeeded without conflict. Both production domains now serve the new build using Render. Configuration-only Render deploy `dep-db5a9bcs728c73cd7nu0` succeeded, adding the secondary domain to the shared CORS/Socket.IO allowlist. Fresh authenticated WSS checks passed on both domains. The earlier account-access snapshot is historical and superseded; no new project was created. [Full release evidence, pending device/provider checks and rollback](VERCEL_DEPLOYMENT.md).
 
 ## Remaining actions
 
-1. Publish the owner-approved prepared build to the **existing** Vercel project. Set `VITE_API_URL=https://helpearly-api.onrender.com`; `VITE_SOCKET_URL` may derive from it. Preserve the previous deployment for rollback. Existing production is still the older bundle using its obsolete Railway API until this release occurs.
+1. **Completed:** latest frontend deployed to existing project `client`, both production domains verified with Render API/Socket environment values. Previous deployment retained for rollback.
 2. Use `EXPO_PUBLIC_API_URL=https://helpearly-api.onrender.com` for Android. Link the real EAS project and Firebase Spark FCM credentials privately, complete signing and physical Android/Web testing. Current production templates have the real origin; external IDs/keys remain blank.
 3. Configure a valid AI provider key privately. Local key presence did not establish usable Gemini credentials; no live provider answer is claimed. Enable push only after real FCM/device setup and delivery checks.
 4. Perform supervised emergency acceptance with the phone/apps open, real rendered-screen regression and restart/device media checks. Do not claim unlimited free uptime or commercial readiness.

@@ -1,0 +1,20 @@
+{
+  "executedAt": "2026-10-10T20:55:55.354Z",
+  "deploymentId": "dpl_DNs8jCZVGXz2T1VqTXP86VhPcwmX",
+  "domains": [
+    {
+      "domain": "atyour-service.vercel.app",
+      "httpStatus": 200,
+      "https": "PASS",
+      "latestArtifact": "PASS",
+      "spaLoginRoute": "PASS"
+    },
+    {
+      "domain": "client-sigma-dun-96.vercel.app",
+      "httpStatus": 200,
+      "https": "PASS",
+      "latestArtifact": "PASS",
+      "spaLoginRoute": "PASS"
+    }
+  ]
+}

@@ -18,7 +18,7 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CLIENT_URL
-        value: https://atyour-service.vercel.app
+        value: https://atyour-service.vercel.app,https://client-sigma-dun-96.vercel.app
       - key: NODE_VERSION
         value: 22.14.0
       - key: STORAGE_PROVIDER

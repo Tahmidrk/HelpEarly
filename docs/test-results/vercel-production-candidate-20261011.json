@@ -1,0 +1,11 @@
+{
+  "executedAt": "2026-10-10T20:55:11.523Z",
+  "candidate": "https://client-eu421slwn-tahmidrk758-3108s-projects.vercel.app",
+  "deploymentId": "dpl_DNs8jCZVGXz2T1VqTXP86VhPcwmX",
+  "status": "PASS",
+  "httpStatus": 200,
+  "artifact": "/assets/index-DI4o7ysn.js",
+  "sha256": "c60ca571e1cae05acda88963566da3914d2a939e60d339248428862a1ae522ac",
+  "matchesTestedArtifact": true,
+  "apiOrigin": "https://helpearly-api.onrender.com"
+}

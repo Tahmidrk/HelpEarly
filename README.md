@@ -2,7 +2,7 @@
 
 > **Connecting households with trusted local service workers in Bangladesh — quickly, safely, and transparently.**
 
-Current zero-budget implementation/deployment strategy and approval gates: [docs/FREE_STACK_STRATEGY.md](docs/FREE_STACK_STRATEGY.md). Render backend, existing Supabase migration/private media and live API tests passed; Vercel release, signed Android builds and real push/device verification remain pending.
+Current zero-budget implementation/deployment strategy and approval gates: [docs/FREE_STACK_STRATEGY.md](docs/FREE_STACK_STRATEGY.md). Existing Vercel project `client` now serves [atyour-service.vercel.app](https://atyour-service.vercel.app/) and retains [client-sigma-dun-96.vercel.app](https://client-sigma-dun-96.vercel.app/) as a secondary domain. Both use the live Render backend and existing Supabase database/private media. [Release verification and rollback](docs/VERCEL_DEPLOYMENT.md). Signed Android builds, physical device/FCM delivery and real AI provider configuration remain pending.
 
 Project roadmap: [operational completion, separate branding approvals, regression/device testing and signed APK/AAB release](docs/FREE_STACK_STRATEGY.md#project-roadmap-and-final-branding-approval-gates). Android visuals remain unchanged until the future branding phase is explicitly approved.
 

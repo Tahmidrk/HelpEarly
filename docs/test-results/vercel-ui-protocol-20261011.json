@@ -1,0 +1,17 @@
+{
+  "executedAt": "2026-10-10T21:02:01.116Z",
+  "origin": "https://atyour-service.vercel.app",
+  "websiteRegistration": "PASS: actual browser household registration",
+  "browserPhotoBookingDatabasePersistence": "PASS",
+  "offeredFeeAndManualService": "PASS",
+  "privateSignedPhotoByteEquality": "PASS",
+  "authenticatedWSSBothDomains": "PASS",
+  "missingTokenAndUntrustedOriginDenied": "PASS",
+  "durableWorkerNotification": "PASS",
+  "liveAI": "PENDING: authenticated endpoint returns 503; provider credentials absent",
+  "physicalAndroid": "PENDING",
+  "FCMPush": "PENDING",
+  "disposableFixtureCleanup": "PASS: two fixture users and their records/media removed",
+  "originalRecordCountsAndFingerprints": "PASS: all original tables match backup except approved derived rating aggregates",
+  "browserLogoutReloginBooking": "PASS: rendered dashboard shows booking after actual logout/login"
+}

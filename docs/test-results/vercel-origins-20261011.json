@@ -1,0 +1,20 @@
+{
+  "executedAt": "2026-10-10T20:51:32.744Z",
+  "results": [
+    {
+      "origin": "https://atyour-service.vercel.app",
+      "status": 204,
+      "allowed": true
+    },
+    {
+      "origin": "https://client-sigma-dun-96.vercel.app",
+      "status": 204,
+      "allowed": true
+    },
+    {
+      "origin": "https://untrusted.example.test",
+      "status": 200,
+      "allowed": false
+    }
+  ]
+}
