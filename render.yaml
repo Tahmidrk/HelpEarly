@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: at-your-service-api
+    name: helpearly-api
     runtime: node
     rootDir: server
     buildCommand: npm ci --omit=dev

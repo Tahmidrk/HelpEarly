@@ -6,6 +6,8 @@ Current zero-budget implementation/deployment strategy and approval gates: [docs
 
 Project roadmap: [operational completion, separate branding approvals, regression/device testing and signed APK/AAB release](docs/FREE_STACK_STRATEGY.md#project-roadmap-and-final-branding-approval-gates). Android visuals remain unchanged until the future branding phase is explicitly approved.
 
+Render deployment: [actual service/build/runtime report](docs/RENDER_DEPLOYMENT.md). Production database/security/media changes are [conditionally approved after verified production backup and isolated restore](docs/SUPABASE_RELEASE_APPROVAL.md); that condition remains pending.
+
 Android UI preservation and website feature parity: [comparison, implementation and executed checks](docs/FEATURE_PARITY.md).
 
 An academic software project (SDP II) — a web-based platform that enables households to discover, compare, and book verified local home service workers (plumbers, electricians, cleaners, carpenters, handymen, and more).
