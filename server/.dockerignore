@@ -1,0 +1,15 @@
+node_modules
+.env
+.env.*
+uploads
+*.log
+*.dump
+.test-persistence.json
+tests
+clean_db_categories.js
+fix_unassigned_categories.js
+inspect_helpers.js
+db/add_helpers_to_20.sql
+db/checkUser.js
+db/ensureSumUser.js
+db/testSumLogin.js

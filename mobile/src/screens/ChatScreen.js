@@ -317,7 +317,7 @@ export default function ChatScreen({ route, navigation }) {
                     <Text style={styles.partnerName}>{item.name}</Text>
                     <Text style={styles.msgTime}>{lastMsg?.time || 'Now'}</Text>
                   </View>
-                  
+
                   <View style={styles.rowBottom}>
                     <Text style={styles.catBadge}>{primaryCat}</Text>
                     <Text style={styles.lastMsgText} numberOfLines={1}>

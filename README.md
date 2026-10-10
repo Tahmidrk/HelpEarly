@@ -1,74 +1,118 @@
 # At Your Service
 
-A web platform connecting households with trusted local helpers for home services.
+> **Connecting households with trusted local service workers in Bangladesh — quickly, safely, and transparently.**
 
-For connecting a cloned copy to the same shared online database, see [CONNECT_SHARED_DATABASE.md](./CONNECT_SHARED_DATABASE.md).
+An academic software project (SDP II) — a web-based platform that enables households to discover, compare, and book verified local home service workers (plumbers, electricians, cleaners, carpenters, handymen, and more).
 
-## Features
+---
 
-- **User Registration & Login** - JWT-based auth with role-based access (Household, Helper, Admin)
-- **Helper Profiles** - Detailed profiles with services, skills, availability, and ratings
-- **Search & Filter** - Find helpers by category, location, rating, and price
-- **Online Booking** - Schedule services with date, time, and address
-- **Real-time Chat** - Socket.io-powered messaging between users and helpers
-- **Job Board** - Households post jobs, helpers apply with proposals
-- **Ratings & Reviews** - Rate completed services with star ratings and comments
-- **Admin Dashboard** - Platform stats, user management, activity monitoring
-- **Payment Tracking** - Track earnings and payment history
+## Platform Overview
+
+**At Your Service** solves a common problem in Bangladesh: households struggle to find reliable, nearby service workers, and skilled workers lack a dedicated platform to grow their income. This platform bridges that gap.
+
+### Key Highlights
+
+| Feature | Description |
+|---|---|
+| **Smart Recommendation** | Ranks helpers by distance, rating, price, availability & category match |
+| **Emergency / Urgent Mode** | Broadcast urgent requests to all nearby available helpers |
+| **Photo-Based Job Posts** | Upload photos of the problem so helpers understand before proposing |
+| **In-App Chat** | Real-time Socket.io messaging between households and helpers |
+| **Role-Based Access** | Separate dashboards for Households, Helpers, and Admins |
+| **Advance Scheduling** | Book now or schedule for a future date |
+| **Re-booking** | Quickly re-book a previously trusted helper |
+| **Complaint System** | Report disputes — investigated by Admins |
+
+---
+
+## Features by Role
+
+### Households
+- Browse & filter verified helpers (category, location, rating, price, availability)
+- Post jobs with photos, description, preferred date/time, and location
+- Receive Smart Helper Recommendations
+- Send emergency / urgent requests
+- In-app chat with helpers before booking
+- View booking history & re-book trusted helpers
+- Rate and review completed services
+- Submit complaints about workers or services
+
+### Service Helpers
+- Live job feed — receive nearby job alerts
+- View job photos and submit price proposals
+- Toggle availability on/off
+- Manage active and completed bookings
+- Track earnings and payment status
+- Build reputation through ratings and reviews
+
+### Admins
+- Review and approve/reject helper registrations
+- Platform analytics dashboard (users, bookings, revenue, categories)
+- Account suspension, restriction, and ban management
+- Complaint investigation and resolution
+- Content and review moderation
+
+---
 
 ## Tech Stack
 
-| Layer      | Technology                     |
-|------------|-------------------------------|
-| Frontend   | React.js, Vite, React Router |
-| Backend    | Node.js, Express.js          |
-| Database   | PostgreSQL                    |
-| Real-time  | Socket.io                     |
-| Auth       | JWT + bcrypt                  |
-| Styling    | Vanilla CSS (Dark Theme)     |
+| Layer | Technology |
+|---|---|
+| Frontend | React.js + Vite + React Router |
+| Backend | Node.js + Express.js |
+| Database | PostgreSQL (working locally; production hosting pending) |
+| Real-Time | Socket.io |
+| Authentication | JWT + bcrypt |
+| Authorization | Role-Based Access Control (RBAC) |
+| Styling | Vanilla CSS (Light + Dark Theme) |
+| Push Notifications | Expo/FCM integration implemented; real credentials and delivery pending |
+| Maps *(planned)* | Google Maps API + Expo Location |
+| Media Storage | Server files with persistent-volume deployment templates |
+
+---
 
 ## Getting Started
 
 ### Prerequisites
-
-- Node.js 18+
+- Node.js 22.13+
 - PostgreSQL 14+
 
 ### 1. Setup Database
 
-For a shared online database, create one hosted PostgreSQL database and put the same `DATABASE_URL` in `server/.env` on every PC:
+**Option A — Shared Online Database (Supabase/Render)**
+
+Create one hosted PostgreSQL instance and share the connection string:
 
 ```env
-DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE?sslmode=require
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 ```
 
-When `DATABASE_URL` is set, every account, ban, booking, complaint, and chat is stored in that same online database.
+Set this in `server/.env` on every machine. All bookings, accounts, chats, and complaints will be stored in the shared database.
 
-This repository does not include the real `server/.env` file. If you clone it and want the same shared database, create `server/.env` from `server/.env.example` and paste the same private `DATABASE_URL` there.
-
-For local-only development:
+**Option B — Local Database**
 
 ```bash
-# Create database
-createdb helpearly
-
-# Initialize schema & seed data
+# Copy and edit env
 cd server
-cp .env.example .env  # edit with your DB credentials
+cp .env.example .env
+
+# Create the database and initialize its schema (existing records are preserved)
+npm run db:create
 npm run db:init
 ```
 
-### 2. Start Server
+### 2. Start the Server
 
 ```bash
 cd server
 npm install
 node server.js
+# or for dev: npm run dev
 ```
 
 Server runs on `http://localhost:5000`
 
-### 3. Start Client
+### 3. Start the Client
 
 ```bash
 cd client
@@ -78,31 +122,63 @@ npm run dev
 
 Client runs on `http://localhost:5173`
 
+---
+
 ## Demo Accounts
 
-| Role      | Email              | Password |
-|-----------|-------------------|----------|
-| Household | fatima@example.com | test123  |
-| Helper    | rahim@example.com  | test123  |
-| Admin     | admin@helpearly.com| admin123 |
+| Role | Email | Password |
+|---|---|---|
+| Household | fatima@example.com | test123 |
+| Helper | rahim@example.com | test123 |
+| Admin | admin@atyourservice.com | admin123 |
+
+---
 
 ## Project Structure
 
 ```
-sdpproject/
-├── client/          # React Frontend (Vite)
-│   ├── src/
-│   │   ├── components/  # Reusable UI components
-│   │   ├── pages/       # Page views
-│   │   ├── context/     # Auth context
-│   │   └── utils/       # API helpers
-│   └── ...
-├── server/          # Express Backend
-│   ├── controllers/   # Route handlers
-│   ├── routes/        # API routes
-│   ├── middleware/     # Auth & upload middleware
-│   ├── db/           # Schema & seed data
-│   ├── socket/       # Real-time chat
-│   └── ...
+at-your-service/
+├── client/                   # React Frontend (Vite)
+│   ├── public/               # Static assets (logo, favicon)
+│   └── src/
+│       ├── components/       # Reusable UI (Navbar, Footer, Cards, etc.)
+│       ├── pages/            # Page views (Home, Dashboard, Chat, Admin, etc.)
+│       ├── context/          # AuthContext (JWT + role management)
+│       └── utils/            # API helpers, icon mapping
+├── server/                   # Express.js Backend
+│   ├── controllers/          # Route handler logic
+│   ├── routes/               # API route definitions
+│   ├── middleware/           # Auth (JWT) & file upload middleware
+│   ├── db/                   # Schema, migrations & seed data
+│   └── socket/               # Socket.io real-time chat
 └── README.md
 ```
+
+---
+
+## API Endpoints (Summary)
+
+Production setup and verification: [Deployment guide](docs/DEPLOYMENT.md), [Physical Android checklist](docs/ANDROID_CHECKLIST.md), [Completion report](docs/COMPLETION_REPORT.md). No cloud deployment or real push delivery is claimed. Uploaded photos require a persistent volume; do not use an ephemeral API filesystem for production.
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/auth/register` | Register a new user |
+| POST | `/api/auth/login` | Login and receive JWT |
+| GET | `/api/helpers` | List helpers (with filters) |
+| GET | `/api/helpers/:id` | Helper profile |
+| POST | `/api/jobs` | Create a job post |
+| GET | `/api/jobs` | Browse job listings |
+| POST | `/api/bookings` | Create a booking |
+| GET | `/api/bookings` | User's bookings |
+| GET | `/api/messages` | Chat messages |
+| POST | `/api/reviews` | Submit a review |
+| POST | `/api/complaints` | Submit a complaint |
+| GET | `/api/admin/*` | Admin management endpoints |
+
+---
+
+## Academic Context
+
+- **Course**: CSE 4104 — Software Development Project II (SDP II)
+- **Project Type**: Mobile-first web platform (prototype)
+- **Constraint**: Realistic for a student development team; no unrealistic AI/ML claims — Smart Recommendation uses a transparent scoring algorithm (distance + rating + price + availability).

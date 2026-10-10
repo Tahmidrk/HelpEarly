@@ -502,7 +502,7 @@ export default function ExploreScreen({ route, navigation }) {
                 const maxPrice = prices.length ? Math.max(...prices) : minPrice;
                 const priceRangeDisplay = minPrice>0 ? (minPrice === maxPrice ? `৳${minPrice}` : `৳${minPrice} - ৳${maxPrice}`) : 'Offer a fee';
                 const catName = selectedCategory !== 'All' ? selectedCategory : (item.primary_category || item.category || item.services?.[0]?.category_name || 'Service Worker');
-                
+
                 // Get bio matching the primary category
                 const matchedBio = item.bio || 'No bio provided.';
                 const formattedRating = (Number(item.total_reviews) > 0 ? Number(item.avg_rating).toFixed(1) : 'Not rated');
@@ -526,7 +526,7 @@ export default function ExploreScreen({ route, navigation }) {
                         <Text style={styles.category}>
                           {catName} · 📍 {item.location || 'Dhaka'}
                         </Text>
-                        
+
                         <View style={styles.ratingRow}>
                           <Ionicons name="star" size={14} color="#f59e0b" />
                           <Text style={styles.ratingText}>{formattedRating} ({reviewCount} reviews)</Text>

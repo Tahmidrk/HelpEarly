@@ -1,0 +1,60 @@
+# Template only: do not provision paid hosting without approval.
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: at_your_service
+      POSTGRES_USER: helpearly
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set a strong DB_PASSWORD privately}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U helpearly -d at_your_service"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  api:
+    build: ./server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: helpearly
+      DB_NAME: at_your_service
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+      DB_SSL: "false"
+      JWT_SECRET: ${JWT_SECRET:?Set a random JWT_SECRET of at least 32 characters}
+      CLIENT_URL: https://${APP_DOMAIN:?Set your real domain}
+      TRUST_PROXY: "1"
+      UPLOAD_DIR: /app/uploads
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.6-flash}
+      PUSH_ENABLED: ${PUSH_ENABLED:-false}
+      EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN:-}
+    volumes:
+      - uploads_data:/app/uploads
+  web:
+    build: ./client
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?Set your real domain}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+volumes:
+  postgres_data:
+  uploads_data:
+  caddy_data:
+  caddy_config:

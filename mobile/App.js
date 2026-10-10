@@ -65,7 +65,7 @@ function MainTabs() {
           ),
         }}
       />
-      
+
       {!isWorker && !isAdmin ? (
         <Tab.Screen
           name="Explore"

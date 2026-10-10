@@ -273,7 +273,7 @@ export default function JobsScreen({ navigation, route }) {
 
   // Category Filtering for Worker Job Feed
   const workerCategory = (user?.primary_category || user?.category || '').toLowerCase();
-  
+
   const displayedJobs = jobs.filter((job) => {
     if (activeRole !== 'helper') return true;
     if (activeTab === 'my_posts') {

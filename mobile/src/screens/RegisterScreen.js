@@ -17,10 +17,10 @@ import { useAuth } from '../context/AuthContext';
 
 export default function RegisterScreen({ navigation }) {
   const { register } = useAuth();
-  
+
   // User Sub-Role: 'household', 'helper' (worker), or 'both'
   const [userRole, setUserRole] = useState('household');
-  
+
   // Form fields
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -28,17 +28,17 @@ export default function RegisterScreen({ navigation }) {
   const [nidNumber, setNidNumber] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Real website categories list (excl. Painting, Tutoring, Handyman)
   const websiteCategories = [
     'Cleaning', 'Plumbing', 'Electrical',
     'Gardening', 'Babysitting', 'Moving',
     'Cooking'
   ];
-  
+
   // Selected Worker Skill Category
   const [category, setCategory] = useState('');
-  
+
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
@@ -84,7 +84,7 @@ export default function RegisterScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          
+
           {/* Top Branding Header */}
           <View style={styles.header}>
             <View style={styles.logoBadge}>
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 24, fontWeight: '900', color: '#0f172a' },
   subtitle: { fontSize: 13, color: '#64748b', marginTop: 3, textAlign: 'center' },
-  
+
   accountTypeWrapper: {
     flexDirection: 'row',
     backgroundColor: '#e2e8f0',

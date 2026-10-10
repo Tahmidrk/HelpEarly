@@ -463,7 +463,7 @@ export default function WorkerDashboardScreen({ navigation }) {
                   {viewDetailsBooking?.booker_name || viewDetailsBooking?.client_name || viewDetailsBooking?.user_name || 'Customer'}
                 </Text>
               </TouchableOpacity>
-              
+
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
                 <Text style={{ fontSize: 12.5, color: '#475569', flex: 1, marginRight: 8 }}>
                   📍 {viewDetailsBooking?.address || viewDetailsBooking?.booker_location || viewDetailsBooking?.location || 'Dhaka, Bangladesh'}

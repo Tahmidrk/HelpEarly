@@ -187,7 +187,7 @@ export default function HelperDetailScreen({ route, navigation }) {
             <Text style={styles.avatarText}>{helper.name?.charAt(0) || 'H'}</Text>
           </View>
           <Text style={styles.name}>{helper.name}</Text>
-          
+
           <View style={styles.badgeRow}>
             <View style={styles.categoryBadge}>
               <Text style={styles.categoryBadgeText}>{primaryCategory}</Text>
@@ -422,7 +422,7 @@ export default function HelperDetailScreen({ route, navigation }) {
                         <Ionicons name="cash-outline" size={16} color="#0d9488" />
                         <Text style={styles.receiptTitle}>Your Booking Offer</Text>
                       </View>
-                      
+
                       <View style={styles.receiptLine}>
                         <Text style={styles.receiptItemLabel}>Selected Work</Text>
                         <Text style={styles.receiptItemVal}>{serviceDescription || 'Describe the work above'}</Text>

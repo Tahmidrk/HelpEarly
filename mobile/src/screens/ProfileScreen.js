@@ -17,7 +17,7 @@ import MapViewModal from '../components/MapViewModal';
 
 export default function ProfileScreen({ navigation }) {
   const { user, logout, activeRole, switchMode, updateUserProfile, saveWorkerSettings } = useAuth();
-  
+
   // Mandatory Location Modal for new/unconfigured accounts
   const [mandatoryLocModal, setMandatoryLocModal] = useState(false);
   const [mandatoryLocation, setMandatoryLocation] = useState('');
@@ -128,7 +128,7 @@ export default function ProfileScreen({ navigation }) {
         <TouchableOpacity style={styles.profileCard} onPress={() => navigation.navigate('Notifications')}><Text style={{ color: '#0d9488', fontWeight: '800' }}>Notifications</Text></TouchableOpacity>
         {user?.role!=='admin' && <TouchableOpacity style={styles.profileCard} onPress={()=>navigation.navigate('Complaints')}><Text style={{color:'#0d9488',fontWeight:'800'}}>My complaints</Text></TouchableOpacity>}
         {user?.role !== 'admin' && <TouchableOpacity style={styles.profileCard} onPress={() => navigation.navigate('Emergency')}><Text style={{ color: '#991b1b', fontWeight: '800' }}>Emergency requests</Text></TouchableOpacity>}
-        
+
         {/* If activeRole is 'helper', render exact Helper Detail profile view from household mode */}
         {activeRole === 'helper' ? (
           <View style={[styles.profileCard, { marginBottom: 16 }]}>

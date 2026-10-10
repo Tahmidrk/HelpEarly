@@ -4,3 +4,16 @@ dist/
 *.log
 .DS_Store
 uploads/
+.env.*
+!.env.example
+*.dump
+*.backup
+.expo/
+google-services.json
+service-account*.json
+credentials.json
+*.jks
+*.keystore
+.test-persistence.json
+dist-web/
+.claude/

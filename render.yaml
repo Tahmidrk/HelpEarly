@@ -3,10 +3,16 @@ services:
     name: at-your-service-api
     runtime: node
     rootDir: server
-    buildCommand: npm ci
+    buildCommand: npm ci --omit=dev
     startCommand: npm start
-    plan: free
-    autoDeploy: true
+    # Persistent uploaded photos require a disk-capable paid plan. Provision manually.
+    plan: starter
+    autoDeploy: false
+    healthCheckPath: /api/health
+    disk:
+      name: helpearly-uploads
+      mountPath: /var/data/helpearly-uploads
+      sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
@@ -17,4 +23,18 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CLIENT_URL
+        sync: false
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: UPLOAD_DIR
+        value: /var/data/helpearly-uploads
+      - key: TRUST_PROXY
+        value: 1
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.6-flash
+      - key: PUSH_ENABLED
+        value: false
+      - key: EXPO_ACCESS_TOKEN
         sync: false

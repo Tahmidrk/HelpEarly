@@ -278,7 +278,7 @@ export default function HomeScreen({ navigation }) {
                       <Ionicons name="location-outline" size={13} color="#0d9488" />
                       <Text style={styles.helperLocationText}>{h.location || 'Dhaka'}</Text>
                     </TouchableOpacity>
-                    
+
                     {/* 4. Review star */}
                     {(() => {
                       const formattedRating = (Number(h.total_reviews) > 0 ? Number(h.avg_rating).toFixed(1) : 'Not rated');
@@ -701,4 +701,3 @@ const styles = StyleSheet.create({
   emptyCard: { padding: 30, alignItems: 'center', justifyContent: 'center' },
   emptyText: { color: '#94a3b8', fontSize: 13, marginTop: 8 },
 });
-

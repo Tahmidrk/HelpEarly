@@ -1,0 +1,14 @@
+{$APP_DOMAIN} {
+  encode gzip
+  header X-Content-Type-Options nosniff
+  header Referrer-Policy no-referrer
+  @backend path /api/* /uploads/* /socket.io/*
+  handle @backend {
+    reverse_proxy api:5000
+  }
+  handle {
+    root * /srv
+    try_files {path} /index.html
+    file_server
+  }
+}
