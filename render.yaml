@@ -18,7 +18,7 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CLIENT_URL
-        sync: false
+        value: https://atyour-service.vercel.app
       - key: NODE_VERSION
         value: 22.14.0
       - key: STORAGE_PROVIDER
@@ -31,6 +31,10 @@ services:
         sync: false
       - key: DB_POOL_MAX
         value: 5
+      - key: DB_SSL
+        value: true
+      - key: DB_SSL_ALLOW_SELF_SIGNED
+        value: false
       - key: RUN_BACKGROUND_WORKER
         value: true
       - key: LOG_REQUESTS
