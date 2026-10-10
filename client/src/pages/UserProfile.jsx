@@ -76,9 +76,11 @@ export default function UserProfile() {
               </div>
               {profile.role === 'helper' && (
                 <div className="profile-meta" style={{ marginTop: 10 }}>
-                  <StarRating rating={profile.avg_rating || 0} />
-                  <span className="rating-value">{Number(profile.avg_rating || 0).toFixed(1)}</span>
-                  <span className="review-count">({profile.total_reviews || 0} reviews)</span>
+                  {Number(profile.total_reviews) > 0 ? <>
+                    <StarRating rating={profile.avg_rating} />
+                    <span className="rating-value">{Number(profile.avg_rating).toFixed(1)}</span>
+                    <span className="review-count">({profile.total_reviews} reviews)</span>
+                  </> : <span className="review-count">Not rated yet</span>}
                 </div>
               )}
               {canHelperChat && (

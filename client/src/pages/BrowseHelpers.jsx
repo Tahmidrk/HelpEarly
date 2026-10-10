@@ -85,11 +85,27 @@ export default function BrowseHelpers() {
               onChange={(e) => updateFilter('location', e.target.value)}
               id="filter-location"
             />
+            <input
+              type="number"
+              className="form-input filter-price"
+              placeholder="Max Rate (৳)..."
+              value={filters.max_rate || ''}
+              onChange={(e) => updateFilter('max_rate', e.target.value)}
+              id="filter-max-rate"
+              style={{ maxWidth: 140 }}
+            />
             <select className="form-input filter-select" value={filters.min_rating} onChange={(e) => updateFilter('min_rating', e.target.value)} id="filter-rating">
               <option value="">Any Rating</option>
-              <option value="4">4.0+</option>
-              <option value="4.5">4.5+</option>
-              <option value="4.8">4.8+</option>
+              <option value="4">4.0+ Stars</option>
+              <option value="4.5">4.5+ Stars</option>
+              <option value="4.8">4.8+ Stars</option>
+            </select>
+            <select className="form-input filter-select" value={filters.sort || ''} onChange={(e) => updateFilter('sort', e.target.value)} id="filter-sort">
+              <option value="">Sort By</option>
+              <option value="rating_desc">Highest Rated</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="reviews">Most Reviews</option>
             </select>
           </div>
         </div>

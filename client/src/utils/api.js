@@ -9,6 +9,7 @@ async function request(endpoint, options = {}) {
   const config = {
     headers: {
       'Content-Type': 'application/json',
+      'X-Active-Role': localStorage.getItem('activeRole') || '',
       ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     },
@@ -65,7 +66,12 @@ export const categoriesAPI = {
 
 // Bookings
 export const bookingsAPI = {
-  create: (data) => request('/bookings', { method: 'POST', body: JSON.stringify(data) }),
+  create: (data) => {
+    if (data instanceof FormData) {
+      return request('/bookings', { method: 'POST', body: data });
+    }
+    return request('/bookings', { method: 'POST', body: JSON.stringify(data) });
+  },
   getAll: (params) => {
     const query = params ? new URLSearchParams(params).toString() : '';
     return request(`/bookings?${query}`);
@@ -110,7 +116,12 @@ export const complaintsAPI = {
 
 // Jobs
 export const jobsAPI = {
-  create: (data) => request('/jobs', { method: 'POST', body: JSON.stringify(data) }),
+  create: (data) => {
+    if (data instanceof FormData) {
+      return request('/jobs', { method: 'POST', body: data });
+    }
+    return request('/jobs', { method: 'POST', body: JSON.stringify(data) });
+  },
   getAll: (params) => {
     const query = params ? new URLSearchParams(params).toString() : '';
     return request(`/jobs?${query}`);
@@ -137,6 +148,14 @@ export const adminAPI = {
     return request(`/admin/users?${query}`);
   },
   updateUser: (id, data) => request(`/admin/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  verifyHelper: (id) => request(`/admin/helpers/${id}/verify`, { method: 'PUT' }),
+  verifyHelper: (id, isVerified = true) => request(`/admin/helpers/${id}/verify`, { method: 'PUT', body: JSON.stringify({ is_verified: isVerified }) }),
   deleteUser: (id) => request(`/admin/users/${id}`, { method: 'DELETE' }),
+  deleteJob: (id) => request(`/admin/jobs/${id}`, { method: 'DELETE' }),
+  deleteReview: (id) => request(`/admin/reviews/${id}`, { method: 'DELETE' }),
+};
+
+// Emergency Broadcast
+export const emergencyAPI = {
+  notify: (data) => request('/emergency/notify', { method: 'POST', body: JSON.stringify(data) }),
+  accept: (id) => request(`/emergency/${id}/accept`, { method: 'POST' }),
 };

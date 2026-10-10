@@ -19,11 +19,14 @@ import JobDetail from './pages/JobDetail';
 import PostJob from './pages/PostJob';
 import Profile from './pages/Profile';
 import UserProfile from './pages/UserProfile';
+import AIChatbot from './components/AIChatbot';
+import EmergencyNotificationListener from './components/EmergencyNotificationListener';
 
 export default function App() {
   return (
     <>
       <SplashScreen />
+      <EmergencyNotificationListener />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -56,6 +59,7 @@ export default function App() {
           <ProtectedRoute><Profile /></ProtectedRoute>
         } />
       </Routes>
+      <AIChatbot />
       <Footer />
     </>
   );

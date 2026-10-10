@@ -61,9 +61,11 @@ export default function HelperProfile() {
               <h1>{helper.name}</h1>
               <p className="profile-location"><i className="fas fa-map-marker-alt"></i> {helper.location || 'Location not set'}</p>
               <div className="profile-rating">
-                <StarRating rating={helper.avg_rating || 0} />
-                <span className="rating-value">{Number(helper.avg_rating || 0).toFixed(1)}</span>
-                <span className="review-count">({helper.total_reviews || 0} reviews)</span>
+                {Number(helper.total_reviews) > 0 ? <>
+                  <StarRating rating={helper.avg_rating} />
+                  <span className="rating-value">{Number(helper.avg_rating).toFixed(1)}</span>
+                  <span className="review-count">({helper.total_reviews} reviews)</span>
+                </> : <span className="review-count">Not rated yet</span>}
               </div>
               <div className="profile-meta">
                 <span className="meta-item"><i className="fas fa-money-bill-wave"></i> ৳{helper.hourly_rate}/hr</span>

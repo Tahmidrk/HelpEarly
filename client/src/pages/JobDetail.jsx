@@ -129,7 +129,7 @@ export default function JobDetail() {
                           name={app.helper_name}
                         />
                       </h3>
-                      <p className="text-secondary"><i className="fas fa-star" style={{ color: '#f59e0b' }}></i> {Number(app.avg_rating || 0).toFixed(1)} · {app.total_reviews || 0} reviews</p>
+                      <p className="text-secondary"><i className="fas fa-star" style={{ color: '#f59e0b' }}></i> {Number(app.total_reviews) > 0 ? `${Number(app.avg_rating).toFixed(1)} · ${app.total_reviews} reviews` : 'Not rated yet'}</p>
                     </div>
                     <span className={`badge ${app.status === 'accepted' ? 'badge-success' : app.status === 'rejected' ? 'badge-danger' : 'badge-warning'}`}>{app.status}</span>
                   </div>

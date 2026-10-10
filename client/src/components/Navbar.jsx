@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import EmergencyModal from './EmergencyModal';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, activeRole, switchMode, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  const [showEmergency, setShowEmergency] = useState(false);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -24,7 +26,6 @@ export default function Navbar() {
     if (path === '/') {
       return location.pathname === '/' ? 'active' : '';
     }
-
     return location.pathname === path || location.pathname.startsWith(`${path}/`) ? 'active' : '';
   };
 
@@ -61,7 +62,7 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Household: Dashboard + Job Board + Chat */}
+          {/* Household: Dashboard + Job Board + Chat + Emergency */}
           {user && user.role === 'household' && (
             <>
               <Link to="/dashboard" className={`nav-link ${isActive('/dashboard')}`} onClick={() => setMenuOpen(false)}>
@@ -73,8 +74,28 @@ export default function Navbar() {
               <Link to="/chat" className={`nav-link ${isActive('/chat')}`} onClick={() => setMenuOpen(false)}>
                 Chat
               </Link>
+              <button
+                type="button"
+                className="nav-link btn-emergency-nav"
+                onClick={() => { setShowEmergency(true); setMenuOpen(false); }}
+                style={{
+                  color: 'var(--danger)',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  padding: '4px 12px',
+                  borderRadius: 'var(--radius-full)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                }}
+              >
+                <i className="fas fa-ambulance animate-pulse" /> Emergency
+              </button>
             </>
           )}
+
+          <EmergencyModal isOpen={showEmergency} onClose={() => setShowEmergency(false)} />
 
           {/* Helper: Chat */}
           {user && user.role === 'helper' && (
@@ -110,6 +131,44 @@ export default function Navbar() {
         </div>
 
         <div className="navbar-actions">
+          {/* Mode Switcher for User (Household vs Worker) */}
+          {user && user.role !== 'admin' && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                background: 'var(--bg-tertiary)',
+                borderRadius: 'var(--radius-full)',
+                padding: '3px',
+                border: '1px solid var(--border-color)',
+                marginRight: 10,
+              }}
+            >
+              <button
+                type="button"
+                className={`btn btn-sm ${activeRole === 'household' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ padding: '4px 10px', fontSize: '0.75rem', borderRadius: 'var(--radius-full)' }}
+                onClick={() => {
+                  switchMode('household');
+                  if (location.pathname.startsWith('/helper/dashboard')) navigate('/dashboard');
+                }}
+              >
+                <i className="fas fa-home" /> Household
+              </button>
+              <button
+                type="button"
+                className={`btn btn-sm ${activeRole === 'helper' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ padding: '4px 10px', fontSize: '0.75rem', borderRadius: 'var(--radius-full)' }}
+                onClick={() => {
+                  switchMode('helper');
+                  if (location.pathname.startsWith('/dashboard') || location.pathname === '/helpers') navigate('/helper/dashboard');
+                }}
+              >
+                <i className="fas fa-wrench" /> Worker
+              </button>
+            </div>
+          )}
+
           <button
             className="btn btn-ghost btn-sm theme-toggle"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

@@ -14,7 +14,7 @@ export default function UserDashboard() {
   const [bookings, setBookings] = useState([]);
   const [myJobs, setMyJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [reviewForm, setReviewForm] = useState({ bookingId: null, helperId: null, rating: 5, comment: '' });
+  const [reviewForm, setReviewForm] = useState({ bookingId: null, helperId: null, rating: 0, comment: '' });
 
   useEffect(() => {
     Promise.all([
@@ -34,6 +34,7 @@ export default function UserDashboard() {
   };
 
   const handleReview = async () => {
+    if (!reviewForm.rating) return alert('Choose a rating first.');
     try {
       await reviewsAPI.create({
         helper_id: reviewForm.helperId,
@@ -41,7 +42,7 @@ export default function UserDashboard() {
         rating: reviewForm.rating,
         comment: reviewForm.comment,
       });
-      setReviewForm({ bookingId: null, helperId: null, rating: 5, comment: '' });
+      setReviewForm({ bookingId: null, helperId: null, rating: 0, comment: '' });
       alert('Review submitted!');
     } catch (err) { alert(err.message); }
   };
@@ -100,8 +101,14 @@ export default function UserDashboard() {
                     {statusBadge(booking.status)}
                   </div>
                   <div className="booking-item-details">
-                    <span><i className="fas fa-calendar"></i> {new Date(booking.booking_date).toLocaleDateString()}</span>
-                    <span><i className="fas fa-clock"></i> {new Date(booking.booking_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span>
+                      <i className="fas fa-calendar-alt" style={{ color: 'var(--accent)' }}></i>{' '}
+                      {new Date(booking.booking_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                    <span>
+                      <i className="fas fa-clock" style={{ color: 'var(--accent)' }}></i>{' '}
+                      {new Date(booking.booking_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                     <span><i className="fas fa-map-marker-alt"></i> {booking.address || 'N/A'}</span>
                     <span><i className="fas fa-dollar-sign"></i> ৳{booking.total_price || 0}</span>
                   </div>
@@ -111,10 +118,17 @@ export default function UserDashboard() {
                     {booking.status === 'pending' && (
                       <button className="btn btn-danger btn-sm" onClick={() => handleStatusUpdate(booking.id, 'cancelled')}>Cancel</button>
                     )}
-                    {booking.status === 'completed' && !reviewForm.bookingId && (
-                      <button className="btn btn-primary btn-sm" onClick={() => setReviewForm({ ...reviewForm, bookingId: booking.id, helperId: booking.helper_id })}>
-                        <i className="fas fa-star"></i> Leave Review
-                      </button>
+                    {booking.status === 'completed' && (
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <Link to={`/book/${booking.helper_profile_id || booking.helper_id}`} className="btn btn-secondary btn-sm">
+                          <i className="fas fa-redo"></i> Rebook Worker
+                        </Link>
+                        {!reviewForm.bookingId && (
+                          <button className="btn btn-primary btn-sm" onClick={() => setReviewForm({ ...reviewForm, bookingId: booking.id, helperId: booking.helper_id })}>
+                            <i className="fas fa-star"></i> Leave Review
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                   {reviewForm.bookingId === booking.id && (
@@ -124,7 +138,7 @@ export default function UserDashboard() {
                         onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })} rows={2} />
                       <div style={{ display: 'flex', gap: 8 }}>
                         <button className="btn btn-primary btn-sm" onClick={handleReview}>Submit</button>
-                        <button className="btn btn-ghost btn-sm" onClick={() => setReviewForm({ bookingId: null, helperId: null, rating: 5, comment: '' })}>Cancel</button>
+                        <button className="btn btn-ghost btn-sm" onClick={() => setReviewForm({ bookingId: null, helperId: null, rating: 0, comment: '' })}>Cancel</button>
                       </div>
                     </div>
                   )}

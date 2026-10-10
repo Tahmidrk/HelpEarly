@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { helpersAPI, bookingsAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
@@ -6,22 +6,29 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import AddressMap, { addressPlaceholder } from '../components/AddressMap';
 import ProfileLink from '../components/ProfileLink';
 
+const MAX_PHOTOS = 3;
+
 export default function Booking() {
   const { helperId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const fileInputRef = useRef(null);
   const [helper, setHelper] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [photos, setPhotos] = useState([]);
+  const [previews, setPreviews] = useState([]);
   const selectedServiceId = searchParams.get('service');
 
   const [form, setForm] = useState({
     service_id: selectedServiceId || '',
     booking_date: '',
     booking_time: '10:00',
+    service_description: '',
+    offered_fee: '',
     notes: '',
     address: user?.location || '',
   });
@@ -36,6 +43,25 @@ export default function Booking() {
       .finally(() => setLoading(false));
   }, [helperId]);
 
+  useEffect(() => {
+    return () => previews.forEach(URL.revokeObjectURL);
+  }, [previews]);
+
+  const handlePhotoChange = (e) => {
+    const files = Array.from(e.target.files);
+    const toAdd = files.slice(0, MAX_PHOTOS - photos.length);
+    if (!toAdd.length) return;
+    setPhotos(prev => [...prev, ...toAdd]);
+    setPreviews(prev => [...prev, ...toAdd.map(f => URL.createObjectURL(f))]);
+    e.target.value = '';
+  };
+
+  const removePhoto = (i) => {
+    URL.revokeObjectURL(previews[i]);
+    setPhotos(prev => prev.filter((_, idx) => idx !== i));
+    setPreviews(prev => prev.filter((_, idx) => idx !== i));
+  };
+
   const selectedService = helper?.services?.find(s => String(s.id) === String(form.service_id));
 
   const handleSubmit = async (e) => {
@@ -43,14 +69,17 @@ export default function Booking() {
     setError('');
     setSubmitting(true);
     try {
-      await bookingsAPI.create({
-        helper_id: parseInt(helperId),
-        service_id: form.service_id ? parseInt(form.service_id) : null,
-        booking_date: `${form.booking_date}T${form.booking_time}:00`,
-        notes: form.notes,
-        total_price: selectedService?.price || helper?.hourly_rate || 0,
-        address: form.address,
-      });
+      const fd = new FormData();
+      fd.append('helper_id', parseInt(helperId));
+      if (form.service_id) fd.append('service_id', parseInt(form.service_id));
+      fd.append('booking_date', `${form.booking_date}T${form.booking_time}:00`);
+      fd.append('service_description', form.service_description.trim());
+      if (form.notes) fd.append('notes', form.notes);
+      fd.append('total_price', form.offered_fee);
+      fd.append('address', form.address);
+      photos.forEach(f => fd.append('photos', f));
+
+      await bookingsAPI.create(fd);
       setSuccess(true);
     } catch (err) {
       setError(err.message);
@@ -109,17 +138,37 @@ export default function Booking() {
                 </select>
               </div>
 
+              <div className="form-group">
+                <label htmlFor="booking-description">Services You Need</label>
+                <textarea id="booking-description" className="form-input" placeholder="Describe exactly what you need done"
+                  value={form.service_description} onChange={(e) => setForm({ ...form, service_description: e.target.value })} rows={4} required />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="booking-offer">Your Offered Fee (৳)</label>
+                <input type="number" id="booking-offer" className="form-input" min="1" step="0.01" placeholder="Enter your offer"
+                  value={form.offered_fee} onChange={(e) => setForm({ ...form, offered_fee: e.target.value })} required />
+              </div>
+
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="booking-date">Date</label>
+                  <label htmlFor="booking-date">
+                    <i className="fas fa-calendar-alt" style={{ marginRight: 6, color: 'var(--accent)' }} />
+                    Schedule Date
+                  </label>
                   <input type="date" id="booking-date" className="form-input" value={form.booking_date}
                     onChange={(e) => setForm({ ...form, booking_date: e.target.value })}
                     min={new Date().toISOString().split('T')[0]} required />
+                  <small className="field-help">Book today or schedule days/weeks in advance.</small>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="booking-time">Time</label>
+                  <label htmlFor="booking-time">
+                    <i className="fas fa-clock" style={{ marginRight: 6, color: 'var(--accent)' }} />
+                    Preferred Time
+                  </label>
                   <input type="time" id="booking-time" className="form-input" value={form.booking_time}
                     onChange={(e) => setForm({ ...form, booking_time: e.target.value })} required />
+                  <small className="field-help">Select arrival time slot.</small>
                 </div>
               </div>
 
@@ -136,6 +185,44 @@ export default function Booking() {
                 <label htmlFor="booking-notes">Notes (Optional)</label>
                 <textarea id="booking-notes" className="form-input" placeholder="Any special instructions..."
                   value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3} />
+              </div>
+
+              {/* ── Photo Attachment ── */}
+              <div className="form-group">
+                <label>
+                  <i className="fas fa-camera" style={{ marginRight: 6, color: 'var(--accent)' }} />
+                  Attach Photos
+                  <span className="field-optional-tag">Optional</span>
+                </label>
+                <p className="field-help" style={{ marginBottom: 10 }}>
+                  Share photos of the problem so the helper knows what to expect.
+                </p>
+                {previews.length > 0 && (
+                  <div className="photo-preview-grid">
+                    {previews.map((src, i) => (
+                      <div className="photo-preview-item" key={i}>
+                        <img src={src} alt={`Attachment ${i + 1}`} />
+                        <button type="button" className="photo-remove-btn" onClick={() => removePhoto(i)} aria-label="Remove">
+                          <i className="fas fa-times" />
+                        </button>
+                      </div>
+                    ))}
+                    {photos.length < MAX_PHOTOS && (
+                      <button type="button" className="photo-add-more-btn" onClick={() => fileInputRef.current?.click()}>
+                        <i className="fas fa-plus" /><span>Add more</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+                {previews.length === 0 && (
+                  <button type="button" className="photo-upload-btn" onClick={() => fileInputRef.current?.click()} id="booking-photo-btn">
+                    <i className="fas fa-cloud-upload-alt" />
+                    <span>Attach photos</span>
+                    <small>JPG, PNG, WebP — max 5MB each</small>
+                  </button>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp"
+                  multiple style={{ display: 'none' }} onChange={handlePhotoChange} id="booking-photo-input" />
               </div>
 
               <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }} disabled={submitting} id="booking-submit">
@@ -179,8 +266,8 @@ export default function Booking() {
                 </div>
               )}
               <div className="summary-row total">
-                <span>Total</span>
-                <span>৳{selectedService?.price || helper.hourly_rate || 0}</span>
+                <span>Your Offer</span>
+                <span>{form.offered_fee ? `৳${form.offered_fee}` : 'Not entered'}</span>
               </div>
             </div>
           </div>

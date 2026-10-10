@@ -34,7 +34,7 @@ export default function SplashScreen() {
         <div className="splash-logo-ring">
           <img src="/logo.svg" alt="At Your Service" className="splash-logo" />
         </div>
-        <p className="splash-eyebrow">Home help, made simple</p>
+        <p className="splash-eyebrow">Local services, made simple</p>
         <h1 className="splash-title">At Your Service</h1>
         <div className="splash-loader" aria-hidden="true">
           <span />

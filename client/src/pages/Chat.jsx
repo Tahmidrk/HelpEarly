@@ -23,6 +23,8 @@ export default function Chat() {
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
   const messagesEndRef = useRef(null);
+  const activeConvRef = useRef(null);
+  activeConvRef.current = activeConv;
 
   // Initialize socket
   useEffect(() => {
@@ -32,9 +34,10 @@ export default function Chat() {
 
     s.on('new_message', (msg) => {
       // Only add messages from OTHER users; our own messages are already added via the API response.
-      if (msg.sender_id !== user.id) {
-        setMessages(prev => [...prev, msg]);
+      if (msg.sender_id !== user.id && msg.conversation_id === activeConvRef.current?.id) {
+        setMessages(prev => prev.some(item=>item.id===msg.id) ? prev : [...prev, msg]);
       }
+      messagesAPI.getConversations().then(setConversations).catch(console.error);
     });
 
     return () => s.disconnect();
@@ -86,14 +89,6 @@ export default function Chat() {
       });
 
       setMessages(prev => [...prev, result.message]);
-
-      if (socket) {
-        socket.emit('send_message', {
-          conversationId: result.conversationId,
-          recipientId,
-          content: newMessage,
-        });
-      }
 
       setNewMessage('');
     } catch (err) {

@@ -63,10 +63,10 @@ export default function AdminDashboard() {
     } catch (err) { alert(err.message); }
   };
 
-  const handleVerifyHelper = async (helperId) => {
+  const handleVerifyHelper = async (helperId, isVerified) => {
     try {
-      await adminAPI.verifyHelper(helperId);
-      alert('Helper verified!');
+      await adminAPI.verifyHelper(helperId, !isVerified);
+      setUsers(users.map(u => u.helper_profile_id === helperId ? { ...u, is_verified: !isVerified } : u));
     } catch (err) { alert(err.message); }
   };
 
@@ -187,9 +187,10 @@ export default function AdminDashboard() {
                   <tr>
                     <th>User</th>
                     <th>Email</th>
+                    <th>NID Card #</th>
                     <th>Role</th>
                     <th>Location</th>
-                    <th>Status</th>
+                    <th>Status / Verification</th>
                     <th>Joined</th>
                     <th>Actions</th>
                   </tr>
@@ -209,12 +210,31 @@ export default function AdminDashboard() {
                         </div>
                       </td>
                       <td>{u.email}</td>
+                      <td><code style={{ fontSize: '0.85rem' }}>{u.nid_number || 'Not Provided'}</code></td>
                       <td><span className={`badge ${u.role === 'admin' ? 'badge-danger' : u.role === 'helper' ? 'badge-primary' : 'badge-info'}`}>{u.role}</span></td>
                       <td>{u.location || '-'}</td>
-                      <td><span className={`badge ${u.is_active ? 'badge-success' : 'badge-danger'}`}>{u.is_active ? 'Active' : 'Banned'}</span></td>
+                      <td>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <span className={`badge ${u.is_active ? 'badge-success' : 'badge-danger'}`}>
+                            {u.is_active ? 'Active' : 'Banned'}
+                          </span>
+                          {u.role === 'helper' && (
+                            u.is_verified ? (
+                              <span className="badge badge-info"><i className="fas fa-check-circle" /> Verified Helper</span>
+                            ) : (
+                              <span className="badge badge-warning"><i className="fas fa-clock" /> Pending Approval</span>
+                            )
+                          )}
+                        </div>
+                      </td>
                       <td>{new Date(u.created_at).toLocaleDateString()}</td>
                       <td>
-                        <div style={{ display: 'flex', gap: 6 }}>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          {u.role === 'helper' && (
+                            <button className={`btn btn-sm ${u.is_verified ? 'btn-secondary' : 'btn-success'}`} onClick={() => handleVerifyHelper(u.helper_profile_id, u.is_verified)}>
+                              {u.is_verified ? 'Remove Verification' : 'Approve Helper'}
+                            </button>
+                          )}
                           <button className={`btn btn-sm ${u.is_active ? 'btn-danger' : 'btn-success'}`}
                             onClick={() => handleToggleUser(u.id, u.is_active)}>
                             {u.is_active ? 'Ban' : 'Unban'}

@@ -1,90 +1,111 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
-  <title id="title">At Your Service logo</title>
-  <desc id="desc">A neon house held by a hand with a check mark, based on the requested logo reference.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
   <defs>
-    <linearGradient id="houseStroke" x1="102" y1="130" x2="410" y2="360" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#2447ff"/>
-      <stop offset="52%" stop-color="#7138ff"/>
-      <stop offset="100%" stop-color="#b23cff"/>
+    <!-- Background gradient: dark teal (top-left) → light teal/cyan (bottom-right) -->
+    <radialGradient id="bgGrad" cx="30%" cy="25%" r="80%">
+      <stop offset="0%"   stop-color="#00838f"/>
+      <stop offset="55%"  stop-color="#00697a"/>
+      <stop offset="100%" stop-color="#004d5c"/>
+    </radialGradient>
+
+    <!-- Worker body gradient: lighter teal -->
+    <linearGradient id="workerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#4dd0e1"/>
+      <stop offset="100%" stop-color="#00bcd4"/>
     </linearGradient>
-    <linearGradient id="handStroke" x1="100" y1="320" x2="414" y2="390" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#3345ff"/>
-      <stop offset="55%" stop-color="#7c37ff"/>
-      <stop offset="100%" stop-color="#a93cff"/>
+
+    <!-- Worker overalls / dark part -->
+    <linearGradient id="overallsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#00838f"/>
+      <stop offset="100%" stop-color="#006064"/>
     </linearGradient>
-    <linearGradient id="checkStroke" x1="235" y1="286" x2="330" y2="245" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#14c8ff"/>
-      <stop offset="100%" stop-color="#19f2df"/>
+
+    <!-- Speech bubble swoosh (left, teal) -->
+    <linearGradient id="swooshLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#00bcd4"/>
+      <stop offset="100%" stop-color="#00838f"/>
     </linearGradient>
-    <filter id="purpleGlow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="22" result="blur"/>
-      <feColorMatrix
-        in="blur"
-        type="matrix"
-        values="0 0 0 0 0.38  0 0 0 0 0.12  0 0 0 0 1  0 0 0 .95 0"
-        result="glow"
-      />
-      <feMerge>
-        <feMergeNode in="glow"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <filter id="cyanGlow" x="-70%" y="-70%" width="240%" height="240%">
-      <feGaussianBlur stdDeviation="14" result="blur"/>
-      <feColorMatrix
-        in="blur"
-        type="matrix"
-        values="0 0 0 0 0.02  0 0 0 0 0.9  0 0 0 0 1  0 0 0 .9 0"
-        result="glow"
-      />
-      <feMerge>
-        <feMergeNode in="glow"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
+
+    <!-- Rounded rect clip -->
+    <clipPath id="roundedClip">
+      <rect width="400" height="400" rx="80" ry="80"/>
+    </clipPath>
   </defs>
 
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#purpleGlow)">
-    <path
-      d="M118 232 240 132c10-8 25-8 35 0l121 100"
-      stroke="url(#houseStroke)"
-      stroke-width="30"
-    />
-    <path
-      d="M144 241v116M368 241v94M176 337V232l80-66 80 66v98"
-      stroke="url(#houseStroke)"
-      stroke-width="22"
-    />
-    <path
-      d="M365 184h36v69l19 17"
-      stroke="url(#houseStroke)"
-      stroke-width="24"
-    />
-    <path
-      d="M225 225h28v28h-28zM271 225h28v28h-28zM225 271h28v28h-28zM271 271h28v28h-28z"
-      stroke="#162052"
-      stroke-width="8"
-      filter="none"
-    />
-    <path
-      d="M117 356c21-34 58-50 103-36l76 26c18 6 27 23 21 38-6 15-24 22-42 16l-54-17"
-      stroke="url(#handStroke)"
-      stroke-width="28"
-    />
-    <path
-      d="M221 383 285 403c28 9 55 3 76-17l60-56c12-11 30-10 40 1 10 12 9 29-3 40l-61 58c-44 41-94 57-155 43-56-12-103-39-125-76"
-      stroke="url(#handStroke)"
-      stroke-width="28"
-    />
-  </g>
+  <!-- ── Background ── -->
+  <rect width="400" height="400" rx="80" ry="80" fill="url(#bgGrad)"/>
 
+  <!-- ── House outline (white, thick stroke, no fill) ── -->
+  <!-- Roof -->
+  <polyline
+    points="70,185  200,72  330,185"
+    fill="none" stroke="white" stroke-width="22"
+    stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Left wall -->
+  <line x1="88" y1="175" x2="88"  y2="330" stroke="white" stroke-width="20" stroke-linecap="round"/>
+  <!-- Right wall -->
+  <line x1="312" y1="175" x2="312" y2="330" stroke="white" stroke-width="20" stroke-linecap="round"/>
+  <!-- Chimney (right side of roof) -->
+  <rect x="274" y="88" width="28" height="52" rx="5" fill="none" stroke="white" stroke-width="16" stroke-linejoin="round"/>
+
+  <!-- Window grid (4 squares, white, near roof peak) -->
+  <rect x="180" y="108" width="18" height="18" rx="3" fill="white"/>
+  <rect x="202" y="108" width="18" height="18" rx="3" fill="white"/>
+  <rect x="180" y="130" width="18" height="18" rx="3" fill="white"/>
+  <rect x="202" y="130" width="18" height="18" rx="3" fill="white"/>
+
+  <!-- ── Left speech bubble / leaf swoosh (teal) ── -->
   <path
-    d="M246 299 282 335 337 269"
-    fill="none"
-    stroke="url(#checkStroke)"
-    stroke-width="28"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    filter="url(#cyanGlow)"
-  />
+    d="M 62,240  Q 30,310  55,355  Q 80,395  118,365  Q 88,330  100,290  Z"
+    fill="url(#swooshLeft)" opacity="0.95"/>
+  <path
+    d="M 62,240  Q 48,270  62,300  Q 80,270  100,255  Z"
+    fill="url(#swooshLeft)" opacity="0.85"/>
+
+  <!-- ── Right speech bubble (white/very light) ── -->
+  <path
+    d="M 338,240  Q 372,305  348,355  Q 324,395  286,368  Q 315,332  302,292  Z"
+    fill="white" opacity="0.28"/>
+  <path
+    d="M 338,240  Q 352,268  338,298  Q 320,272  302,258  Z"
+    fill="white" opacity="0.22"/>
+
+  <!-- ── Worker figure (LEFT) ── -->
+  <!-- Head -->
+  <circle cx="148" cy="224" r="30" fill="url(#workerGrad)"/>
+  <!-- Cap brim -->
+  <ellipse cx="148" cy="202" rx="33" ry="10" fill="url(#overallsGrad)"/>
+  <!-- Cap dome -->
+  <path d="M 115,206 Q 115,178 148,178 Q 181,178 181,206 Z" fill="url(#workerGrad)"/>
+  <!-- Cap button -->
+  <circle cx="148" cy="180" r="5" fill="url(#overallsGrad)"/>
+  <!-- Body / torso -->
+  <ellipse cx="148" cy="305" rx="46" ry="55" fill="url(#workerGrad)"/>
+  <!-- Overalls bib -->
+  <rect x="122" y="264" width="52" height="48" rx="8" fill="url(#overallsGrad)"/>
+  <!-- Strap left -->
+  <rect x="126" y="252" width="13" height="22" rx="4" fill="url(#overallsGrad)"/>
+  <!-- Strap right -->
+  <rect x="161" y="252" width="13" height="22" rx="4" fill="url(#overallsGrad)"/>
+  <!-- Buckle whites -->
+  <rect x="126" y="252" width="13" height="8" rx="2" fill="white" opacity="0.5"/>
+  <rect x="161" y="252" width="13" height="8" rx="2" fill="white" opacity="0.5"/>
+
+  <!-- ── Clipboard (CENTER) ── -->
+  <rect x="188" y="215" width="72" height="98" rx="8" fill="#e0f7fa" stroke="#b2ebf2" stroke-width="2"/>
+  <!-- Clip -->
+  <rect x="206" y="206" width="36" height="18" rx="6" fill="#80deea"/>
+  <circle cx="224" cy="206" r="9" fill="#00838f"/>
+  <!-- Clipboard house icon -->
+  <polyline points="204,250  224,236  244,250" fill="none" stroke="#00697a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="211" y="249" width="26" height="19" rx="2" fill="#00838f" opacity="0.85"/>
+  <!-- Lines -->
+  <rect x="200" y="278" width="48" height="5" rx="2" fill="#80deea"/>
+  <rect x="200" y="288" width="34" height="5" rx="2" fill="#80deea"/>
+  <!-- Checkmark circle -->
+  <circle cx="224" cy="310" r="13" fill="#00bcd4"/>
+  <polyline points="217,310  222,316  232,303" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ── Household person silhouette (RIGHT, white) ── -->
+  <circle cx="284" cy="228" r="28" fill="white" opacity="0.30"/>
+  <ellipse cx="284" cy="306" rx="36" ry="44" fill="white" opacity="0.28"/>
 </svg>

@@ -36,10 +36,10 @@ export default function HelperCard({ helper }) {
           </h3>
           <p className="helper-location"><i className="fas fa-map-marker-alt"></i> {helper.location || 'Location not set'}</p>
           <div className="helper-rating">
-            <StarRating rating={helper.avg_rating || 0} />
-            <span className="rating-text">
-              {helper.avg_rating ? Number(helper.avg_rating).toFixed(1) : '0.0'} ({helper.total_reviews || 0})
-            </span>
+            {Number(helper.total_reviews) > 0 ? <>
+              <StarRating rating={helper.avg_rating} />
+              <span className="rating-text">{Number(helper.avg_rating).toFixed(1)} ({helper.total_reviews})</span>
+            </> : <span className="rating-text">Not rated yet</span>}
           </div>
         </div>
       </div>

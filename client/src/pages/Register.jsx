@@ -119,7 +119,14 @@ export default function Register() {
                   </div>
                   <div className="form-group">
                     <label htmlFor="reg-phone">Phone Number</label>
-                    <input type="tel" id="reg-phone" className="form-input" placeholder="01XXXXXXXXX" value={form.phone} onChange={updateField('phone')} />
+                    <input type="tel" id="reg-phone" className="form-input" placeholder="01XXXXXXXXX" value={form.phone} onChange={updateField('phone')} required />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="reg-nid">
+                      NID Card Number <span style={{ color: 'var(--danger)', fontSize: '0.8rem' }}>(Required for Security)</span>
+                    </label>
+                    <input type="text" id="reg-nid" className="form-input" placeholder="e.g., 19982691234500123" value={form.nid_number || ''} onChange={updateField('nid_number')} required />
+                    <small className="field-help">Your NID is securely stored for platform safety & verification.</small>
                   </div>
                   <div className="form-group">
                     <label htmlFor="reg-location">Address / Location</label>

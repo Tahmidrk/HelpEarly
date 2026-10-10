@@ -1,49 +1,49 @@
 /* ============================================
-   At Your Service - Clean White + Blue Design
+   At Your Service - Teal & Emerald Design
    ============================================ */
 
 :root {
-  /* Backgrounds - white/light */
+  /* Backgrounds - white/light teal tint */
   --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f1f5f9;
+  --bg-secondary: #f0fdfa;
+  --bg-tertiary: #ccfbf1;
   --bg-card: #ffffff;
   --bg-glass: #ffffff;
-  --bg-input: #f8fafc;
-  --bg-hover: rgba(59, 130, 246, 0.06);
+  --bg-input: #f0fdfa;
+  --bg-hover: rgba(13, 148, 136, 0.08);
 
-  /* Accents - blue */
-  --accent: #3b82f6;
-  --accent-light: #2563eb;
-  --accent-dark: #1d4ed8;
-  --accent2: #3b82f6;
-  --accent3: #60a5fa;
+  /* Accents - Teal (#0d9488) */
+  --accent: #0d9488;
+  --accent-light: #14b8a6;
+  --accent-dark: #0f766e;
+  --accent2: #0d9488;
+  --accent3: #2dd4bf;
 
   /* Status Colors */
-  --success: #22c55e;
-  --success-bg: rgba(34, 197, 94, 0.1);
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.1);
   --warning: #f59e0b;
   --warning-bg: rgba(245, 158, 11, 0.1);
   --danger: #ef4444;
   --danger-bg: rgba(239, 68, 68, 0.1);
-  --info: #3b82f6;
-  --info-bg: rgba(59, 130, 246, 0.08);
+  --info: #0d9488;
+  --info-bg: rgba(13, 148, 136, 0.1);
 
-  /* Text - dark */
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
+  /* Text - dark teal tint */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
   --text-muted: #94a3b8;
-  --text-accent: #2563eb;
+  --text-accent: #0f766e;
 
   /* Borders */
   --border: #e2e8f0;
-  --border-light: #f1f5f9;
-  --border-accent: #3b82f6;
+  --border-light: #f0fdfa;
+  --border-accent: #14b8a6;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 2px rgba(13, 148, 136, 0.05);
+  --shadow-md: 0 2px 6px rgba(13, 148, 136, 0.08);
+  --shadow-lg: 0 4px 12px rgba(13, 148, 136, 0.12);
 
   /* Layout */
   --radius-sm: 6px;
@@ -62,25 +62,25 @@
 }
 
 :root[data-theme='dark'] {
-  --bg-primary: #0f172a;
-  --bg-secondary: #111827;
-  --bg-tertiary: #1e293b;
-  --bg-card: #111827;
-  --bg-glass: #111827;
-  --bg-input: #0f172a;
-  --bg-hover: rgba(96, 165, 250, 0.14);
-  --accent: #60a5fa;
-  --accent-light: #93c5fd;
-  --accent-dark: #3b82f6;
-  --accent2: #60a5fa;
-  --accent3: #93c5fd;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-accent: #93c5fd;
-  --border: #334155;
-  --border-light: #1f2937;
-  --border-accent: #60a5fa;
+  --bg-primary: #042f2e;
+  --bg-secondary: #0f172a;
+  --bg-tertiary: #115e59;
+  --bg-card: #0f172a;
+  --bg-glass: #0f172a;
+  --bg-input: #042f2e;
+  --bg-hover: rgba(45, 212, 191, 0.14);
+  --accent: #2dd4bf;
+  --accent-light: #5eead4;
+  --accent-dark: #14b8a6;
+  --accent2: #2dd4bf;
+  --accent3: #99f6e4;
+  --text-primary: #f0fdfa;
+  --text-secondary: #99f6e4;
+  --text-muted: #5eead4;
+  --text-accent: #2dd4bf;
+  --border: #134e4a;
+  --border-light: #0f766e;
+  --border-accent: #2dd4bf;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.55);

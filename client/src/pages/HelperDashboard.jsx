@@ -81,9 +81,33 @@ export default function HelperDashboard() {
   return (
     <div className="page">
       <div className="container">
-        <div className="page-header animate-fade-in">
-          <h1>Helper Dashboard <i className="fas fa-wrench"></i></h1>
-          <p>Manage your services, bookings and applications</p>
+        <div className="page-header animate-fade-in" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1>Helper Dashboard <i className="fas fa-wrench"></i></h1>
+            <p>Manage your services, bookings and applications</p>
+          </div>
+          {profile && (
+            <div className="glass-card" style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                Status: <strong style={{ color: profile.is_available ? 'var(--success)' : 'var(--danger)' }}>
+                  {profile.is_available ? 'Available' : 'Unavailable'}
+                </strong>
+              </span>
+              <button
+                className={`btn btn-sm ${profile.is_available ? 'btn-danger' : 'btn-success'}`}
+                onClick={async () => {
+                  const newStatus = !profile.is_available;
+                  try {
+                    await helpersAPI.update({ is_available: newStatus });
+                    setProfile({ ...profile, is_available: newStatus });
+                    setEditForm({ ...editForm, is_available: newStatus });
+                  } catch (e) { alert(e.message); }
+                }}
+              >
+                {profile.is_available ? 'Go Offline' : 'Go Online'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Stats */}
@@ -91,11 +115,12 @@ export default function HelperDashboard() {
           <div className="stat-card"><div className="stat-icon" style={{ background: 'var(--info-bg)' }}><i className="fas fa-clipboard-list"></i></div><div className="stat-info"><h3>{bookings.length}</h3><p>Total Requests</p></div></div>
           <div className="stat-card"><div className="stat-icon" style={{ background: 'var(--warning-bg)' }}><i className="fas fa-hourglass-half"></i></div><div className="stat-info"><h3>{bookings.filter(b => b.status === 'pending').length}</h3><p>Pending</p></div></div>
           <div className="stat-card"><div className="stat-icon" style={{ background: 'var(--success-bg)' }}><i className="fas fa-money-bill-wave"></i></div><div className="stat-info"><h3>৳{earnings}</h3><p>Total Earnings</p></div></div>
-          <div className="stat-card"><div className="stat-icon" style={{ background: 'rgba(139,92,246,0.15)' }}><i className="fas fa-star"></i></div><div className="stat-info"><h3>{Number(profile?.avg_rating || 0).toFixed(1)}</h3><p>Rating ({profile?.total_reviews || 0})</p></div></div>
+          <div className="stat-card"><div className="stat-icon" style={{ background: 'rgba(139,92,246,0.15)' }}><i className="fas fa-star"></i></div><div className="stat-info"><h3>{Number(profile?.total_reviews) > 0 ? Number(profile.avg_rating).toFixed(1) : 'Not rated'}</h3><p>{Number(profile?.total_reviews) > 0 ? `Rating (${profile.total_reviews})` : 'No reviews yet'}</p></div></div>
         </div>
 
         <div className="tabs">
           <button className={`tab ${activeTab === 'bookings' ? 'active' : ''}`} onClick={() => setActiveTab('bookings')}>Booking Requests</button>
+          <button className={`tab ${activeTab === 'wallet' ? 'active' : ''}`} onClick={() => setActiveTab('wallet')}>Earnings & Wallet ৳</button>
           <button className={`tab ${activeTab === 'services' ? 'active' : ''}`} onClick={() => setActiveTab('services')}>My Services</button>
           <button className={`tab ${activeTab === 'applications' ? 'active' : ''}`} onClick={() => setActiveTab('applications')}>Job Applications</button>
           <button className={`tab ${activeTab === 'complaints' ? 'active' : ''}`} onClick={() => setActiveTab('complaints')}>Complaints</button>
@@ -121,8 +146,14 @@ export default function HelperDashboard() {
                     {statusBadge(b.status)}
                   </div>
                   <div className="booking-item-details">
-                    <span><i className="fas fa-calendar"></i> {new Date(b.booking_date).toLocaleDateString()}</span>
-                    <span><i className="fas fa-clock"></i> {new Date(b.booking_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span>
+                      <i className="fas fa-calendar-alt" style={{ color: 'var(--accent)' }}></i>{' '}
+                      {new Date(b.booking_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                    <span>
+                      <i className="fas fa-clock" style={{ color: 'var(--accent)' }}></i>{' '}
+                      {new Date(b.booking_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                     <span><i className="fas fa-map-marker-alt"></i> {b.address || 'N/A'}</span>
                     <span><i className="fas fa-money-bill-wave"></i> ৳{b.total_price || 0}</span>
                     {b.client_phone && <span><i className="fas fa-phone"></i> {b.client_phone}</span>}
@@ -137,7 +168,10 @@ export default function HelperDashboard() {
                       </>
                     )}
                     {b.status === 'confirmed' && (
-                      <button className="btn btn-primary btn-sm" onClick={() => handleBookingAction(b.id, 'completed')}>Mark Complete</button>
+                      <button className="btn btn-primary btn-sm" onClick={() => handleBookingAction(b.id, 'in_progress')}>Start Work</button>
+                    )}
+                    {b.status === 'in_progress' && (
+                      <button className="btn btn-success btn-sm" onClick={() => handleBookingAction(b.id, 'completed')}>Mark Complete</button>
                     )}
                   </div>
                 </div>
@@ -146,7 +180,42 @@ export default function HelperDashboard() {
           </div>
         )}
 
-        {/* Services */}
+        {/* Earnings & Wallet */}
+        {activeTab === 'wallet' && (
+          <div className="stagger-children">
+            <div className="glass-card-static" style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 style={{ margin: 0 }}>Total Earnings Balance</h3>
+                <p className="text-secondary" style={{ margin: '4px 0 0' }}>Track income from all completed customer bookings</p>
+              </div>
+              <h1 style={{ color: 'var(--success)', margin: 0 }}>৳{earnings}</h1>
+            </div>
+
+            <h3>Payment History ({bookings.filter(b => b.status === 'completed').length} completed jobs)</h3>
+            {bookings.filter(b => b.status === 'completed').length === 0 ? (
+              <div className="empty-state">
+                <i className="fas fa-wallet" style={{ fontSize: '2rem' }}></i>
+                <h3>No earnings history yet</h3>
+                <p>Complete booking requests to see your payments here.</p>
+              </div>
+            ) : (
+              bookings.filter(b => b.status === 'completed').map((b) => (
+                <div key={b.id} className="booking-item glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h4 style={{ margin: 0 }}>{b.service_name || 'Service Job'}</h4>
+                    <p className="text-secondary" style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>
+                      Client: {b.client_name} · Date: {new Date(b.booking_date).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--success)' }}>+ ৳{b.total_price || 0}</span>
+                    <div><span className="badge badge-success">Paid</span></div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
         {activeTab === 'services' && (
           <div>
             <button className="btn btn-primary" style={{ marginBottom: 16 }} onClick={() => setShowAddService(!showAddService)}>
@@ -263,7 +332,7 @@ export default function HelperDashboard() {
                   <span><i className="fas fa-briefcase"></i> {profile.experience_years} years</span>
                   <span><i className="fas fa-circle" style={{ fontSize: '0.5rem', color: profile.is_available ? 'var(--success)' : 'var(--danger)', verticalAlign: 'middle' }}></i> {profile.is_available ? 'Available' : 'Unavailable'}</span>
                   <span>{profile.is_verified ? <><i className="fas fa-check-circle" style={{ color: 'var(--success)' }}></i> Verified</> : <><i className="fas fa-clock"></i> Not verified</>}</span>
-                  <span><i className="fas fa-star" style={{ color: '#f59e0b' }}></i> {Number(profile.avg_rating || 0).toFixed(1)} ({profile.total_reviews} reviews)</span>
+                  <span><i className="fas fa-star" style={{ color: '#f59e0b' }}></i> {Number(profile.total_reviews) > 0 ? `${Number(profile.avg_rating).toFixed(1)} (${profile.total_reviews} reviews)` : 'Not rated yet'}</span>
                 </div>
               </div>
             )}

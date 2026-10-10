@@ -266,7 +266,7 @@ export default function Profile() {
                   </div>
                   <div className="profile-field">
                     <span className="profile-label">Rating</span>
-                    <span><i className="fas fa-star"></i> {Number(helperProfile.avg_rating || 0).toFixed(1)} ({helperProfile.total_reviews} reviews)</span>
+                    <span><i className="fas fa-star"></i> {Number(helperProfile.total_reviews) > 0 ? `${Number(helperProfile.avg_rating).toFixed(1)} (${helperProfile.total_reviews} reviews)` : 'Not rated yet'}</span>
                   </div>
                   <div className="profile-field">
                     <span className="profile-label">Verified</span>
