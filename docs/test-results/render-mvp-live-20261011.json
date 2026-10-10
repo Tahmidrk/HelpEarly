@@ -1,0 +1,22 @@
+{
+  "executedAt": "2026-10-10T20:10:01.332Z",
+  "backend": "https://helpearly-api.onrender.com/api",
+  "scope": "Disposable release probe accounts only; no emergency broadcast to existing workers; actual external HTTP/WSS and Supabase",
+  "Worker registration category and no fake services/reviews/rating": "PASS",
+  "Role guards and dual self-exclusion": "PASS",
+  "Admin verification and household discovery": "PASS",
+  "Actual Web and Android API modules share live profiles and worker services": "PASS",
+  "External WSS authenticated and missing-token/untrusted-origin rejection": "PASS",
+  "Booking offered fee/manual service/photo and Web-to-Android sync": "PASS",
+  "Android-to-Web booking update and missed-socket recovery": "PASS",
+  "Two-way chat persistence and participant authorization": "PASS",
+  "Booking lifecycle and genuine completed-booking review": "PASS",
+  "Photo job, worker proposal and acceptance creates persisted booking": "PASS",
+  "Admin complaint resolution persists": "PASS",
+  "Logout/relogin database persistence": "PASS",
+  "physicalAndroid": "PENDING",
+  "liveEmergency": "PENDING: avoid broadcasting synthetic emergency to existing workers",
+  "liveAI": "PENDING: provider key not configured",
+  "livePush": "PENDING: Expo/FCM credentials not configured",
+  "fixtureCleanupAndOriginalRecordPreservation": "PASS"
+}

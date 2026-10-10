@@ -35,6 +35,8 @@ services:
         value: true
       - key: DB_SSL_ALLOW_SELF_SIGNED
         value: false
+      - key: DB_SSL_CA
+        sync: false
       - key: RUN_BACKGROUND_WORKER
         value: true
       - key: LOG_REQUESTS

@@ -1,0 +1,60 @@
+{
+  "appliedAt": "2026-10-10T20:02:47.071Z",
+  "project": "gjwkrqlzroujlueexcxc",
+  "backupFolder": "H:/apps/HelpEarly-backups/supabase-production-2026-10-10T20-01-10-313Z",
+  "backupAndRestoreVerified": true,
+  "migrationSourceHashes": {
+    "db/ensureSchema.js": "FED5CFEF142EB85BD4DE88EEE5344E684140D192606DD24A20F67B9DC7A38924",
+    "db/schema.sql": "728D3782EB1D2E63B7B095DA17F6AC374553C64AC35611ED8759449B54F872A2",
+    "db/migrations/production.sql": "D63D16E91C133733E0C41BF73DB7D465BCD0758599591ABA26B9C885202C2FF9",
+    "db/migrations/free-stack.sql": "4BE742D6DA2619C1EEC1A9E7150B657292D96688422071E9BDF2DF108FAC3C07",
+    "db/migrations/api-security.sql": "8F9A0F010616E9B81C60CF5E5916D80D109D86CFC7FB3874046D955057B519CC"
+  },
+  "schemaVersion": 2,
+  "tables": 22,
+  "rls_tables": 22,
+  "directAnonymousAuthenticatedGrants": 0,
+  "originalRecordsPreserved": true,
+  "originalTableCounts": {
+    "bookings": 10,
+    "categories": 10,
+    "complaints": 2,
+    "conversations": 4,
+    "helper_categories": 31,
+    "helper_services": 40,
+    "helpers": 22,
+    "job_applications": 3,
+    "jobs": 12,
+    "messages": 27,
+    "payments": 4,
+    "reviews": 5,
+    "users": 31
+  },
+  "currentOriginalTableCounts": {
+    "bookings": 10,
+    "categories": 10,
+    "complaints": 2,
+    "conversations": 4,
+    "helper_categories": 31,
+    "helper_services": 40,
+    "helpers": 22,
+    "job_applications": 3,
+    "jobs": 12,
+    "messages": 27,
+    "payments": 4,
+    "reviews": 5,
+    "users": 31
+  },
+  "derivedRatingsVerified": true,
+  "privateBucket": {
+    "id": "helpearly-media",
+    "public": false,
+    "fileSizeLimit": 5242880,
+    "allowedMimeTypes": [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif"
+    ]
+  }
+}

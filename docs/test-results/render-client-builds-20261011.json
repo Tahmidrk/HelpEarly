@@ -1,0 +1,21 @@
+{
+  "executedAt": "2026-10-10T20:18:13.702Z",
+  "artifacts": [
+    {
+      "file": "client/dist/assets/index-BH9vB0Ja.js",
+      "bytes": 360021,
+      "sha256": "e98ad34aff3f8b437d12bba83151df33f0d376cac01d83ba17a625980750331c",
+      "liveApiEmbedded": true,
+      "serverSecretsAbsent": true
+    },
+    {
+      "file": "H:/apps/HelpEarly-test-tools/android-render-export/_expo/static/js/android/index-b18cafc124f476fa2a1c80bde15c2d7b.hbc",
+      "bytes": 2822336,
+      "sha256": "25a8efb7ea2138b476c47507a258ee847d223e4be442056a517e9b7b18f60401",
+      "liveApiEmbedded": true,
+      "serverSecretsAbsent": true
+    }
+  ],
+  "signedAPK": false,
+  "physicalAndroidVerified": false
+}

@@ -26,8 +26,11 @@ for (const [file, hash] of Object.entries(baseline.files)) {
   if (/^mobile\/src\/(screens|components)\//.test(file) && file.endsWith('.js')) {
     const old = execFileSync('git', ['show', `${baseline.commit}:${file}`], { cwd: root, encoding: 'utf8' });
     assert.deepEqual(visual(bytes.toString()), visual(old), `Android JSX or styles changed: ${file}`); screens++;
+  } else if (file === 'mobile/.env.production.example') {
+    const old = execFileSync('git', ['show', `${baseline.commit}:${file}`], { cwd: root, encoding: 'utf8' });
+    assert.equal(bytes.toString().replace(/\r\n/g, '\n'), old.replace(/\r\n/g, '\n').replace(/^EXPO_PUBLIC_API_URL=$/m, 'EXPO_PUBLIC_API_URL=https://helpearly-api.onrender.com'), 'Only the reviewed Render API URL may change in the Android production template');
   } else if (!file.startsWith('mobile/src/context/')) assert.equal(current, hash, `Android navigation/config/assets/dependencies changed: ${file}`);
 }
 const result = { executed_at: new Date().toISOString(), baseline: baseline.commit, status: 'PASS', tracked_files: Object.keys(baseline.files).length, visual_modules: screens, changed_internal_files: changed, screenshot_comparison: 'NOT RUN: no connected Android device/emulator. Source comparison does not verify rendered pixels.' };
 fs.writeFileSync(path.join(root, 'docs/test-results/android-parity.json'), JSON.stringify(result, null, 2) + '\n');
-console.log(`PASS: ${screens} Android screen/component JSX and styles match baseline; navigation, config, assets and dependencies byte-identical. ${changed.length} internal-only files changed. Screenshots NOT RUN.`);
+console.log(`PASS: ${screens} Android screen/component JSX and styles match baseline; navigation, assets and dependencies byte-identical. Production template permits only the reviewed Render API URL. ${changed.length} tracked files changed. Screenshots NOT RUN.`);

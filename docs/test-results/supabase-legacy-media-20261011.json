@@ -1,0 +1,10 @@
+{
+  "executedAt": "2026-10-10T20:21:51.105Z",
+  "project": "gjwkrqlzroujlueexcxc",
+  "check": "Read-only legacy /uploads/ reference counts",
+  "usersAvatarReferences": 0,
+  "bookingPhotoReferences": 0,
+  "jobPhotoReferences": 0,
+  "status": "PASS",
+  "note": "No existing public application rows reference local /uploads/ paths. No rows or media modified."
+}

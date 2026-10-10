@@ -2,11 +2,11 @@
 
 > **Connecting households with trusted local service workers in Bangladesh — quickly, safely, and transparently.**
 
-Current zero-budget implementation/deployment strategy and approval gates: [docs/FREE_STACK_STRATEGY.md](docs/FREE_STACK_STRATEGY.md). Local test execution is documented there; live deployment and real Android push still require setup and verification.
+Current zero-budget implementation/deployment strategy and approval gates: [docs/FREE_STACK_STRATEGY.md](docs/FREE_STACK_STRATEGY.md). Render backend, existing Supabase migration/private media and live API tests passed; Vercel release, signed Android builds and real push/device verification remain pending.
 
 Project roadmap: [operational completion, separate branding approvals, regression/device testing and signed APK/AAB release](docs/FREE_STACK_STRATEGY.md#project-roadmap-and-final-branding-approval-gates). Android visuals remain unchanged until the future branding phase is explicitly approved.
 
-Render deployment: [actual service/build/runtime report](docs/RENDER_DEPLOYMENT.md). Production database/security/media changes are [conditionally approved after verified production backup and isolated restore](docs/SUPABASE_RELEASE_APPROVAL.md); that condition remains pending.
+Render deployment: [actual service/build/runtime report](docs/RENDER_DEPLOYMENT.md). Production database/security/media changes were [approved and completed after verified production backup and isolated restore](docs/SUPABASE_RELEASE_APPROVAL.md).
 
 Android UI preservation and website feature parity: [comparison, implementation and executed checks](docs/FEATURE_PARITY.md).
 
@@ -68,14 +68,14 @@ An academic software project (SDP II) — a web-based platform that enables hous
 |---|---|
 | Frontend | React.js + Vite + React Router |
 | Backend | Node.js + Express.js |
-| Database | PostgreSQL (working locally; production hosting pending) |
+| Database | Existing Supabase PostgreSQL; approved schema migration and preserved records verified |
 | Real-Time | Socket.io |
 | Authentication | JWT + bcrypt |
 | Authorization | Role-Based Access Control (RBAC) |
 | Styling | Vanilla CSS (Light + Dark Theme) |
 | Push Notifications | Expo/FCM integration implemented; real credentials and delivery pending |
 | Maps *(planned)* | Google Maps API + Expo Location |
-| Media Storage | Server files with persistent-volume deployment templates |
+| Media Storage | Private Supabase Storage behind the backend storage abstraction |
 
 ---
 
@@ -166,7 +166,7 @@ at-your-service/
 
 ## API Endpoints (Summary)
 
-Production setup and verification: [Current production audit](docs/PRODUCTION_AUDIT.md), [Deployment guide](docs/DEPLOYMENT.md), [Physical Android checklist](docs/ANDROID_CHECKLIST.md), [Local completion report](docs/COMPLETION_REPORT.md). Existing Vercel frontend and Supabase database are confirmed; the frontend's configured Railway API is unavailable. Latest local changes and real push delivery are not deployed/verified. Uploaded photos require persistent storage; do not use an ephemeral API filesystem for production.
+Current live status: [Render/Supabase release report](docs/RENDER_DEPLOYMENT.md). Render Free, PostgreSQL preservation, private media and actual HTTP/WSS MVP checks passed. Existing Vercel still uses its unavailable Railway API until the approved redeployment completes; Vercel account sign-in is pending. Signed Android builds, physical-device testing, AI provider credentials and real push delivery remain pending. Earlier [production audit](docs/PRODUCTION_AUDIT.md), [deployment guide](docs/DEPLOYMENT.md) and [local completion report](docs/COMPLETION_REPORT.md) describe earlier states; use the current report for release status. [Physical Android checklist](docs/ANDROID_CHECKLIST.md).
 
 | Method | Endpoint | Description |
 |---|---|---|

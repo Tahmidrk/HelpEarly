@@ -1,0 +1,32 @@
+{
+  "executedAt": "2026-10-10T20:07:35.298Z",
+  "backendOrigin": "https://helpearly-api.onrender.com",
+  "probes": [
+    {
+      "route": "/api/health",
+      "status": 200,
+      "data": {
+        "status": "ok",
+        "database": "connected"
+      }
+    },
+    {
+      "route": "/api/ready",
+      "status": 200,
+      "data": {
+        "status": "ready",
+        "schema": 2
+      }
+    },
+    {
+      "route": "/api/auth/me",
+      "status": 401,
+      "data": {
+        "message": "No token, authorization denied"
+      }
+    }
+  ],
+  "corsAllowedStatus": 204,
+  "corsAllowedOrigin": "https://atyour-service.vercel.app",
+  "corsUntrustedDenied": true
+}

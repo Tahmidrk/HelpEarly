@@ -1,0 +1,10 @@
+{
+  "executedAt": "2026-10-10T20:04:41.413Z",
+  "provider": "supabase",
+  "privateBucket": "helpearly-media",
+  "privateUploadReadSignedURL": "PASS",
+  "unsignedPublicAccessDenied": "PASS",
+  "mimeAllowlist": "PASS",
+  "mimeRejectionCode": "STORAGE_400",
+  "probeCleanup": "PASS"
+}
