@@ -1,6 +1,6 @@
 # HelpEarly Render deployment execution report
 
-Updated 2026-10-11. **Render Free backend is live and tested.** Existing Supabase data was preserved through the approved migration. Existing Vercel website has not been redeployed; deployment is approved and Vercel account sign-in remains pending. No paid service, disk, new database or payment card was added. Android visuals are unchanged.
+Updated 2026-10-11. **Render Free backend is live and tested.** Existing Supabase data was preserved through the approved migration. Existing Vercel website has not been redeployed; deployment is approved and access to the Vercel account owning atyour-service.vercel.app remains pending. No paid service, disk, new database or payment card was added. Android visuals are unchanged.
 
 | Check | Actual result |
 |---|---|
@@ -14,7 +14,7 @@ Updated 2026-10-11. **Render Free backend is live and tested.** Existing Supabas
 | CORS | PASS: existing Vercel origin preflight HTTP 204 and correct allow-origin; untrusted origin gets no CORS permission |
 | Authentication/Socket.IO | PASS: tokenless REST denied, normal login/role guards work, actual external authenticated WSS connects; missing token and untrusted socket origin rejected |
 | Production schema/media | PASS: owner-approved schema 2/22 tables, RLS/direct grant remediation and private bucket; original records preserved |
-| Vercel release | APPROVED, SIGN-IN PENDING: existing website retained; latest production build with the Render origin passed |
+| Vercel release | APPROVED, PROJECT ACCESS PENDING: existing website retained; latest production build with the Render origin passed |
 | Android | PASS: clean Hermes export contains Render URL; real API-module pairing passed. Signed APK/AAB, physical phone and FCM remain pending |
 | Branding | Deferred until operational completion and explicit owner approval |
 
@@ -47,6 +47,12 @@ Fresh production backup: `H:\apps\HelpEarly-backups\supabase-production-2026-10-
 The exact reviewed migration and private bucket were applied only after the owner's conditional approval gate was satisfied. [Approval scope/source hashes](SUPABASE_RELEASE_APPROVAL.md); [execution evidence](test-results/supabase-production-release-20261011.json). All original counts remain: users 31, helpers 22, bookings 10, jobs 12, messages 27, reviews 5, complaints 2, conversations 4, categories 10, helper categories 31, helper services 40, job applications 3, payments 4. Original records match row fingerprints, except approved helper aggregates recomputed from source reviews. Live startup stays read-only; migrations are never triggered automatically by deployment.
 
 Security advisor's old RLS-disabled errors are resolved. Its 22 no-policy INFO findings are intentional for the Express-only model; six mutable function-search-path WARN findings remain for separately reviewed hardening, not silently applied SQL. [Advisor explanation](https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable). Privileged DB/service credentials, dependency advisories, least-privilege roles, monitoring and scaling/load tests still need commercial hardening.
+
+## Vercel account access check
+
+On 2026-10-11 the owner signed in successfully as `tahmidrk758-3108`. The team picker lists only `tahmidrk758-3108's projects` (Hobby), containing one existing project, `client`. Its production domain is `client-sigma-dun-96.vercel.app`, not the approved `atyour-service.vercel.app`. No project, deployment, Git connection or domain was changed. Access to the actual owning account/project is required before deploying the tested build. Do not replace the unrelated client project or transfer the existing production domain without a separate reviewed request.
+
+![Observed Vercel project access](test-results/vercel-account-access-20261011.jpg)
 
 ## Remaining actions
 

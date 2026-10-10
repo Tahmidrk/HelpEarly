@@ -1,0 +1,12 @@
+{
+  "executedAt": "2026-10-10T20:28:05.182Z",
+  "status": "BLOCKED",
+  "signedIn": true,
+  "observedAccount": "tahmidrk758-3108",
+  "team": "tahmidrk758-3108s-projects",
+  "observedProject": "client",
+  "observedProductionDomain": "client-sigma-dun-96.vercel.app",
+  "requiredExistingDomain": "atyour-service.vercel.app",
+  "productionChanged": false,
+  "reason": "Approved existing project is not available in the signed-in account; owner-project access required."
+}

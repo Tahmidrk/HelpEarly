@@ -166,7 +166,7 @@ at-your-service/
 
 ## API Endpoints (Summary)
 
-Current live status: [Render/Supabase release report](docs/RENDER_DEPLOYMENT.md). Render Free, PostgreSQL preservation, private media and actual HTTP/WSS MVP checks passed. Existing Vercel still uses its unavailable Railway API until the approved redeployment completes; Vercel account sign-in is pending. Signed Android builds, physical-device testing, AI provider credentials and real push delivery remain pending. Earlier [production audit](docs/PRODUCTION_AUDIT.md), [deployment guide](docs/DEPLOYMENT.md) and [local completion report](docs/COMPLETION_REPORT.md) describe earlier states; use the current report for release status. [Physical Android checklist](docs/ANDROID_CHECKLIST.md).
+Current live status: [Render/Supabase release report](docs/RENDER_DEPLOYMENT.md). Render Free, PostgreSQL preservation, private media and actual HTTP/WSS MVP checks passed. Existing Vercel still uses its unavailable Railway API until the approved redeployment completes; access to the Vercel account owning atyour-service.vercel.app is pending. Signed Android builds, physical-device testing, AI provider credentials and real push delivery remain pending. Earlier [production audit](docs/PRODUCTION_AUDIT.md), [deployment guide](docs/DEPLOYMENT.md) and [local completion report](docs/COMPLETION_REPORT.md) describe earlier states; use the current report for release status. [Physical Android checklist](docs/ANDROID_CHECKLIST.md).
 
 | Method | Endpoint | Description |
 |---|---|---|
