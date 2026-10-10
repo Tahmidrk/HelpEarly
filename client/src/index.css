@@ -445,3 +445,12 @@ select.form-input {
 .toast-success { background: var(--success); color: white; }
 .toast-error { background: var(--danger); color: white; }
 .toast-info { background: var(--info); color: white; }
+
+/* New web parity features reuse existing theme and flexible layout. */
+.parity-card { margin-bottom: 16px; overflow-wrap: anywhere; }
+.parity-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.parity-actions { justify-content: flex-start; margin-top: 12px; }
+.parity-actions label { flex: 1 1 180px; min-width: 0; }
+.parity-photos { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+.parity-photos img { width: 160px; max-width: 100%; height: 120px; object-fit: cover; border-radius: var(--radius-md); }
+@media (max-width: 600px) { .parity-actions .btn { white-space: normal; } .parity-photos a { max-width: 45%; } }

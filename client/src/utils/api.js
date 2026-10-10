@@ -56,6 +56,20 @@ export const chatbotAPI = {
   send: message => request('/chatbot', {method:'POST',body:JSON.stringify({message})}),
 };
 
+export const notificationsAPI = {
+  list: () => request('/notifications'),
+  read: id => request(`/notifications/${id}/read`, { method: 'PUT' }),
+};
+
+export const getMediaUrls = value => {
+  if (!value) return [];
+  let paths = value;
+  if (typeof value === 'string') {
+    try { paths = JSON.parse(value); } catch { paths = [value]; }
+  }
+  return (Array.isArray(paths) ? paths : [paths]).filter(path => typeof path === 'string').map(getMediaUrl).filter(Boolean);
+};
+
 // Helpers
 export const helpersAPI = {
   getAll: (params) => {
@@ -64,6 +78,7 @@ export const helpersAPI = {
   },
   getOne: (id) => request(`/helpers/${id}`),
   getMyProfile: () => request('/helpers/me'),
+  saveSettings: data => request('/helpers/settings', { method: 'PUT', body: JSON.stringify(data) }),
   update: (data) => request('/helpers/me', { method: 'PUT', body: JSON.stringify(data) }),
   addService: (data) => request('/helpers/services', { method: 'POST', body: JSON.stringify(data) }),
   deleteService: (id) => request(`/helpers/services/${id}`, { method: 'DELETE' }),
@@ -103,7 +118,7 @@ export const reviewsAPI = {
 // Messages
 export const messagesAPI = {
   getConversations: () => request('/messages/conversations'),
-  getMessages: (conversationId) => request(`/messages/${conversationId}`),
+  getMessages: (conversationId) => request(`/messages/${conversationId}?limit=1000`),
   send: (data) => request('/messages', { method: 'POST', body: JSON.stringify(data) }),
   getOrCreateConversation: (userId) => request(`/messages/conversation/${userId}`),
 };
@@ -167,6 +182,9 @@ export const adminAPI = {
 
 // Emergency Broadcast
 export const emergencyAPI = {
+  list: () => request('/emergency'),
   notify: (data) => request('/emergency/notify', { method: 'POST', body: JSON.stringify(data) }),
   accept: (id) => request(`/emergency/${id}/accept`, { method: 'POST' }),
+  decline: id => request(`/emergency/${id}/decline`, { method: 'POST' }),
+  cancel: id => request(`/emergency/${id}/cancel`, { method: 'POST' }),
 };

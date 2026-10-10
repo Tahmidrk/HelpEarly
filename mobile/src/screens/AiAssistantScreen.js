@@ -13,8 +13,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { chatbotAPI } from '../api/client';
+import { useNotifications } from '../context/NotificationContext';
 
 export default function AiAssistantScreen() {
+  const { revision } = useNotifications();
   const [messages, setMessages] = useState([
     {
       id: '1',
@@ -27,9 +29,11 @@ export default function AiAssistantScreen() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (loading) return;
+    let disposed = false;
     chatbotAPI.history()
       .then((history) => {
-        if (history.length) setMessages(history.map((item) => ({
+        if (!disposed && history.length) setMessages(history.map((item) => ({
           id: String(item.id),
           sender: item.role === 'model' ? 'ai' : 'user',
           text: item.content,
@@ -37,7 +41,8 @@ export default function AiAssistantScreen() {
         })));
       })
       .catch(() => {});
-  }, []);
+    return () => { disposed = true; };
+  }, [revision, loading]);
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;

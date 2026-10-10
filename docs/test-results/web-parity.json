@@ -1,0 +1,17 @@
+{
+  "executed_at": "2026-10-10T19:13:22.386Z",
+  "results": {
+    "notification destinations verify conversations, restrict roles and ignore invalid job IDs": "PASS",
+    "web inbox opens saved update, reports errors and retains records offline": "PASS",
+    "web emergencies recover list, enforce role actions and expose accepted booking": "PASS",
+    "existing service IDs and category preserved through editable worker settings": "PASS",
+    "booking photos displayed; reschedule sends date and keeps conflict editable": "PASS",
+    "AI loads database history, refreshes external updates and rejects guest send": "PASS",
+    "dual-role route guard and navigation follow active role; inbox reachable": "PASS",
+    "actual App resets AI history on logout and account switch": "PASS",
+    "admin verifies dual worker, saves notes/status and complainant sees response": "PASS",
+    "dual-role job board chooses own/matching API and hides self proposal; job photos render": "PASS",
+    "booking/job upload previews survive adding photos and release URLs on removal/unmount": "PASS"
+  },
+  "environment": "React 18 test renderer with mocked APIs; no rendered-pixel/browser verification"
+}

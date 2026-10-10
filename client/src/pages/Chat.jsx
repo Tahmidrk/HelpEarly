@@ -20,6 +20,7 @@ export default function Chat() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
+  const [error, setError] = useState(''), [sending, setSending] = useState(false);
   const messagesEndRef = useRef(null);
   const activeConvRef = useRef(null);
   activeConvRef.current = activeConv;
@@ -36,7 +37,7 @@ export default function Chat() {
       if (msg.sender_id !== user.id && msg.conversation_id === activeConvRef.current?.id) {
         setMessages(prev => prev.some(item=>item.id===msg.id) ? prev : [...prev, msg]);
       }
-      messagesAPI.getConversations().then(setConversations).catch(console.error);
+      messagesAPI.getConversations().then(setConversations).catch(err => setError(err.message));
     });
 
     return () => s.disconnect();
@@ -46,7 +47,7 @@ export default function Chat() {
   useEffect(() => {
     messagesAPI.getConversations()
       .then(setConversations)
-      .catch(console.error)
+      .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [revision]);
 
@@ -62,16 +63,17 @@ export default function Chat() {
         loadMessages(conv.id);
         if (socket) socket.emit('join_conversation', conv.id);
         // Refresh conversations
-        messagesAPI.getConversations().then(setConversations);
-      }).catch(console.error);
+        messagesAPI.getConversations().then(setConversations).catch(err => setError(err.message));
+      }).catch(err => setError(err.message));
     }
   }, [targetUserId, loading]);
 
   const loadMessages = async (convId) => {
     try {
       const msgs = await messagesAPI.getMessages(convId);
-      setMessages(msgs);
-    } catch (err) { console.error(err); }
+      if (Number(activeConvRef.current?.id) === Number(convId)) setMessages(msgs);
+      setError('');
+    } catch (err) { setError(err.message); }
   };
 
   const selectConversation = (conv) => {
@@ -82,21 +84,25 @@ export default function Chat() {
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !activeConv || activeConv.is_other_active === false) return;
-
+    if (sending || !newMessage.trim() || !activeConv || activeConv.is_other_active === false) return;
+    setSending(true);
+    const conversationId = activeConv.id, content = newMessage;
     try {
       const recipientId = activeConv.other_id || activeConv.other_user?.id;
       const result = await messagesAPI.send({
         recipient_id: recipientId,
-        content: newMessage,
+        content,
       });
 
-      setMessages(prev => [...prev, result.message]);
-
-      setNewMessage('');
+      if (Number(activeConvRef.current?.id) === Number(conversationId)) {
+        setMessages(prev => prev.some(item => item.id === result.message.id) ? prev : [...prev, result.message]);
+        setNewMessage(previous => previous === content ? '' : previous);
+      }
+      setError('');
     } catch (err) {
-      console.error(err);
+      setError(err.message);
     }
+    finally { setSending(false); }
   };
 
   // Auto-scroll to bottom
@@ -109,6 +115,7 @@ export default function Chat() {
   return (
     <div className="page chat-page">
       <div className="container">
+        {error && <p role="alert" className="alert alert-error">{error}</p>}
         <div className="chat-layout animate-fade-in">
           {/* Sidebar */}
           <div className="chat-sidebar glass-card-static">
@@ -200,7 +207,7 @@ export default function Chat() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       id="chat-message-input"
                     />
-                    <button type="submit" className="btn btn-primary" id="chat-send-btn" disabled={!newMessage.trim()}>
+                    <button type="submit" className="btn btn-primary" id="chat-send-btn" disabled={sending || !newMessage.trim()}>
                       Send <i className="fas fa-paper-plane"></i>
                     </button>
                   </form>

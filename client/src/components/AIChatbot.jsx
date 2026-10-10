@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 
 import { chatbotAPI } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
+import { useSync } from '../context/SyncContext';
 
 const QUICK_PROMPTS = [
   'How do I find a plumber?',
@@ -32,6 +34,9 @@ function formatText(text) {
 }
 
 export default function AIChatbot() {
+  const { user } = useAuth();
+  const revision = useSync('ai');
+  const [retry, setRetry] = useState(0), [historyLoading, setHistoryLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [input, setInput] = useState('');
@@ -42,17 +47,19 @@ export default function AIChatbot() {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!user || !open || loading) return;
+    let disposed = false;
+    setHistoryLoading(true);
     chatbotAPI.history()
       .then((data) => {
-        if (data.length) {
-          setMessages(data.map((item) => ({ role: item.role === 'model' ? 'assistant' : 'user', text: item.content })));
-          setShowQuick(false);
-        }
+        if (disposed) return;
+        setMessages(data.length ? data.map((item) => ({ role: item.role === 'model' ? 'assistant' : 'user', text: item.content })) : [WELCOME_MESSAGE]);
+        setShowQuick(!data.length);
       })
-      .catch((err) => setError(err.message));
-  }, []);
+      .catch((err) => { if (!disposed) setError(err.message); })
+      .finally(() => { if (!disposed) setHistoryLoading(false); });
+    return () => { disposed = true; };
+  }, [user?.id, open, revision, loading, retry]);
 
   useEffect(() => {
     if (open) {
@@ -63,7 +70,8 @@ export default function AIChatbot() {
 
   async function sendMessage(text) {
     const userText = (text || input).trim();
-    if (!userText || loading) return;
+    if (!userText || loading || historyLoading) return;
+    if (!user) { setError('Log in to use the AI assistant and your private history.'); return; }
 
     setInput('');
     setError('');
@@ -90,10 +98,8 @@ export default function AIChatbot() {
   }
 
   function handleReset() {
-    setMessages([WELCOME_MESSAGE]);
-    setShowQuick(true);
     setError('');
-    setInput('');
+    setRetry(value => value + 1);
   }
 
   return (
@@ -125,16 +131,16 @@ export default function AIChatbot() {
               </div>
               <div>
                 <p className="chatbot-title">AI Assistant</p>
-                <p className="chatbot-subtitle">At Your Service · Always online</p>
+                <p className="chatbot-subtitle">At Your Service · Your private history</p>
               </div>
             </div>
             <div className="chatbot-header-actions">
               <button
                 className="chatbot-icon-btn"
                 onClick={handleReset}
-                title="New conversation"
+                title="Refresh saved history"
                 type="button"
-                aria-label="Reset conversation"
+                aria-label="Refresh saved history"
               >
                 <i className="fas fa-redo-alt" />
               </button>
@@ -151,6 +157,7 @@ export default function AIChatbot() {
 
           {/* Messages */}
           <div className="chatbot-messages" id="chatbot-messages">
+            {historyLoading && <p className="text-secondary" role="status">Loading saved history…</p>}
             {messages.map((msg, i) => (
               <div
                 key={i}
@@ -216,7 +223,7 @@ export default function AIChatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
-              disabled={loading}
+              disabled={loading || historyLoading}
               maxLength={500}
               id="chatbot-input"
               aria-label="Message the AI assistant"
@@ -224,7 +231,7 @@ export default function AIChatbot() {
             <button
               className="chatbot-send-btn"
               onClick={() => sendMessage()}
-              disabled={loading || !input.trim()}
+              disabled={loading || historyLoading || !input.trim()}
               type="button"
               aria-label="Send message"
               id="chatbot-send-btn"

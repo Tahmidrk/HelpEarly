@@ -18,7 +18,7 @@ async function getNativeNotifications() {
 }
 
 export function NotificationProvider({ children, navigationRef }) {
-  const { user, activeRole, fetchUserBookings, switchMode } = useAuth();
+  const { user, activeRole, fetchUserBookings, switchMode, refreshUser } = useAuth();
   const seen=useRef(new Set());
   const [revision, setRevision] = useState(0);
   const [pushStatus, setPushStatus] = useState('Not enabled');
@@ -78,6 +78,7 @@ export function NotificationProvider({ children, navigationRef }) {
     const sync = createSynchronizer(authAPI.revisions, changed => {
       setRevision(value => value + 1);
       if (changed.includes('bookings')) fetchUserBookings();
+      if (changed.includes('profile') || changed.includes('helpers')) refreshUser();
     });
     const refresh = () => sync.check(true);
     const timer = setInterval(() => { if (AppState.currentState === 'active') sync.check(true); }, 30000);

@@ -17,8 +17,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { helpersAPI, bookingsAPI, reviewsAPI, messagesAPI, withPhoto, bookingDate } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import MapViewModal from '../components/MapViewModal';
+import { useNotifications } from '../context/NotificationContext';
 
 export default function HelperDetailScreen({ route, navigation }) {
+  const { revision } = useNotifications();
   const { user, addBooking } = useAuth();
   const { helperId, helperData, autoOpenBooking } = route.params || {};
   const [helper, setHelper] = useState(helperData || null);
@@ -70,7 +72,7 @@ export default function HelperDetailScreen({ route, navigation }) {
       loadHelperDetail();
       fetchLiveReviews();
     }
-  }, [helperId]);
+  }, [helperId, revision]);
 
   const fetchLiveReviews = async () => {
     try {
@@ -84,7 +86,7 @@ export default function HelperDetailScreen({ route, navigation }) {
 
   const loadHelperDetail = async () => {
     try {
-      setLoading(true);
+      if (!helper) setLoading(true);
       const data = await helpersAPI.getById(helperId);
       setHelper(data);
     } catch (err) {

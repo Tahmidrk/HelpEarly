@@ -5,14 +5,17 @@ import { syncAPI, SOCKET_URL } from '../utils/api';
 import { createSynchronizer } from '../utils/sync';
 const SyncContext = createContext({});
 export function SyncProvider({ children }) {
-  const { user, activeRole } = useAuth();
+  const { user, activeRole, refreshUser } = useAuth();
   const [revisions, setRevisions] = useState({});
   useEffect(() => {
     setRevisions({});
     if (!user) return;
-    const sync = createSynchronizer(syncAPI.revisions, changed => setRevisions(previous => {
-      const next = { ...previous }; for (const key of changed) next[key] = (next[key] || 0) + 1; return next;
-    }));
+    const sync = createSynchronizer(syncAPI.revisions, changed => {
+      if (changed.includes('profile') || changed.includes('helpers')) refreshUser();
+      setRevisions(previous => {
+        const next = { ...previous }; for (const key of changed) next[key] = (next[key] || 0) + 1; return next;
+      });
+    });
     const socket = io(SOCKET_URL, { auth: { token: localStorage.getItem('token') }, withCredentials: true });
     const refresh = () => sync.check(true);
     socket.on('connect', refresh); socket.on('sync_hint', () => sync.check());

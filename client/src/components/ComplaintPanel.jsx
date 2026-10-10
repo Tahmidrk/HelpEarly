@@ -6,6 +6,7 @@ import { useSync } from '../context/SyncContext';
 
 export default function ComplaintPanel() {
   const revision = useSync('complaints','bookings');
+  const [error, setError] = useState('');
   const [contacts, setContacts] = useState([]);
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,15 +16,16 @@ export default function ComplaintPanel() {
 
   const loadData = async () => {
     const [contactData, complaintData] = await Promise.all([
-      complaintsAPI.getContacts().catch(() => []),
-      complaintsAPI.getMine().catch(() => []),
+      complaintsAPI.getContacts(),
+      complaintsAPI.getMine(),
     ]);
     setContacts(contactData);
     setComplaints(complaintData);
+    setError('');
   };
 
   useEffect(() => {
-    loadData().finally(() => setLoading(false));
+    loadData().catch(err => setError(err.message)).finally(() => setLoading(false));
   }, [revision]);
 
   const handleSubmit = async (e) => {
@@ -54,6 +56,7 @@ export default function ComplaintPanel() {
     <div className="complaint-grid">
       <form className="glass-card-static" onSubmit={handleSubmit}>
         <h3 style={{ marginBottom: 12 }}>Submit a Complaint</h3>
+        {error && <p className="alert alert-error" role="alert">{error} <button type="button" className="btn btn-secondary btn-sm" onClick={() => loadData().catch(err => setError(err.message))}>Retry</button></p>}
         {message && (
           <div className={`alert ${message.startsWith('Error') ? 'alert-error' : 'alert-success'}`}>
             {message}
@@ -130,6 +133,7 @@ export default function ComplaintPanel() {
                   />
                 </p>
                 <p>{complaint.description}</p>
+                {complaint.admin_notes && <p><strong>Admin response:</strong> {complaint.admin_notes}</p>}
               </div>
             ))}
           </div>

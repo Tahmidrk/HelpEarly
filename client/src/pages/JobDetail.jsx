@@ -6,13 +6,14 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { getCategoryIcon } from '../utils/iconMap';
 import AddressMap from '../components/AddressMap';
 import ProfileLink from '../components/ProfileLink';
+import PhotoGallery from '../components/PhotoGallery';
 
 import { useSync } from '../context/SyncContext';
 
 export default function JobDetail() {
   const revision = useSync("jobs");
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, activeRole } = useAuth();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -54,6 +55,7 @@ export default function JobDetail() {
   if (!job) return <div className="page"><div className="container"><div className="empty-state"><h3>{errorMessage || 'Job not found'}</h3></div></div></div>;
 
   const isOwner = user?.id === job.user_id;
+  const role = user?.role === 'both' ? activeRole : user?.role;
   const hasApplied = Boolean(job.viewer_application);
 
   return (
@@ -80,9 +82,10 @@ export default function JobDetail() {
             <span><i className="fas fa-map-marker-alt"></i> {job.location}</span>
             {job.preferred_date && <span><i className="fas fa-calendar"></i> Preferred: {new Date(job.preferred_date).toLocaleDateString()}</span>}
           </div>
+          <PhotoGallery photos={job.photos} />
           <AddressMap address={job.location} label="Job map" />
 
-          {user?.role === 'helper' && job.status === 'open' && (
+          {role === 'helper' && !isOwner && job.status === 'open' && (
             <div style={{ marginBottom: 24 }}>
               {hasApplied ? (
                 <div className="glass-card-static" style={{ background: 'var(--bg-tertiary)' }}>
@@ -116,7 +119,7 @@ export default function JobDetail() {
           {!user && (<p className="text-secondary" style={{ marginBottom: 16 }}><a href="/login">Login</a> as a helper to apply for this job.</p>)}
         </div>
 
-        {isOwner && job.applications && job.applications.length > 0 && (
+        {isOwner && role === 'household' && job.applications && job.applications.length > 0 && (
           <div style={{ marginTop: 24 }}>
             <h2 style={{ marginBottom: 16 }}>Applications ({job.applications.length})</h2>
             <div className="stagger-children">

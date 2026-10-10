@@ -1,5 +1,7 @@
 # HelpEarly free-stack execution report — 2026-10-10
 
+Latest local Android-preserving website parity work and checks: [FEATURE_PARITY.md](FEATURE_PARITY.md). Hosted deployment approval gates below still apply.
+
 **Local implementation/configuration complete. Hosted university demonstration remains NOT READY until external setup/approval and real-device verification. Commercial reliability is a future release gate.**
 
 ## Delivered

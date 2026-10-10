@@ -113,6 +113,36 @@ async function main() {
   const mobile=createSynchronizer(()=>request('/sync',worker.token),keys=>changedMobile.push(...keys));
   await web.check();await mobile.check();changedWeb.length=0;changedMobile.length=0;
   const unrelated=await request('/sync',third.token);
+  // Execute both real client API modules against this disposable PostgreSQL API.
+  const esbuild = require('../../client/node_modules/esbuild');
+  const webApiBuild = await esbuild.build({entryPoints:[path.join(root,'../client/src/utils/api.js')],bundle:true,write:false,platform:'node',format:'esm',define:{'import.meta.env':JSON.stringify({VITE_API_URL:base})}});
+  const clientApi = await import('data:text/javascript;base64,'+Buffer.from(webApiBuild.outputFiles[0].text).toString('base64'));
+  global.localStorage={getItem:key=>key==='token'?home.token:key==='activeRole'?'household':null};
+  global.__parityMobileSession={token:worker.token,activeRole:'helper'};
+  const mobileApiBuild=await esbuild.build({entryPoints:[path.join(root,'../mobile/src/api/client.js')],bundle:true,write:false,platform:'node',format:'esm',define:{'process.env.EXPO_PUBLIC_API_URL':JSON.stringify(base)},plugins:[{name:'native-test-bindings',setup(build){
+    build.onResolve({filter:/^(react-native|@react-native-async-storage\/async-storage|expo-constants|expo-file-system)$/},args=>({path:args.path,namespace:'native-test'}));
+    build.onLoad({filter:/.*/,namespace:'native-test'},args=>({contents:args.path==='react-native'?"export const Platform={OS:'android'};":args.path.includes('async-storage')?"export default {getItem:async key=>globalThis.__parityMobileSession[key]||null};":args.path==='expo-file-system'?"export class File {}":"export default {};",loader:'js'}));
+  }}]});
+  const androidApi=await import('data:text/javascript;base64,'+Buffer.from(mobileApiBuild.outputFiles[0].text).toString('base64'));
+  await clientApi.authAPI.updateProfile({name:'Web changed household',location:'Dhaka'});
+  const sameAccountSession=global.__parityMobileSession;global.__parityMobileSession={token:home.token,activeRole:'household'};
+  assert.equal((await androidApi.authAPI.getMe()).name,'Web changed household');
+  global.__parityMobileSession=sameAccountSession;
+  await androidApi.helpersAPI.saveSettings({category:'Electrical',bio:'Android updated services',hourly_rate:400,experience_years:2,services:[{service_name:'Parity wiring',price:400}]});
+  assert.equal((await clientApi.helpersAPI.getOne(helper)).services[0].service_name,'Parity wiring');
+  pass('Actual web and Android API modules share persisted profiles and worker services');
+  const aiBefore=await clientApi.syncAPI.revisions();
+  await db.query("INSERT INTO ai_messages(user_id,role,content) VALUES($1,'user','Private cross-platform question'),($1,'model','Private cross-platform answer')",[home.user.id]);
+  await web.check();assert(changedWeb.includes('ai'));assert.notEqual((await clientApi.syncAPI.revisions()).ai,aiBefore.ai);
+  global.__parityMobileSession={token:home.token,activeRole:'household'};
+  assert((await androidApi.chatbotAPI.history()).some(row=>row.content==='Private cross-platform answer'));
+  assert.deepEqual(await clientApi.chatbotAPI.history(),await androidApi.chatbotAPI.history());
+  assert.equal((await request('/sync',third.token)).ai,unrelated.ai);assert.equal((await request('/chatbot',third.token)).length,0);
+  await db.query("SELECT enqueue_notification($1,'parity:inbox','test','Web inbox parity','{}')",[home.user.id]);
+  const inboxItem=(await clientApi.notificationsAPI.list()).find(row=>row.title==='Web inbox parity');assert(inboxItem);
+  await clientApi.notificationsAPI.read(inboxItem.id);assert((await androidApi.notificationsAPI.list()).find(row=>row.id===inboxItem.id).read_at);
+  global.__parityMobileSession=sameAccountSession;changedWeb.length=0;changedMobile.length=0;
+  pass('AI history and inbox read state synchronize across real APIs; unrelated user denied private history');
   const socket=await socketFor(worker.token);
   const deniedSocket=require('../../mobile/node_modules/socket.io-client').io(base.replace('/api',''),{auth:{token:worker.token},transports:['websocket'],reconnection:false,extraHeaders:{Origin:'https://untrusted.fixture.test'}});sockets.push(deniedSocket);
   await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Origin rejection timeout')),5000);deniedSocket.once('connect_error',()=>{clearTimeout(timer);resolve();});deniedSocket.once('connect',()=>{clearTimeout(timer);reject(new Error('Unapproved Socket.IO origin accepted'));});});pass('Socket.IO browser origin allowlist');

@@ -1,0 +1,16 @@
+{
+  "executed_at": "2026-10-10T19:13:53.314Z",
+  "baseline": "bdff65c53c7022388fb1c60217059a3ec4f2093b",
+  "status": "PASS",
+  "tracked_files": 39,
+  "visual_modules": 15,
+  "changed_internal_files": [
+    "mobile/src/context/AuthContext.js",
+    "mobile/src/context/NotificationContext.js",
+    "mobile/src/screens/AiAssistantScreen.js",
+    "mobile/src/screens/HelperDetailScreen.js",
+    "mobile/src/screens/HomeScreen.js",
+    "mobile/src/screens/WorkerDashboardScreen.js"
+  ],
+  "screenshot_comparison": "NOT RUN: no connected Android device/emulator. Source comparison does not verify rendered pixels."
+}

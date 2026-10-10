@@ -13,6 +13,7 @@ export default function BrowseHelpers() {
   const [helpers, setHelpers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [totalPages, setTotalPages] = useState(1);
 
   const [filters, setFilters] = useState({
@@ -27,8 +28,8 @@ export default function BrowseHelpers() {
   useEffect(() => {
     categoriesAPI.getAll()
       .then(cats => setCategories(cats.filter(c => !HIDDEN_CATEGORIES.includes(c.name))))
-      .catch(console.error);
-  }, []);
+      .catch(err => setError(err.message));
+  }, [revision]);
 
   useEffect(() => {
     setLoading(true);
@@ -39,8 +40,9 @@ export default function BrowseHelpers() {
       .then((data) => {
         setHelpers(data.helpers || []);
         setTotalPages(data.totalPages || 1);
+        setError('');
       })
-      .catch(console.error)
+      .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [filters, revision]);
 
@@ -55,6 +57,7 @@ export default function BrowseHelpers() {
   return (
     <div className="page">
       <div className="container">
+        {error && <p role="alert" className="alert alert-error">{error}</p>}
         <div className="page-header animate-fade-in">
           <h1>Find Helpers</h1>
           <p>Browse trusted professionals near you</p>

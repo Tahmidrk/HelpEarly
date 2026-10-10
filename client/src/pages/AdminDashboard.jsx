@@ -13,6 +13,7 @@ export default function AdminDashboard() {
   const [complaints, setComplaints] = useState([]);
   const [userFilter, setUserFilter] = useState({ role: '', search: '' });
   const [loading, setLoading] = useState(true);
+  const [notes, setNotes] = useState({}), [busy, setBusy] = useState(false), [error, setError] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -30,7 +31,7 @@ export default function AdminDashboard() {
           userBreakdown: usersData.userBreakdown || statsData.userBreakdown,
         });
       } catch (err) {
-        console.error(err);
+        if (isMounted) setError(err.message);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -47,10 +48,10 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (activeTab === 'users') {
-      adminAPI.getUsers(userFilter).then(data => setUsers(data.users || [])).catch(console.error);
+      adminAPI.getUsers(userFilter).then(data => { setUsers(data.users || []); setError(''); }).catch(err => setError(err.message));
     }
     if (activeTab === 'complaints') {
-      complaintsAPI.getAll().then(setComplaints).catch(console.error);
+      complaintsAPI.getAll().then(data => { setComplaints(data); setError(''); }).catch(err => setError(err.message));
     }
   }, [activeTab, userFilter, revision]);
 
@@ -87,8 +88,12 @@ export default function AdminDashboard() {
   };
 
   const handleComplaintStatus = async (id, status) => {
+    if (busy) return;
+    setBusy(true);
     try {
-      await complaintsAPI.update(id, { status });
+      const current = complaints.find(c => c.id === id);
+      const admin_notes = notes[id] ?? current.admin_notes ?? '';
+      await complaintsAPI.update(id, { status, admin_notes });
       setComplaints(complaints.map(c => c.id === id ? { ...c, status } : c));
     } catch (err) { alert(err.message); }
   };
@@ -98,6 +103,7 @@ export default function AdminDashboard() {
   return (
     <div className="page">
       <div className="container">
+        {error && <p role="alert" className="alert alert-error">{error}. Refresh will retry.</p>}
         <div className="page-header animate-fade-in">
           <h1>Admin Dashboard <i className="fas fa-shield-alt"></i></h1>
           <p>Platform management and monitoring</p>
@@ -179,6 +185,7 @@ export default function AdminDashboard() {
                   <option value="">All Roles</option>
                   <option value="household">Households</option>
                   <option value="helper">Helpers</option>
+                  <option value="both">Dual-role accounts</option>
                   <option value="admin">Admins</option>
                 </select>
               </div>
@@ -221,7 +228,7 @@ export default function AdminDashboard() {
                           <span className={`badge ${u.is_active ? 'badge-success' : 'badge-danger'}`}>
                             {u.is_active ? 'Active' : 'Banned'}
                           </span>
-                          {u.role === 'helper' && (
+                          {u.helper_profile_id && (
                             u.is_verified ? (
                               <span className="badge badge-info"><i className="fas fa-check-circle" /> Verified Helper</span>
                             ) : (
@@ -233,7 +240,7 @@ export default function AdminDashboard() {
                       <td>{new Date(u.created_at).toLocaleDateString()}</td>
                       <td>
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                          {u.role === 'helper' && (
+                          {u.helper_profile_id && (
                             <button className={`btn btn-sm ${u.is_verified ? 'btn-secondary' : 'btn-success'}`} onClick={() => handleVerifyHelper(u.helper_profile_id, u.is_verified)}>
                               {u.is_verified ? 'Remove Verification' : 'Approve Helper'}
                             </button>
@@ -286,10 +293,11 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                     <p style={{ marginBottom: 12 }}>{complaint.description}</p>
+                    <label>Investigation notes<textarea className="form-input" rows={3} value={notes[complaint.id] ?? complaint.admin_notes ?? ''} onChange={e => setNotes(previous => ({ ...previous, [complaint.id]: e.target.value }))} /></label>
                     <div className="booking-item-actions">
-                      <button className="btn btn-secondary btn-sm" onClick={() => handleComplaintStatus(complaint.id, 'reviewing')}>Reviewing</button>
-                      <button className="btn btn-success btn-sm" onClick={() => handleComplaintStatus(complaint.id, 'resolved')}>Resolve</button>
-                      <button className="btn btn-danger btn-sm" onClick={() => handleComplaintStatus(complaint.id, 'dismissed')}>Dismiss</button>
+                      <button className="btn btn-secondary btn-sm" disabled={busy} onClick={() => handleComplaintStatus(complaint.id, 'reviewing')}>Reviewing</button>
+                      <button className="btn btn-success btn-sm" disabled={busy} onClick={() => handleComplaintStatus(complaint.id, 'resolved')}>Resolve</button>
+                      <button className="btn btn-danger btn-sm" disabled={busy} onClick={() => handleComplaintStatus(complaint.id, 'dismissed')}>Dismiss</button>
                     </div>
                   </div>
                 ))}

@@ -7,6 +7,8 @@ import { getCategoryIcon, HIDDEN_CATEGORIES } from '../utils/iconMap';
 import AddressMap from '../components/AddressMap';
 import ComplaintPanel from '../components/ComplaintPanel';
 import ProfileLink from '../components/ProfileLink';
+import PhotoGallery from '../components/PhotoGallery';
+import WorkerSettings from '../components/WorkerSettings';
 
 import { useSync } from '../context/SyncContext';
 
@@ -28,7 +30,7 @@ export default function HelperDashboard() {
   useEffect(() => {
     Promise.all([
       helpersAPI.getMyProfile(),
-      bookingsAPI.getAll(),
+      bookingsAPI.getAll({limit: 1000}),
       jobsAPI.getMyApplications(),
       categoriesAPI.getAll(),
     ]).then(([p, b, a, c]) => {
@@ -164,6 +166,7 @@ export default function HelperDashboard() {
                     <span><i className="fas fa-money-bill-wave"></i> ৳{b.total_price || 0}</span>
                     {b.client_phone && <span><i className="fas fa-phone"></i> {b.client_phone}</span>}
                   </div>
+                  <PhotoGallery photos={b.photos} />
                   <AddressMap address={b.address} label="Service map" />
                   {b.notes && <p className="booking-notes"><i className="fas fa-sticky-note"></i> {b.notes}</p>}
                   <div className="booking-item-actions">
@@ -224,6 +227,7 @@ export default function HelperDashboard() {
         )}
         {activeTab === 'services' && (
           <div>
+            <WorkerSettings />
             <button className="btn btn-primary" style={{ marginBottom: 16 }} onClick={() => setShowAddService(!showAddService)}>
               {showAddService ? 'Cancel' : '+ Add Service'}
             </button>

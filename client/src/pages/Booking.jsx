@@ -21,6 +21,8 @@ export default function Booking() {
   const [error, setError] = useState('');
   const [photos, setPhotos] = useState([]);
   const [previews, setPreviews] = useState([]);
+  const previewsRef = useRef([]);
+  previewsRef.current = previews;
   const selectedServiceId = searchParams.get('service');
 
   const [form, setForm] = useState({
@@ -44,8 +46,8 @@ export default function Booking() {
   }, [helperId]);
 
   useEffect(() => {
-    return () => previews.forEach(URL.revokeObjectURL);
-  }, [previews]);
+    return () => previewsRef.current.forEach(URL.revokeObjectURL);
+  }, []);
 
   const handlePhotoChange = (e) => {
     const files = Array.from(e.target.files);

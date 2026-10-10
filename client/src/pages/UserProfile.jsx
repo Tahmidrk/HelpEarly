@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSync } from '../context/SyncContext';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { usersAPI, getMediaUrl } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
@@ -7,9 +8,10 @@ import AddressMap from '../components/AddressMap';
 import StarRating from '../components/StarRating';
 
 export default function UserProfile() {
+  const revision = useSync('helpers');
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, activeRole } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,7 +23,7 @@ export default function UserProfile() {
       .then(setProfile)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, revision]);
 
   if (loading) return <LoadingSpinner />;
 
@@ -40,8 +42,8 @@ export default function UserProfile() {
   }
 
   const initial = profile.name?.charAt(0).toUpperCase() || '?';
-  const canHelperChat = user?.role === 'helper'
-    && profile.role === 'household'
+  const canHelperChat = (user?.role === 'both' ? activeRole : user?.role) === 'helper'
+    && ['household', 'both'].includes(profile.role)
     && Number(user.id) !== Number(profile.id);
 
   const handleChat = () => {
@@ -67,14 +69,14 @@ export default function UserProfile() {
                 <i className="fas fa-map-marker-alt"></i> {profile.location || 'Location not set'}
               </p>
               <div className="profile-meta">
-                <span className={`badge ${profile.role === 'helper' ? 'badge-primary' : profile.role === 'admin' ? 'badge-danger' : 'badge-info'}`}>
+                <span className={`badge ${['helper', 'both'].includes(profile.role) ? 'badge-primary' : profile.role === 'admin' ? 'badge-danger' : 'badge-info'}`}>
                   {profile.role}
                 </span>
                 <span className="meta-item">
                   <i className="fas fa-calendar"></i> Joined {new Date(profile.created_at).toLocaleDateString()}
                 </span>
               </div>
-              {profile.role === 'helper' && (
+              {['helper', 'both'].includes(profile.role) && (
                 <div className="profile-meta" style={{ marginTop: 10 }}>
                   {Number(profile.total_reviews) > 0 ? <>
                     <StarRating rating={profile.avg_rating} />
@@ -97,7 +99,7 @@ export default function UserProfile() {
         <div className="grid grid-2">
           <div className="glass-card-static">
             <h3 style={{ marginBottom: 12 }}><i className="fas fa-id-card"></i> Profile Details</h3>
-            {profile.role === 'helper' ? (
+            {['helper', 'both'].includes(profile.role) ? (
               <>
                 <p style={{ marginBottom: 16 }}>{profile.bio || 'No helper bio added yet.'}</p>
                 <div className="booking-item-details">

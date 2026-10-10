@@ -5,6 +5,7 @@ import EmergencyModal from './EmergencyModal';
 
 export default function Navbar() {
   const { user, activeRole, switchMode, logout } = useAuth();
+  const role = user?.role === 'both' ? activeRole : user?.role;
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -44,14 +45,14 @@ export default function Navbar() {
           </Link>
 
           {/* Household: Browse Helpers is their main page */}
-          {(!user || user.role === 'household') && (
+          {(!user || role === 'household') && (
             <Link to="/helpers" className={`nav-link ${isActive('/helpers')}`} onClick={() => setMenuOpen(false)}>
               Browse Helpers
             </Link>
           )}
 
           {/* Helper: Dashboard + Browse Jobs */}
-          {user && user.role === 'helper' && (
+          {user && role === 'helper' && (
             <>
               <Link to="/helper/dashboard" className={`nav-link ${isActive('/helper/dashboard')}`} onClick={() => setMenuOpen(false)}>
                 Dashboard
@@ -63,7 +64,7 @@ export default function Navbar() {
           )}
 
           {/* Household: Dashboard + Job Board + Chat + Emergency */}
-          {user && user.role === 'household' && (
+          {user && role === 'household' && (
             <>
               <Link to="/dashboard" className={`nav-link ${isActive('/dashboard')}`} onClick={() => setMenuOpen(false)}>
                 Dashboard
@@ -98,7 +99,7 @@ export default function Navbar() {
           <EmergencyModal isOpen={showEmergency} onClose={() => setShowEmergency(false)} />
 
           {/* Helper: Chat */}
-          {user && user.role === 'helper' && (
+          {user && role === 'helper' && (
             <Link to="/chat" className={`nav-link ${isActive('/chat')}`} onClick={() => setMenuOpen(false)}>
               Chat
             </Link>
@@ -111,6 +112,8 @@ export default function Navbar() {
             </Link>
           )}
 
+          {user && <Link to="/notifications" className={`nav-link ${isActive('/notifications')}`} onClick={() => setMenuOpen(false)}>Notifications</Link>}
+          {user && role !== 'admin' && <Link to="/emergency" className={`nav-link ${isActive('/emergency')}`} onClick={() => setMenuOpen(false)}>Emergency requests</Link>}
           {/* Profile - for logged in users */}
           {user && (
             <Link to="/profile" className={`nav-link ${isActive('/profile')}`} onClick={() => setMenuOpen(false)}>
@@ -132,7 +135,7 @@ export default function Navbar() {
 
         <div className="navbar-actions">
           {/* Mode Switcher for User (Household vs Worker) */}
-          {user && user.role !== 'admin' && (
+          {user?.role === 'both' && (
             <div
               style={{
                 display: 'flex',

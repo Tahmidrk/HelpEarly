@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-10T17:50:44.050Z",
+  "executed_at": "2026-10-10T19:09:46.244Z",
   "database": "isolated local replica of Supabase schema; synthetic records only",
   "results": {
     "Production startup refuses unmigrated database without changing schema": "PASS",
@@ -9,6 +9,8 @@
     "HTTP CORS allowlist": "PASS",
     "14 database-backed MVP groups": "PASS",
     "20 authorization/concurrency/outbox groups": "PASS",
+    "Actual web and Android API modules share persisted profiles and worker services": "PASS",
+    "AI history and inbox read state synchronize across real APIs; unrelated user denied private history": "PASS",
     "Socket.IO browser origin allowlist": "PASS",
     "Web mutation to worker sync; private revision isolation; authenticated hints": "PASS",
     "Android mutation to web; missed updates recovered without socket": "PASS",

@@ -21,14 +21,19 @@ import Profile from './pages/Profile';
 import UserProfile from './pages/UserProfile';
 import AIChatbot from './components/AIChatbot';
 import EmergencyNotificationListener from './components/EmergencyNotificationListener';
+import Notifications from './pages/Notifications';
+import Emergency from './pages/Emergency';
+import ComplaintPanel from './components/ComplaintPanel';
+import { useAuth } from './context/AuthContext';
 
 export default function App() {
+  const { user, activeRole } = useAuth();
   return (
     <>
       <SplashScreen />
       <EmergencyNotificationListener />
       <Navbar />
-      <Routes>
+      <Routes key={`routes:${user?.id || 'guest'}:${activeRole}`}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -58,8 +63,11 @@ export default function App() {
         <Route path="/profile" element={
           <ProtectedRoute><Profile /></ProtectedRoute>
         } />
+        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+        <Route path="/emergency" element={<ProtectedRoute roles={['household', 'helper']}><Emergency /></ProtectedRoute>} />
+        <Route path="/complaints" element={<ProtectedRoute roles={['household', 'helper']}><div className="page"><div className="container"><div className="page-header"><h1>My complaints</h1></div><ComplaintPanel /></div></div></ProtectedRoute>} />
       </Routes>
-      <AIChatbot />
+      <AIChatbot key={`ai:${user?.id || 'guest'}:${activeRole}`} />
       <Footer />
     </>
   );

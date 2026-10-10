@@ -13,7 +13,7 @@ import { useSync } from '../context/SyncContext';
 export default function HelperProfile() {
   const revision = useSync("helpers");
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, activeRole } = useAuth();
   const navigate = useNavigate();
   const [helper, setHelper] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +29,8 @@ export default function HelperProfile() {
   if (loading) return <LoadingSpinner />;
   if (!helper) return <div className="page"><div className="container"><div className="empty-state"><i className="fas fa-frown" style={{ fontSize: '2rem' }}></i><h3>Helper not found</h3></div></div></div>;
 
+  const canBook = !user || ((user.role === 'both' ? activeRole : user.role) === 'household' && Number(user.id) !== Number(helper.user_id));
+  const canChat = !user || Number(user.id) !== Number(helper.user_id);
   const initial = helper.name?.charAt(0).toUpperCase();
 
   const handleChat = () => {
@@ -89,8 +91,8 @@ export default function HelperProfile() {
               )}
             </div>
             <div className="profile-actions">
-              <Link to={`/book/${id}`} className="btn btn-primary btn-lg" id="book-btn"><i className="fas fa-calendar-check"></i> Book Now</Link>
-              <button className="btn btn-secondary btn-lg" onClick={handleChat} id="chat-btn"><i className="fas fa-comments"></i> Chat</button>
+              {canBook && <Link to={`/book/${id}`} className="btn btn-primary btn-lg" id="book-btn"><i className="fas fa-calendar-check"></i> Book Now</Link>}
+              {canChat && <button className="btn btn-secondary btn-lg" onClick={handleChat} id="chat-btn"><i className="fas fa-comments"></i> Chat</button>}
             </div>
           </div>
           <AddressMap address={helper.location} label="Helper location map" />
@@ -122,7 +124,7 @@ export default function HelperProfile() {
                   </div>
                   <div className="service-price-action">
                     <span className="service-price">৳{service.price}</span>
-                    <Link to={`/book/${id}?service=${service.id}`} className="btn btn-primary btn-sm">Book This</Link>
+                    {canBook && <Link to={`/book/${id}?service=${service.id}`} className="btn btn-primary btn-sm">Book This</Link>}
                   </div>
                 </div>
               ))

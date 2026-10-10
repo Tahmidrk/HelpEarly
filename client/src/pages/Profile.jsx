@@ -3,9 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import { authAPI, helpersAPI } from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import AddressMap, { addressPlaceholder } from '../components/AddressMap';
+import { useSync } from '../context/SyncContext';
 
 export default function Profile() {
-  const { user, updateUser } = useAuth();
+  const { user, activeRole, updateUser } = useAuth();
+  const role = user?.role === 'both' ? activeRole : user?.role;
+  const revision = useSync('profile', 'helpers');
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [helperProfile, setHelperProfile] = useState(null);
@@ -28,27 +31,31 @@ export default function Profile() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (user?.role === 'helper') {
+    let disposed = false;
+    if (!editing) setForm({ name: user?.name || '', phone: user?.phone || '', location: user?.location || '' });
+    if (role === 'helper') {
       helpersAPI.getMyProfile()
         .then((p) => {
+          if (disposed) return;
           setHelperProfile(p);
-          setHelperForm({
+          if (!editing) setHelperForm({
             bio: p.bio || '',
             hourly_rate: p.hourly_rate || '',
             experience_years: p.experience_years || '',
             is_available: p.is_available,
           });
         })
-        .catch(console.error);
+        .catch(err => { if (!disposed) setMessage('Error: ' + err.message); });
     }
-  }, [user]);
+    return () => { disposed = true; };
+  }, [user, role, revision, editing]);
 
   const handleSave = async () => {
     setLoading(true);
     setMessage('');
     try {
       const updatedUser = await authAPI.updateProfile(form);
-      if (user?.role === 'helper') {
+      if (role === 'helper') {
         await helpersAPI.update(helperForm);
       }
       updateUser(updatedUser);
@@ -157,7 +164,7 @@ export default function Profile() {
               </div>
               <AddressMap address={form.location} label="Profile map preview" />
 
-              {user.role === 'helper' && (
+              {role === 'helper' && (
                 <>
                   <h3 style={{ margin: '24px 0 16px', fontSize: '1.1rem' }}>Helper Details</h3>
                   <div className="form-group">
@@ -245,7 +252,7 @@ export default function Profile() {
                 <span>{new Date(user.created_at).toLocaleDateString()}</span>
               </div>
 
-              {user.role === 'helper' && helperProfile && (
+              {role === 'helper' && helperProfile && (
                 <>
                   <h3 style={{ margin: '24px 0 12px', fontSize: '1.1rem' }}>Helper Details</h3>
                   <div className="profile-field">

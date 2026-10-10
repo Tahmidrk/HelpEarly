@@ -75,8 +75,19 @@ export function AuthProvider({ children }) {
     setUser((prev) => ({ ...prev, ...updatedUser }));
   };
 
+  const refreshUser = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const data = await authAPI.getMe();
+      if (localStorage.getItem('token') === token) setUser(previous => previous && Number(previous.id) === Number(data.id) && JSON.stringify(previous) !== JSON.stringify(data) ? data : previous);
+    } catch (error) {
+      if ([401, 403].includes(error.status) && localStorage.getItem('token') === token) logout();
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, activeRole, loading, login, register, logout, switchMode, updateUser }}>
+    <AuthContext.Provider value={{ user, activeRole, loading, login, register, logout, switchMode, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

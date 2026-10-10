@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSync } from '../context/SyncContext';
 import { Link } from 'react-router-dom';
 import { categoriesAPI, helpersAPI } from '../utils/api';
 import HelperCard from '../components/HelperCard';
@@ -115,6 +116,7 @@ const STATS = [
 ];
 
 export default function Home() {
+  const revision = useSync('helpers', 'categories');
   const [categories, setCategories] = useState([]);
   const [featuredHelpers, setFeaturedHelpers] = useState([]);
 
@@ -125,7 +127,7 @@ export default function Home() {
     helpersAPI.getAll({ limit: 6, sort: 'rating_desc' })
       .then((data) => setFeaturedHelpers(data.helpers || []))
       .catch(console.error);
-  }, []);
+  }, [revision]);
 
   return (
     <div className="page home-page">

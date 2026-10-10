@@ -65,6 +65,19 @@ export function AuthProvider({ children }) {
     return me;
   };
 
+  const refreshUser = async () => {
+    const token = await AsyncStorage.getItem('token');
+    if (!token) return;
+    try {
+      const me = await authAPI.getMe();
+      if (await AsyncStorage.getItem('token') === token) setUser(previous => previous && Number(previous.id) === Number(me.id) && JSON.stringify(previous) !== JSON.stringify(me) ? me : previous);
+    } catch (error) {
+      if ([401, 403].includes(error.status) && await AsyncStorage.getItem('token') === token) {
+        await AsyncStorage.removeItem('token'); setUser(null); setUserBookings([]);
+      }
+    }
+  };
+
   const logout = async () => {
     try {
       if (await AsyncStorage.getItem('pushEnabled') === 'true') {
@@ -126,6 +139,7 @@ export function AuthProvider({ children }) {
         userBookings,
         bookingsError,
         saveWorkerSettings,
+        refreshUser,
         fetchUserBookings,
         addBooking,
         cancelBooking,

@@ -7,6 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import AddressMap from '../components/AddressMap';
 import ComplaintPanel from '../components/ComplaintPanel';
 import ProfileLink from '../components/ProfileLink';
+import PhotoGallery from '../components/PhotoGallery';
 
 import { useSync } from '../context/SyncContext';
 
@@ -19,10 +20,11 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshError,setRefreshError] = useState('');
   const [reviewForm, setReviewForm] = useState({ bookingId: null, helperId: null, rating: 0, comment: '' });
+  const [schedule, setSchedule] = useState(null), [savingSchedule, setSavingSchedule] = useState(false), [scheduleError, setScheduleError] = useState('');
 
   useEffect(() => {
     Promise.all([
-      bookingsAPI.getAll(),
+      bookingsAPI.getAll({limit: 1000}),
       jobsAPI.getMyJobs(),
     ]).then(([b, j]) => {
       setBookings(b);
@@ -50,6 +52,18 @@ export default function UserDashboard() {
       setReviewForm({ bookingId: null, helperId: null, rating: 0, comment: '' });
       alert('Review submitted!');
     } catch (err) { alert(err.message); }
+  };
+
+  const reschedule = async event => {
+    event.preventDefault(); setSavingSchedule(true); setScheduleError('');
+    try {
+      const date = new Date(`${schedule.date}T${schedule.time}:00`);
+      if (Number.isNaN(date.getTime())) throw new Error('Enter a valid date and time');
+      const updated = await bookingsAPI.update(schedule.id, { booking_date: date.toISOString() });
+      setBookings(previous => previous.map(row => row.id === updated.id ? { ...row, ...updated } : row));
+      setSchedule(null);
+    } catch (err) { setScheduleError(err.message); }
+    finally { setSavingSchedule(false); }
   };
 
   const statusBadge = (status) => {
@@ -118,10 +132,15 @@ export default function UserDashboard() {
                     <span><i className="fas fa-map-marker-alt"></i> {booking.address || 'N/A'}</span>
                     <span><i className="fas fa-dollar-sign"></i> ৳{booking.total_price || 0}</span>
                   </div>
+                  <PhotoGallery photos={booking.photos} />
                   <AddressMap address={booking.address} label="Service map" />
                   {booking.notes && <p className="booking-notes"><i className="fas fa-note-sticky"></i> {booking.notes}</p>}
                   <div className="booking-item-actions">
-                    {booking.status === 'pending' && (
+                    {['pending', 'confirmed'].includes(booking.status) && <button className="btn btn-secondary btn-sm" onClick={() => {
+                      const date = new Date(booking.booking_date), local = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
+                      setSchedule({ id: booking.id, date: local.slice(0, 10), time: local.slice(11, 16) }); setScheduleError('');
+                    }}>Reschedule</button>}
+                    {['pending', 'confirmed', 'in_progress'].includes(booking.status) && (
                       <button className="btn btn-danger btn-sm" onClick={() => handleStatusUpdate(booking.id, 'cancelled')}>Cancel</button>
                     )}
                     {booking.status === 'completed' && (
@@ -137,6 +156,12 @@ export default function UserDashboard() {
                       </div>
                     )}
                   </div>
+                  {schedule?.id === booking.id && <form onSubmit={reschedule} className="parity-card">
+                    <div className="form-row"><label>New date<input className="form-input" type="date" required value={schedule.date} onChange={e => setSchedule({ ...schedule, date: e.target.value })} /></label>
+                      <label>New time<input className="form-input" type="time" required value={schedule.time} onChange={e => setSchedule({ ...schedule, time: e.target.value })} /></label></div>
+                    {scheduleError && <p role="alert" className="alert alert-error">{scheduleError}</p>}
+                    <div className="parity-row parity-actions"><button className="btn btn-primary btn-sm" disabled={savingSchedule}>{savingSchedule ? 'Saving…' : 'Save schedule'}</button><button type="button" className="btn btn-secondary btn-sm" disabled={savingSchedule} onClick={() => setSchedule(null)}>Cancel edit</button></div>
+                  </form>}
                   {reviewForm.bookingId === booking.id && (
                     <div className="review-form-inline animate-fade-in">
                       <StarRating rating={reviewForm.rating} onRate={(r) => setReviewForm({ ...reviewForm, rating: r })} />

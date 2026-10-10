@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { categoriesAPI, emergencyAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { HIDDEN_CATEGORIES } from '../utils/iconMap';
+import { Link } from 'react-router-dom';
 
 export default function EmergencyModal({ isOpen, onClose }) {
   const { user } = useAuth();
@@ -9,18 +10,22 @@ export default function EmergencyModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [helpersCount, setHelpersCount] = useState(0);
+  const [error, setError] = useState('');
   const [form, setForm] = useState({
     category_id: '',
     category_name: '',
     location: user?.location || '',
+    contact_phone: user?.phone || '',
   });
 
   useEffect(() => {
     if (isOpen) {
       setSent(false);
+      setError('');
+      setForm(previous => ({ ...previous, location: user?.location || '', contact_phone: user?.phone || '' }));
       categoriesAPI.getAll()
         .then(cats => setCategories(cats.filter(c => !HIDDEN_CATEGORIES.includes(c.name))))
-        .catch(console.error);
+        .catch(err => setError(err.message));
     }
   }, [isOpen]);
 
@@ -41,7 +46,7 @@ export default function EmergencyModal({ isOpen, onClose }) {
       setHelpersCount(res.helpersNotified || 0);
       setSent(true);
     } catch (err) {
-      alert(err.message || 'Failed to send alert');
+      setError(err.message || 'Failed to send alert');
     } finally {
       setLoading(false);
     }
@@ -57,6 +62,7 @@ export default function EmergencyModal({ isOpen, onClose }) {
           <button className="btn btn-ghost btn-sm" onClick={onClose}><i className="fas fa-times" /></button>
         </div>
 
+        {error && <p className="alert alert-error" role="alert">{error}</p>}
         {sent ? (
           <div style={{ textAlign: 'center', padding: '12px 0' }}>
             <span style={{ fontSize: '3rem', color: 'var(--success)', display: 'block', marginBottom: 8 }}>
@@ -66,6 +72,7 @@ export default function EmergencyModal({ isOpen, onClose }) {
             <p className="text-secondary" style={{ margin: '8px 0 16px', fontSize: '0.9rem' }}>
               Sent to <strong>{helpersCount}</strong> local worker{helpersCount !== 1 ? 's' : ''} with your phone number and location. Free workers will call your SIM directly.
             </p>
+            <Link to="/emergency" className="btn btn-secondary" onClick={onClose}>Track request</Link>
             <button className="btn btn-primary" style={{ width: '100%' }} onClick={onClose}>
               Done
             </button>
@@ -92,6 +99,10 @@ export default function EmergencyModal({ isOpen, onClose }) {
               />
             </div>
 
+            <div className="form-group">
+              <label htmlFor="emergency-phone">Contact phone</label>
+              <input id="emergency-phone" className="form-input" type="tel" maxLength={50} required value={form.contact_phone} onChange={e => setForm({ ...form, contact_phone: e.target.value })} />
+            </div>
             <button
               type="submit"
               className="btn btn-danger"

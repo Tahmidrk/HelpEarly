@@ -55,7 +55,7 @@ export default function WorkerDashboardScreen({ navigation }) {
   useEffect(() => {
     loadWorkerData();
     setIsAvailable(user?.helperProfile?.is_available !== false);
-  }, [user?.id, activeRole]);
+  }, [user?.id, activeRole, user?.helperProfile?.is_available]);
 
   const handleAvailability = async (value) => {
     try {

@@ -16,8 +16,10 @@ import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-ico
 import { emergencyAPI, helpersAPI } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import MapViewModal from '../components/MapViewModal';
+import { useNotifications } from '../context/NotificationContext';
 
 export default function HomeScreen({ navigation }) {
+  const { revision } = useNotifications();
   const { user, activeRole, switchMode } = useAuth();
   const [helpers, setHelpers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export default function HomeScreen({ navigation }) {
 
   useEffect(() => {
     fetchTopHelpers();
-  }, []);
+  }, [revision]);
 
   const fetchTopHelpers = async () => {
     try {

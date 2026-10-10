@@ -11,11 +11,13 @@ import { useSync } from '../context/SyncContext';
 
 export default function JobListings() {
   const revision = useSync("jobs","categories");
-  const { user, loading: authLoading } = useAuth();
+  const { user, activeRole, loading: authLoading } = useAuth();
+  const role = user?.role === 'both' ? activeRole : user?.role;
   const [searchParams] = useSearchParams();
   const [jobs, setJobs] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [categoryFilter, setCategoryFilter] = useState(searchParams.get('category') || '');
 
   const getStatusBadgeClass = (status) => {
@@ -32,8 +34,8 @@ export default function JobListings() {
   useEffect(() => {
     categoriesAPI.getAll()
       .then(cats => setCategories(cats.filter(c => !HIDDEN_CATEGORIES.includes(c.name))))
-      .catch(console.error);
-  }, []);
+      .catch(err => setError(err.message));
+  }, [revision]);
 
   useEffect(() => {
     if (authLoading) {
@@ -49,9 +51,9 @@ export default function JobListings() {
         const params = categoryFilter ? { category: categoryFilter } : undefined;
         let data = [];
 
-        if (user?.role === 'household') {
+        if (role === 'household') {
           data = await jobsAPI.getMyJobs(params);
-        } else if (user?.role === 'helper') {
+        } else if (role === 'helper') {
           data = await jobsAPI.getForHelper(params);
         } else {
           data = await jobsAPI.getAll({ ...(params || {}), status: 'open' });
@@ -59,12 +61,10 @@ export default function JobListings() {
 
         if (!ignore) {
           setJobs(data);
+          setError('');
         }
       } catch (error) {
-        console.error(error);
-        if (!ignore) {
-          setJobs([]);
-        }
+        if (!ignore) setError(error.message);
       } finally {
         if (!ignore) {
           setLoading(false);
@@ -77,23 +77,24 @@ export default function JobListings() {
     return () => {
       ignore = true;
     };
-  }, [authLoading, categoryFilter, user?.role, revision]);
+  }, [authLoading, categoryFilter, role, revision]);
 
-  const pageTitle = user?.role === 'household'
+  const pageTitle = role === 'household'
     ? 'My Job Board'
-    : user?.role === 'helper'
+    : role === 'helper'
       ? 'Matching Job Board'
       : 'Job Board';
 
-  const pageSubtitle = user?.role === 'household'
+  const pageSubtitle = role === 'household'
     ? 'Only your job offers are shown here.'
-    : user?.role === 'helper'
+    : role === 'helper'
       ? 'Browse open job offers that match your service categories.'
       : 'Browse available jobs posted by households';
 
   return (
     <div className="page">
       <div className="container">
+        {error && <p role="alert" className="alert alert-error">{error}</p>}
         <div className="page-header animate-fade-in">
           <h1>{pageTitle}</h1>
           <p>{pageSubtitle}</p>
@@ -105,7 +106,7 @@ export default function JobListings() {
               <option value="">All Categories</option>
               {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
-            {user?.role === 'household' && (
+            {role === 'household' && (
               <Link to="/jobs/post" className="btn btn-primary">+ Post a Job</Link>
             )}
           </div>
@@ -115,7 +116,7 @@ export default function JobListings() {
           <div className="empty-state">
             <i className="fas fa-bullhorn" style={{ fontSize: '2rem' }}></i>
             <h3>No jobs found</h3>
-            <p>{user?.role === 'household' ? 'You have not posted any jobs in this category yet.' : 'No matching jobs are available right now.'}</p>
+            <p>{role === 'household' ? 'You have not posted any jobs in this category yet.' : 'No matching jobs are available right now.'}</p>
           </div>
         ) : (
           <div className="stagger-children">

@@ -14,7 +14,9 @@ export default function PostJob() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [photos, setPhotos] = useState([]);       // File objects
-  const [previews, setPreviews] = useState([]);   // Data URLs for preview
+  const [previews, setPreviews] = useState([]);
+  const previewsRef = useRef([]);
+  previewsRef.current = previews;   // Data URLs for preview
   const [form, setForm] = useState({
     category_id: '', title: '', description: '', budget: '',
     location: user?.location || '', preferred_date: '',
@@ -28,8 +30,8 @@ export default function PostJob() {
 
   // Cleanup preview URLs on unmount
   useEffect(() => {
-    return () => previews.forEach(URL.revokeObjectURL);
-  }, [previews]);
+    return () => previewsRef.current.forEach(URL.revokeObjectURL);
+  }, []);
 
   const handlePhotoChange = (e) => {
     const files = Array.from(e.target.files);
