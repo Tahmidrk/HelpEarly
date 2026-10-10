@@ -23,7 +23,8 @@ const auth = async (req, res, next) => {
     req.activeRole = req.user.role === 'both' && ['helper', 'household'].includes(mode) ? mode : req.user.role;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Token is not valid' });
+    const invalid=['JsonWebTokenError','TokenExpiredError','NotBeforeError'].includes(error.name);
+    res.status(invalid?401:503).json({ message: invalid?'Token is not valid':'Authentication database unavailable; retry shortly' });
   }
 };
 
@@ -49,7 +50,8 @@ const optionalAuth = async (req, res, next) => {
     req.activeRole = req.user.role === 'both' && ['helper', 'household'].includes(mode) ? mode : req.user.role;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Token is not valid' });
+    const invalid=['JsonWebTokenError','TokenExpiredError','NotBeforeError'].includes(error.name);
+    res.status(invalid?401:503).json({ message: invalid?'Token is not valid':'Authentication database unavailable; retry shortly' });
   }
 };
 

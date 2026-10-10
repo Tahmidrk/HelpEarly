@@ -5,7 +5,8 @@ import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
-import { API_BASE, notificationsAPI } from '../api/client';
+import { API_BASE, notificationsAPI, authAPI } from '../api/client';
+import { createSynchronizer } from '../utils/sync';
 import { openNotification as routeNotification } from '../utils/openNotification';
 
 const NotificationContext = createContext(null);
@@ -74,9 +75,19 @@ export function NotificationProvider({ children, navigationRef }) {
   useEffect(() => {
     if (!user) return;
     let disposed = false, socket;
+    const sync = createSynchronizer(authAPI.revisions, changed => {
+      setRevision(value => value + 1);
+      if (changed.includes('bookings')) fetchUserBookings();
+    });
+    const refresh = () => sync.check(true);
+    const timer = setInterval(() => { if (AppState.currentState === 'active') sync.check(true); }, 30000);
+    const foreground = AppState.addEventListener('change', state => { if (state === 'active') refresh(); });
+    refresh();
     AsyncStorage.getItem('token').then(token => {
       if (disposed || !token) return;
       socket = io(API_BASE.replace(/\/api\/?$/, ''), { auth: { token }, transports: ['websocket','polling'] });
+      socket.on('connect', refresh);
+      socket.on('sync_hint', () => sync.check());
       socket.on('new_message', () => setRevision(value=>value+1));
       socket.on('notification', item => {
         const duplicate=seen.current.has(item.id);
@@ -87,7 +98,7 @@ export function NotificationProvider({ children, navigationRef }) {
         if (!duplicate && item.type === 'emergency_new' && activeRole === 'helper') Alert.alert('Incoming emergency request', 'Open emergency requests to view details.', [{ text: 'Later' }, { text: 'View', onPress: () => navigationRef.isReady() && navigationRef.navigate('Emergency') }]);
       });
     });
-    return () => { disposed = true; socket?.disconnect(); };
+    return () => { disposed = true; sync.stop(); clearInterval(timer); foreground.remove(); socket?.disconnect(); };
   }, [user?.id, activeRole]);
 
   useEffect(() => {

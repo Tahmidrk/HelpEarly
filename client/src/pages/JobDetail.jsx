@@ -7,7 +7,10 @@ import { getCategoryIcon } from '../utils/iconMap';
 import AddressMap from '../components/AddressMap';
 import ProfileLink from '../components/ProfileLink';
 
+import { useSync } from '../context/SyncContext';
+
 export default function JobDetail() {
+  const revision = useSync("jobs");
   const { id } = useParams();
   const { user } = useAuth();
   const [job, setJob] = useState(null);
@@ -24,7 +27,7 @@ export default function JobDetail() {
       .then(setJob)
       .catch((error) => { console.error(error); setJob(null); setErrorMessage(error.message); })
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, revision]);
 
   const handleApply = async (e) => {
     e.preventDefault();

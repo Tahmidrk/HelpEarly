@@ -17,7 +17,16 @@ async function main(){
     process.on('error',()=>reject(new Error('pg_dump unavailable; set PG_DUMP_BIN')));process.on('close',code=>code===0?resolve():reject(new Error(`pg_dump failed (${code}); check credentials, TLS and version privately`)));
     process.stderr.resume();
   });
-  const media=process.env.UPLOAD_DIR || path.join(__dirname,'..','uploads');await fs.cp(media,path.join(folder,'uploads'),{recursive:true});
+  const storage=require('../utils/storage').getStorage();
+  if(storage.provider==='local') {
+    const media=process.env.UPLOAD_DIR || path.join(__dirname,'..','uploads');await fs.mkdir(media,{recursive:true});await fs.cp(media,path.join(folder,'uploads'),{recursive:true});
+  } else {
+    await storage.check();await fs.mkdir(path.join(folder,'uploads'),{recursive:true});
+    const manifest=[];
+    for(const key of await storage.list()) {const bytes=await storage.read(key);await fs.writeFile(path.join(folder,'uploads',key),bytes,{flag:'wx'});manifest.push({key,bytes:bytes.length,sha256:require('node:crypto').createHash('sha256').update(bytes).digest('hex')});}
+    await fs.writeFile(path.join(folder,'media-manifest.json'),JSON.stringify(manifest,null,2)+'\n');
+  }
+  await fs.writeFile(path.join(folder,'COMPLETE'),'Database and media backup completed. Verify restoration separately.\n');
   await fs.writeFile(path.join(folder,'README.txt'),'PostgreSQL custom-format dump plus uploaded media. Keep private and encrypt offsite. Take backups while writes are stopped for cross-store consistency. Restore into a separate database first; see docs/DEPLOYMENT.md.\n');
   console.log(`Backup saved: ${folder}`);
 }

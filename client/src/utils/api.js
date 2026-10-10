@@ -30,12 +30,13 @@ async function request(endpoint, options = {}) {
   catch {throw new Error('API returned an invalid response. Check backend deployment and VITE_API_URL.');}
 
   if (!res.ok) {
-    throw new Error(data.message || 'Something went wrong');
+    throw Object.assign(new Error(data.message || 'Something went wrong'), {status:res.status});
   }
 
   return data;
 }
 
+export const syncAPI = { revisions: () => request('/sync') };
 // Auth
 export const authAPI = {
   register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),

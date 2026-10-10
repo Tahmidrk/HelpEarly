@@ -56,7 +56,7 @@ exports.createBooking = async (req, res) => {
       db.release();
     }
   } catch (error) {
-    console.error('CreateBooking error:', error);
+    console.error('CreateBooking error:', error.code || error.name);
     res.status(error.status || 500).json({ message: error.status ? error.message : 'Booking could not be saved' });
   }
 };
@@ -106,7 +106,7 @@ exports.getBookings = async (req, res) => {
     const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
-    console.error('GetBookings error:', error);
+    console.error('GetBookings error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -165,7 +165,7 @@ exports.updateBooking = async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('UpdateBooking error:', error);
+    console.error('UpdateBooking error:', error.code || error.name);
     res.status(error.status || 500).json({ message: error.status ? error.message : 'Server error' });
   }
 };
@@ -192,7 +192,7 @@ exports.cancelBooking = async (req, res) => {
     if (!result.rows.length) return res.status(409).json({message:'Completed or cancelled bookings cannot be cancelled'});
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('CancelBooking error:', error);
+    console.error('CancelBooking error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };

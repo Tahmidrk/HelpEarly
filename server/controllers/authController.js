@@ -154,7 +154,7 @@ exports.getMe = async (req, res) => {
 
     res.json(await attachHelper(user));
   } catch (error) {
-    console.error('GetMe error:', error);
+    console.error('GetMe error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -194,7 +194,7 @@ exports.updateProfile = async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('UpdateProfile error:', error);
+    console.error('UpdateProfile error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -236,7 +236,7 @@ exports.changePassword = async (req, res) => {
 
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
-    console.error('ChangePassword error:', error);
+    console.error('ChangePassword error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };

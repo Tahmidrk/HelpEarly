@@ -5,7 +5,10 @@ import HelperCard from '../components/HelperCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { HIDDEN_CATEGORIES } from '../utils/iconMap';
 
+import { useSync } from '../context/SyncContext';
+
 export default function BrowseHelpers() {
+  const revision = useSync("helpers","categories");
   const [searchParams, setSearchParams] = useSearchParams();
   const [helpers, setHelpers] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -39,7 +42,7 @@ export default function BrowseHelpers() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [filters]);
+  }, [filters, revision]);
 
   const updateFilter = (key, value) => {
     const updated = { ...filters, [key]: value, page: 1 };

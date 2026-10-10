@@ -46,7 +46,7 @@ exports.createJob = async (req, res) => {
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error('CreateJob error:', error);
+    console.error('CreateJob error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -89,7 +89,7 @@ exports.getJobs = async (req, res) => {
     const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
-    console.error('GetJobs error:', error);
+    console.error('GetJobs error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -135,7 +135,7 @@ exports.getJobsForHelper = async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error('GetJobsForHelper error:', error);
+    console.error('GetJobsForHelper error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -201,7 +201,7 @@ exports.getJob = async (req, res) => {
 
     res.json({ ...job, applications, viewer_application: viewerApplication });
   } catch (error) {
-    console.error('GetJob error:', error);
+    console.error('GetJob error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -239,7 +239,7 @@ exports.getMyJobs = async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error('GetMyJobs error:', error);
+    console.error('GetMyJobs error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -291,7 +291,7 @@ exports.applyForJob = async (req, res) => {
     if (error.code === '23505') {
       return res.status(400).json({ message: 'You already applied for this job' });
     }
-    console.error('ApplyForJob error:', error);
+    console.error('ApplyForJob error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -362,7 +362,7 @@ exports.updateApplication = async (req, res) => {
       db.release();
     }
   } catch (error) {
-    console.error('UpdateApplication error:', error);
+    console.error('UpdateApplication error:', error.code || error.name);
     res.status(error.status || 500).json({ message: error.status ? error.message : 'Application could not be updated' });
   }
 };
@@ -388,7 +388,7 @@ exports.getMyApplications = async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error('GetMyApplications error:', error);
+    console.error('GetMyApplications error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };

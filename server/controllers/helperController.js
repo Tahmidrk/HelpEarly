@@ -111,7 +111,7 @@ exports.getHelpers = async (req, res) => {
       totalPages: Math.ceil(countResult.rows[0].count / limit),
     });
   } catch (error) {
-    console.error('GetHelpers error:', error);
+    console.error('GetHelpers error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -163,7 +163,7 @@ exports.getHelper = async (req, res) => {
 
     res.json(helper);
   } catch (error) {
-    console.error('GetHelper error:', error);
+    console.error('GetHelper error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -188,7 +188,7 @@ exports.updateHelper = async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('UpdateHelper error:', error);
+    console.error('UpdateHelper error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -213,7 +213,7 @@ exports.addService = async (req, res) => {
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error('AddService error:', error);
+    console.error('AddService error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -234,7 +234,7 @@ exports.deleteService = async (req, res) => {
 
     res.json({ message: 'Service deleted' });
   } catch (error) {
-    console.error('DeleteService error:', error);
+    console.error('DeleteService error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -268,7 +268,7 @@ exports.getMyHelperProfile = async (req, res) => {
     helper.services = servicesResult.rows;
     res.json(helper);
   } catch (error) {
-    console.error('GetMyHelperProfile error:', error);
+    console.error('GetMyHelperProfile error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };

@@ -1,0 +1,17 @@
+{
+  "executed_at": "2026-10-10T17:43:25.516Z",
+  "counts": {
+    "info": 0,
+    "low": 0,
+    "moderate": 3,
+    "high": 1,
+    "critical": 0,
+    "total": 4
+  },
+  "advisories": [
+    "esbuild",
+    "react-router",
+    "react-router-dom",
+    "vite"
+  ]
+}

@@ -9,10 +9,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let timer,disposed=false;
     const token = localStorage.getItem('token');
     if (token) {
-      authAPI.getMe()
+      const restore=()=>authAPI.getMe()
         .then((data) => {
+          if(disposed || localStorage.getItem('token')!==token) return;
           setUser(data);
           const savedRole = localStorage.getItem('activeRole');
           if (data.role!=='both' || !['household','helper'].includes(savedRole)) {
@@ -21,14 +23,19 @@ export function AuthProvider({ children }) {
             localStorage.setItem('activeRole', defaultRole);
           }
         })
-        .catch(() => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('activeRole');
+        .catch(error => {
+          if(disposed || localStorage.getItem('token')!==token) return;
+          if (error.status===401 || error.status===403) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('activeRole');
+          } else if(!disposed && localStorage.getItem('token')===token) timer=setTimeout(restore,5000);
         })
         .finally(() => setLoading(false));
+      restore();
     } else {
       setLoading(false);
     }
+    return ()=>{disposed=true;clearTimeout(timer);};
   }, []);
 
   const login = async (email, password) => {

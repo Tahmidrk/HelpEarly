@@ -2,6 +2,8 @@
 
 > **Connecting households with trusted local service workers in Bangladesh — quickly, safely, and transparently.**
 
+Current zero-budget implementation/deployment strategy and approval gates: [docs/FREE_STACK_STRATEGY.md](docs/FREE_STACK_STRATEGY.md). Local test execution is documented there; live deployment and real Android push still require setup and verification.
+
 An academic software project (SDP II) — a web-based platform that enables households to discover, compare, and book verified local home service workers (plumbers, electricians, cleaners, carpenters, handymen, and more).
 
 ---

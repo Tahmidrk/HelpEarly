@@ -8,7 +8,10 @@ import AddressMap from '../components/AddressMap';
 import ComplaintPanel from '../components/ComplaintPanel';
 import ProfileLink from '../components/ProfileLink';
 
+import { useSync } from '../context/SyncContext';
+
 export default function HelperDashboard() {
+  const revision = useSync("bookings","jobs","helpers","profile","categories");
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('bookings');
   const [profile, setProfile] = useState(null);
@@ -16,6 +19,7 @@ export default function HelperDashboard() {
   const [applications, setApplications] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshError,setRefreshError] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [newService, setNewService] = useState({ category_id: '', service_name: '', description: '', price: '' });
@@ -23,18 +27,19 @@ export default function HelperDashboard() {
 
   useEffect(() => {
     Promise.all([
-      helpersAPI.getMyProfile().catch(() => null),
-      bookingsAPI.getAll().catch(() => []),
-      jobsAPI.getMyApplications().catch(() => []),
-      categoriesAPI.getAll().catch(() => []),
+      helpersAPI.getMyProfile(),
+      bookingsAPI.getAll(),
+      jobsAPI.getMyApplications(),
+      categoriesAPI.getAll(),
     ]).then(([p, b, a, c]) => {
       setProfile(p);
       setBookings(b);
       setApplications(a);
       setCategories(c.filter(cat => !HIDDEN_CATEGORIES.includes(cat.name)));
-      if (p) setEditForm({ bio: p.bio || '', hourly_rate: p.hourly_rate || 0, is_available: p.is_available, experience_years: p.experience_years || 0 });
-    }).finally(() => setLoading(false));
-  }, []);
+      if (p && !editMode) setEditForm({ bio: p.bio || '', hourly_rate: p.hourly_rate || 0, is_available: p.is_available, experience_years: p.experience_years || 0 });
+      setRefreshError('');
+    }).catch(error=>setRefreshError(error.message)).finally(() => setLoading(false));
+  }, [revision]);
 
   const handleUpdateProfile = async () => {
     try {
@@ -81,6 +86,7 @@ export default function HelperDashboard() {
   return (
     <div className="page">
       <div className="container">
+        {refreshError && <p role="alert">Could not refresh: {refreshError}. Retrying; previous records remain visible.</p>}
         <div className="page-header animate-fade-in" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1>Helper Dashboard <i className="fas fa-wrench"></i></h1>

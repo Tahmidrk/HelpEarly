@@ -12,6 +12,9 @@
     "test:mvp": "node tests/mvpFlows.js",
     "test:production": "node tests/productionFlows.js",
     "test:config": "node tests/databaseConfig.js",
+    "test:free": "node tests/freeStack.js",
+    "db:migrate": "node db/migrate.js",
+    "worker": "node worker.js",
     "db:create": "node db/createDatabase.js",
     "db:init": "node db/init.js"
   },

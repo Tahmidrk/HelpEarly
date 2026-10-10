@@ -16,4 +16,7 @@ credentials.json
 *.keystore
 .test-persistence.json
 dist-web/
+dist-web-release/
+dist-android/
+!.env.*.example
 .claude/

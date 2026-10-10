@@ -47,7 +47,7 @@ exports.getConversations = async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error('GetConversations error:', error);
+    console.error('GetConversations error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -86,7 +86,7 @@ exports.getMessages = async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error('GetMessages error:', error);
+    console.error('GetMessages error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -133,7 +133,7 @@ exports.sendMessage = async (req, res) => {
     getIO()?.to(`user_${recipient_id}`).to(`user_${req.user.id}`).emit('new_message',message);
     res.status(201).json({ message, conversationId });
   } catch (error) {
-    console.error('SendMessage error:', error);
+    console.error('SendMessage error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -186,7 +186,7 @@ exports.getOrCreateConversation = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('GetOrCreateConversation error:', error);
+    console.error('GetOrCreateConversation error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };

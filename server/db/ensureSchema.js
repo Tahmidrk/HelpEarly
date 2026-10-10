@@ -1,11 +1,14 @@
 const pool = require('../config/db');
 
 async function ensureSchema() {
+  const db = await pool.connect();
   try {
     const fs = require('fs');
     const path = require('path');
-    await pool.query(fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8'));
-    await pool.query(`
+    await db.query('BEGIN');
+    await db.query('SELECT pg_advisory_xact_lock(724031)');
+    await db.query(fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8'));
+    await db.query(`
       CREATE TABLE IF NOT EXISTS complaints (
         id SERIAL PRIMARY KEY,
         complainant_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -61,19 +64,16 @@ async function ensureSchema() {
       ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
       ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('household', 'helper', 'admin', 'both'));
     `);
-    await pool.query(`INSERT INTO categories (name) SELECT name FROM unnest(ARRAY['Cleaning','Plumbing','Electrical','Gardening','Babysitting','Moving','Cooking']) AS name WHERE NOT EXISTS (SELECT 1 FROM categories c WHERE c.name=name.name)`);
-    const migrationDb = await pool.connect();
-    try {
-      await migrationDb.query('BEGIN');
-      await migrationDb.query('SELECT pg_advisory_xact_lock(724031)');
-      await migrationDb.query(fs.readFileSync(path.join(__dirname, 'migrations', 'production.sql'), 'utf8'));
-      await migrationDb.query('COMMIT');
-    } catch (error) { await migrationDb.query('ROLLBACK'); throw error; }
-    finally { migrationDb.release(); }
-    console.log('✅ DB Schema updated successfully (users_role_check includes "both")');
+    await db.query(`INSERT INTO categories (name) SELECT name FROM unnest(ARRAY['Cleaning','Plumbing','Electrical','Gardening','Babysitting','Moving','Cooking']) AS name WHERE NOT EXISTS (SELECT 1 FROM categories c WHERE c.name=name.name)`);
+    for (const file of ['production.sql','free-stack.sql','api-security.sql']) {
+      await db.query(fs.readFileSync(path.join(__dirname, 'migrations', file), 'utf8'));
+    }
+    await db.query('COMMIT');
+    console.log('HelpEarly schema version 2 ready');
   } catch (err) {
+    await db.query('ROLLBACK');
     throw err;
-  }
+  } finally { db.release(); }
 }
 
 module.exports = ensureSchema;

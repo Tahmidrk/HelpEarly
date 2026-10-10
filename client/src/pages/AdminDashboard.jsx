@@ -3,7 +3,10 @@ import { adminAPI, complaintsAPI } from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProfileLink from '../components/ProfileLink';
 
+import { useSync } from '../context/SyncContext';
+
 export default function AdminDashboard() {
+  const revision = useSync("admin");
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
@@ -49,7 +52,7 @@ export default function AdminDashboard() {
     if (activeTab === 'complaints') {
       complaintsAPI.getAll().then(setComplaints).catch(console.error);
     }
-  }, [activeTab, userFilter]);
+  }, [activeTab, userFilter, revision]);
 
   const handleToggleUser = async (id, isActive) => {
     try {

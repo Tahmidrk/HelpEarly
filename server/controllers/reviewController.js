@@ -18,7 +18,7 @@ exports.createReview = async (req, res) => {
     res.status(201).json(result.rows[0]);
   } catch (error) {
     if (error.code === '23505') return res.status(409).json({ message: 'You already reviewed this booking' });
-    console.error('CreateReview error:', error);
+    console.error('CreateReview error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -48,7 +48,7 @@ exports.getHelperReviews = async (req, res) => {
       total: parseInt(countResult.rows[0].count),
     });
   } catch (error) {
-    console.error('GetHelperReviews error:', error);
+    console.error('GetHelperReviews error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };

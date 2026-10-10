@@ -21,8 +21,10 @@ async function flushNotifications() {
     await db.query('SELECT expire_emergency_notifications()');
     const unsent=await db.query('SELECT id,user_id,type,title,data,created_at FROM notifications WHERE socket_sent_at IS NULL ORDER BY id LIMIT 100');
     for(const notification of unsent.rows) {
-      getIO()?.to(`user_${notification.user_id}`).emit('notification',notification);
-      await db.query('UPDATE notifications SET socket_sent_at=CURRENT_TIMESTAMP WHERE id=$1',[notification.id]);
+      if (getIO()) {
+        getIO().to(`user_${notification.user_id}`).emit('notification',notification);
+        await db.query('UPDATE notifications SET socket_sent_at=CURRENT_TIMESTAMP WHERE id=$1',[notification.id]);
+      }
     }
     // Do not deliver old notifications when a user signs into a new installation.
     await db.query(`INSERT INTO push_deliveries(notification_id,device_id,token)

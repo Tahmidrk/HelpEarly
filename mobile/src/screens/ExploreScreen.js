@@ -18,8 +18,10 @@ import { helpersAPI, reviewsAPI, complaintsAPI } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import ChatScreen from './ChatScreen';
 import MapViewModal from '../components/MapViewModal';
+import { useNotifications } from '../context/NotificationContext';
 
 export default function ExploreScreen({ route, navigation }) {
+  const { revision } = useNotifications();
   const { user, activeRole, userBookings, fetchUserBookings, cancelBooking, updateBookingSchedule } = useAuth();
   const { selectedCategory: paramCat, highlightHelperId: paramHighlightId, openSubTab } = route.params || {};
 
@@ -200,7 +202,7 @@ export default function ExploreScreen({ route, navigation }) {
 
   useEffect(() => {
     loadHelpers();
-  }, []);
+  }, [revision]);
 
   const loadHelpers = async () => {
     try {

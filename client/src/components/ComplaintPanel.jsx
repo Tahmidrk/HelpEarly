@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import { complaintsAPI } from '../utils/api';
 import ProfileLink from './ProfileLink';
 
+import { useSync } from '../context/SyncContext';
+
 export default function ComplaintPanel() {
+  const revision = useSync('complaints','bookings');
   const [contacts, setContacts] = useState([]);
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +24,7 @@ export default function ComplaintPanel() {
 
   useEffect(() => {
     loadData().finally(() => setLoading(false));
-  }, []);
+  }, [revision]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

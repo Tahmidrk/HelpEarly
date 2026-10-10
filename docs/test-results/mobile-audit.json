@@ -1,0 +1,36 @@
+{
+  "executed_at": "2026-10-10T17:43:35.053Z",
+  "counts": {
+    "info": 0,
+    "low": 0,
+    "moderate": 8,
+    "high": 15,
+    "critical": 0,
+    "total": 23
+  },
+  "advisories": [
+    "@expo/cli",
+    "@expo/code-signing-certificates",
+    "@expo/config",
+    "@expo/config-plugins",
+    "@expo/inline-modules",
+    "@expo/local-build-cache-provider",
+    "@expo/metro",
+    "@expo/metro-config",
+    "@expo/prebuild-config",
+    "@react-native/community-cli-plugin",
+    "@react-native/virtualized-lists",
+    "braces",
+    "expo",
+    "expo-splash-screen",
+    "metro",
+    "metro-config",
+    "metro-file-map",
+    "metro-transform-worker",
+    "micromatch",
+    "node-forge",
+    "react-native",
+    "uuid",
+    "xcode"
+  ]
+}

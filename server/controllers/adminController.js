@@ -76,7 +76,7 @@ exports.getStats = async (req, res) => {
       recentBookings: recentBookings.rows,
     });
   } catch (error) {
-    console.error('GetStats error:', error);
+    console.error('GetStats error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -130,7 +130,7 @@ exports.getUsers = async (req, res) => {
       userBreakdown: userBreakdown.rows[0],
     });
   } catch (error) {
-    console.error('GetUsers error:', error);
+    console.error('GetUsers error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -156,7 +156,7 @@ exports.updateUser = async (req, res) => {
     if(is_active===false) getIO()?.in(`user_${id}`).disconnectSockets(true);
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('UpdateUser error:', error);
+    console.error('UpdateUser error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -178,7 +178,7 @@ exports.verifyHelper = async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('VerifyHelper error:', error);
+    console.error('VerifyHelper error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -190,7 +190,7 @@ exports.deleteUser = async (req, res) => {
     await pool.query('DELETE FROM users WHERE id = $1', [id]);
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
-    console.error('DeleteUser error:', error);
+    console.error('DeleteUser error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -202,7 +202,7 @@ exports.deleteJob = async (req, res) => {
     await pool.query('DELETE FROM jobs WHERE id = $1', [id]);
     res.json({ message: 'Job post deleted by admin' });
   } catch (error) {
-    console.error('DeleteJob error:', error);
+    console.error('DeleteJob error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -214,7 +214,7 @@ exports.deleteReview = async (req, res) => {
     await pool.query('DELETE FROM reviews WHERE id = $1', [id]);
     res.json({ message: 'Review deleted by admin' });
   } catch (error) {
-    console.error('DeleteReview error:', error);
+    console.error('DeleteReview error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };

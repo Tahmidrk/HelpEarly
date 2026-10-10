@@ -1,8 +1,10 @@
 # HelpEarly setup, deployment, backup and rollback
 
+**Current strategy:** [FREE_STACK_STRATEGY.md](FREE_STACK_STRATEGY.md) governs the existing Vercel + Render Free + Supabase DB/Storage deployment. Old Compose assets are historical alternatives, not the selected architecture. Production/remote startup no longer applies migrations; reviewed migrations require owner approval and `npm run db:migrate -- --approved`.
+
 Existing production frontend: `https://atyour-service.vercel.app/`. Existing Supabase project: `at-your-service`. The production architecture audit in `docs/PRODUCTION_AUDIT.md` found the frontend's configured Railway API unavailable and the Supabase schema older than local source. Local Express still uses local PostgreSQL. EAS/FCM and a working hosted API remain unverified.
 
-For this existing deployment, preserve the current Vercel project and Supabase records. Follow the existing-stack recovery order in the audit. **Do not restore the local database dump over the existing Supabase database.** The standalone Compose instructions below are an optional alternative template, not instructions to replace this existing architecture.
+For this existing deployment, preserve the current Vercel project and Supabase records. Follow the existing-stack recovery order in the audit. **Do not restore the local database dump over the existing Supabase database.** The standalone Compose assets are historical alternatives, not instructions to replace this existing architecture.
 
 ## Local development
 
@@ -34,29 +36,15 @@ Reference: [Expo FCM v1 credential setup](https://docs.expo.dev/push-notificatio
 
 ## Backend notification operations
 
-Additive SQL migrations run before API listen. Committed marketplace changes create user-owned notification rows in the same transaction through triggers. A failed/rolled-back booking/proposal does not create successful-action notifications. Events cover booking status, proposals, saved messages, emergencies including expiry, complaint updates and verification changes.
+Production/remote startup only checks the schema. Reviewed migrations run separately after owner approval (`npm run db:migrate -- --approved`). Local non-production startup can initialize local PostgreSQL. Committed marketplace changes create user-owned notification rows in the same transaction through triggers. A failed/rolled-back booking/proposal does not create successful-action notifications. Events cover booking status, proposals, saved messages, emergencies including expiry, complaint updates and verification changes.
 
 Dispatcher runs every two seconds under a PostgreSQL advisory lock. Events update active Socket.IO sessions and remain retrievable from the inbox when disconnected. Each event/user and event/device pair has a uniqueness constraint. Pushes contain a generic title/body and record IDs only; details are fetched after login. Device registration/rotation/deactivation use the authenticated user, not a client-supplied user ID. Logout revokes opted-in device registration before clearing local auth. If revocation fails, reconnect and retry logout.
 
 Definite rate-limit/server rejection retries at most five times. Unknown network outcomes remain `unknown` rather than being blindly resent and duplicating alerts. Monitor failed/unknown deliveries; a generic inbox notification remains available. Invalid devices are disabled on ticket or receipt errors. In-memory REST rate limits are suitable for a **single** API instance; a multi-instance deployment needs shared limits and a Socket.IO adapter. This template deliberately deploys one instance.
 
-## Hosting option: one host, persistent volumes
+## Selected hosting: Render Free, existing Supabase and Vercel
 
-`compose.yaml` provides PostgreSQL 17, the Express API and React web behind Caddy. The backend/DB ports are private; only 80/443 are published. Caddy routes `/api`, `/uploads`, and `/socket.io` to Express and serves the built React app at the same origin. HTTPS and WebSocket upgrades are handled by Caddy. PostgreSQL and photos use separate named volumes. This avoids losing uploads on ephemeral hosting.
-
-No host was provisioned and no money spent. Docker Compose syntax was checked; container build/run awaits a running Docker daemon and a real host. The existing Render blueprint now explicitly requires a disk-capable plan and manual deployment, because the former free ephemeral filesystem could not preserve photos. Do not create a paid Render service without approval.
-
-1. Arrange an approved Linux host with enough RAM/storage, Docker Engine and Compose. Point your actual domain's DNS to it. Permit inbound ports 80/443; restrict SSH; do not publish PostgreSQL or port 5000.
-2. Transfer the reviewed Git commit. Copy root `.env.example` to root `.env`; set the real `APP_DOMAIN` hostname (no scheme), strong `DB_PASSWORD`, random `JWT_SECRET` (32+ characters), and server-only Gemini key. Push remains disabled initially. Protect `.env` with `chmod 600 .env`.
-3. Back up the existing local database and uploads before migration. To preserve accounts/records, restore the custom dump into the **new empty target database**, and copy the old uploads into the target uploads volume before opening the site. Do not initialize demo users or reset the original database. Run `docker compose up -d db`, transfer a backup dump, then `docker compose exec -T db pg_restore -U helpearly -d at_your_service --no-owner --no-acl /tmp/database.dump`. Any restore error must be resolved before continuing. Startup adds only the necessary migration tables/columns; never run old cleanup/debug scripts.
-4. Populate uploads using `docker compose create api`, identify its exact upload volume with `docker inspect`, and copy files into that volume using a temporary container. Preserve filenames so existing `/uploads/...` references keep working. Set ownership to the API's node user (UID 1000). Do not point the volume at a different folder with an empty directory.
-5. Run `docker compose up -d --build`. Check API and DB health, container logs, and your real `https://DOMAIN/api/health`. `database: connected` must be returned. Log in through web; check discovery, uploaded-photo URLs, bookings and real-time chat through WSS. Test from outside your LAN. This external verification has not occurred.
-6. Set the mobile production endpoint to the same real HTTPS domain. Run the database-backed tests against staging, **not a busy production system**: tests insert and remove only their own unique fixture accounts, but AI live tests compare global booking counts and need a quiet staging database.
-7. Create a unique admin using `node db/createAdmin.js` with privately provided `ADMIN_EMAIL` and `ADMIN_PASSWORD` (12+ characters). It never overwrites existing accounts. Disable/rotate intentionally documented local demo credentials before making a migrated database public. Gemini keys stay on the API host.
-
-For a separately hosted PostgreSQL database, use `DATABASE_URL` in server settings, verify its TLS certificate by default, and set `DB_SSL_CA` to the provider CA when required. `DB_SSL_ALLOW_SELF_SIGNED=true` is an explicit exception; avoid it in production. The API removes URL SSL options so they cannot silently replace certificate verification; configure TLS through the documented server variables. [node-postgres documents this replacement behavior](https://node-postgres.com/features/ssl). Cross-origin web hosting needs explicit HTTPS `CLIENT_URL` entries plus matching `VITE_API_URL` and `VITE_SOCKET_URL` at build time. CORS is not a substitute for authentication.
-
-Reference: [Docker persistent volumes](https://docs.docker.com/engine/storage/volumes/), [Caddy SPA and reverse-proxy patterns](https://caddyserver.com/docs/caddyfile/patterns).
+Follow [FREE_STACK_STRATEGY.md](FREE_STACK_STRATEGY.md) for the exact approval, backup, schema/security, private Storage, Render and existing Vercel rollout sequence. `render.yaml` selects Free with no disk. Media uses Supabase Storage; the API remains portable. Existing Compose assets are not the supported deployment route for this project and must not replace the existing Supabase database or Vercel website.
 
 ## Backup and restore
 

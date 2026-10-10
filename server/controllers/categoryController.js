@@ -8,7 +8,7 @@ exports.getCategories = async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    console.error('GetCategories error:', error);
+    console.error('GetCategories error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -37,7 +37,7 @@ exports.getCategory = async (req, res) => {
       helpers: helpersResult.rows,
     });
   } catch (error) {
-    console.error('GetCategory error:', error);
+    console.error('GetCategory error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };

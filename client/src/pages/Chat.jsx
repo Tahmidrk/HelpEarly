@@ -6,7 +6,10 @@ import { io } from 'socket.io-client';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProfileLink from '../components/ProfileLink';
 
+import { useSync } from '../context/SyncContext';
+
 export default function Chat() {
+  const revision = useSync('messages');
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const targetUserId = searchParams.get('userId');
@@ -26,6 +29,7 @@ export default function Chat() {
     const token = localStorage.getItem('token');
     const s = io(SOCKET_URL, { auth: { token }, withCredentials: true });
     setSocket(s);
+    s.on('connect', () => { if (activeConvRef.current?.id) s.emit('join_conversation', activeConvRef.current.id); });
 
     s.on('new_message', (msg) => {
       // Only add messages from OTHER users; our own messages are already added via the API response.
@@ -44,7 +48,11 @@ export default function Chat() {
       .then(setConversations)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [revision]);
+
+  useEffect(() => {
+    if (activeConv?.id) loadMessages(activeConv.id);
+  }, [revision, activeConv?.id]);
 
   // Auto-open conversation when navigated with userId
   useEffect(() => {

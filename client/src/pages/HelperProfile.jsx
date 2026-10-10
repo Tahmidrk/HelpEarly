@@ -8,7 +8,10 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { getCategoryIcon } from '../utils/iconMap';
 import AddressMap from '../components/AddressMap';
 
+import { useSync } from '../context/SyncContext';
+
 export default function HelperProfile() {
+  const revision = useSync("helpers");
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -21,7 +24,7 @@ export default function HelperProfile() {
       .then(setHelper)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, revision]);
 
   if (loading) return <LoadingSpinner />;
   if (!helper) return <div className="page"><div className="container"><div className="empty-state"><i className="fas fa-frown" style={{ fontSize: '2rem' }}></i><h3>Helper not found</h3></div></div></div>;

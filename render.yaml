@@ -5,14 +5,9 @@ services:
     rootDir: server
     buildCommand: npm ci --omit=dev
     startCommand: npm start
-    # Persistent uploaded photos require a disk-capable paid plan. Provision manually.
-    plan: starter
+    plan: free
     autoDeploy: false
-    healthCheckPath: /api/health
-    disk:
-      name: helpearly-uploads
-      mountPath: /var/data/helpearly-uploads
-      sizeGB: 1
+    healthCheckPath: /api/ready
     envVars:
       - key: NODE_ENV
         value: production
@@ -26,8 +21,20 @@ services:
         sync: false
       - key: NODE_VERSION
         value: 22.14.0
-      - key: UPLOAD_DIR
-        value: /var/data/helpearly-uploads
+      - key: STORAGE_PROVIDER
+        value: supabase
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        sync: false
+      - key: DB_POOL_MAX
+        value: 5
+      - key: RUN_BACKGROUND_WORKER
+        value: true
+      - key: LOG_REQUESTS
+        value: true
       - key: TRUST_PROXY
         value: 1
       - key: GEMINI_API_KEY

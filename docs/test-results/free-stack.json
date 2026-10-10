@@ -1,0 +1,23 @@
+{
+  "executed_at": "2026-10-10T17:50:44.050Z",
+  "database": "isolated local replica of Supabase schema; synthetic records only",
+  "results": {
+    "Production startup refuses unmigrated database without changing schema": "PASS",
+    "Migration rollback on legacy conflict": "PASS",
+    "Live schema replica migration: records preserved, repeatable": "PASS",
+    "RLS, Data API grants and RPC execution denied for non-owner": "PASS",
+    "HTTP CORS allowlist": "PASS",
+    "14 database-backed MVP groups": "PASS",
+    "20 authorization/concurrency/outbox groups": "PASS",
+    "Socket.IO browser origin allowlist": "PASS",
+    "Web mutation to worker sync; private revision isolation; authenticated hints": "PASS",
+    "Android mutation to web; missed updates recovered without socket": "PASS",
+    "API restart preserves media, revisions and database records": "PASS",
+    "Notification job survives process restart": "PASS",
+    "Supabase private storage HTTP contract (mock provider, not live)": "PASS",
+    "Storage failure surfaced, no fake success": "PASS",
+    "Sync retries offline reads, deduplicates revisions, forces foreground refresh": "PASS",
+    "Dedicated worker process restart preserves and deduplicates pending push jobs (delivery disabled)": "PASS"
+  },
+  "live_storage_push_device": "NOT RUN: credentials/device pending"
+}

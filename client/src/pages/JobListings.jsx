@@ -7,7 +7,10 @@ import { getCategoryIcon, HIDDEN_CATEGORIES } from '../utils/iconMap';
 import AddressMap from '../components/AddressMap';
 import ProfileLink from '../components/ProfileLink';
 
+import { useSync } from '../context/SyncContext';
+
 export default function JobListings() {
+  const revision = useSync("jobs","categories");
   const { user, loading: authLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const [jobs, setJobs] = useState([]);
@@ -74,7 +77,7 @@ export default function JobListings() {
     return () => {
       ignore = true;
     };
-  }, [authLoading, categoryFilter, user?.role]);
+  }, [authLoading, categoryFilter, user?.role, revision]);
 
   const pageTitle = user?.role === 'household'
     ? 'My Job Board'

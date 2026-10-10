@@ -19,7 +19,7 @@ exports.getPublicUser = async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('GetPublicUser error:', error);
+    console.error('GetPublicUser error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };

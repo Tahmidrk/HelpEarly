@@ -8,23 +8,28 @@ import AddressMap from '../components/AddressMap';
 import ComplaintPanel from '../components/ComplaintPanel';
 import ProfileLink from '../components/ProfileLink';
 
+import { useSync } from '../context/SyncContext';
+
 export default function UserDashboard() {
+  const revision = useSync("bookings","jobs");
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('bookings');
   const [bookings, setBookings] = useState([]);
   const [myJobs, setMyJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshError,setRefreshError] = useState('');
   const [reviewForm, setReviewForm] = useState({ bookingId: null, helperId: null, rating: 0, comment: '' });
 
   useEffect(() => {
     Promise.all([
-      bookingsAPI.getAll().catch(() => []),
-      jobsAPI.getMyJobs().catch(() => []),
+      bookingsAPI.getAll(),
+      jobsAPI.getMyJobs(),
     ]).then(([b, j]) => {
       setBookings(b);
       setMyJobs(j);
-    }).finally(() => setLoading(false));
-  }, []);
+      setRefreshError('');
+    }).catch(error=>setRefreshError(error.message)).finally(() => setLoading(false));
+  }, [revision]);
 
   const handleStatusUpdate = async (id, status) => {
     try {
@@ -57,6 +62,7 @@ export default function UserDashboard() {
   return (
     <div className="page">
       <div className="container">
+        {refreshError && <p role="alert">Could not refresh: {refreshError}. Retrying; previous records remain visible.</p>}
         <div className="page-header animate-fade-in">
           <h1>Welcome, {user?.name?.split(' ')[0]}!</h1>
           <p>Manage your bookings and job posts</p>

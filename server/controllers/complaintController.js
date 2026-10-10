@@ -41,7 +41,7 @@ exports.getComplaintContacts = async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error('GetComplaintContacts error:', error);
+    console.error('GetComplaintContacts error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -93,7 +93,7 @@ exports.createComplaint = async (req, res) => {
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error('CreateComplaint error:', error);
+    console.error('CreateComplaint error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -112,7 +112,7 @@ exports.getMyComplaints = async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error('GetMyComplaints error:', error);
+    console.error('GetMyComplaints error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -144,7 +144,7 @@ exports.getAllComplaints = async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error('GetAllComplaints error:', error);
+    console.error('GetAllComplaints error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -173,7 +173,7 @@ exports.updateComplaint = async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('UpdateComplaint error:', error);
+    console.error('UpdateComplaint error:', error.code || error.name);
     res.status(500).json({ message: 'Server error' });
   }
 };

@@ -1,0 +1,1137 @@
+{
+  "columns": [
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "bookings",
+      "default": "nextval('bookings_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "user_id",
+      "type": "integer",
+      "table": "bookings",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "helper_id",
+      "type": "integer",
+      "table": "bookings",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "service_id",
+      "type": "integer",
+      "table": "bookings",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "booking_date",
+      "type": "timestamp without time zone",
+      "table": "bookings",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "end_date",
+      "type": "timestamp without time zone",
+      "table": "bookings",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "status",
+      "type": "character varying(20)",
+      "table": "bookings",
+      "default": "'pending'::character varying",
+      "not_null": false
+    },
+    {
+      "name": "notes",
+      "type": "text",
+      "table": "bookings",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "total_price",
+      "type": "numeric(10,2)",
+      "table": "bookings",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "address",
+      "type": "character varying(500)",
+      "table": "bookings",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "bookings",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp without time zone",
+      "table": "bookings",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "categories",
+      "default": "nextval('categories_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "name",
+      "type": "character varying(100)",
+      "table": "categories",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "icon",
+      "type": "character varying(10)",
+      "table": "categories",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "table": "categories",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "categories",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "complaints",
+      "default": "nextval('complaints_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "complainant_id",
+      "type": "integer",
+      "table": "complaints",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "accused_id",
+      "type": "integer",
+      "table": "complaints",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "subject",
+      "type": "character varying(200)",
+      "table": "complaints",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "table": "complaints",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "status",
+      "type": "character varying(20)",
+      "table": "complaints",
+      "default": "'open'::character varying",
+      "not_null": false
+    },
+    {
+      "name": "admin_notes",
+      "type": "text",
+      "table": "complaints",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "complaints",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp without time zone",
+      "table": "complaints",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "conversations",
+      "default": "nextval('conversations_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "user1_id",
+      "type": "integer",
+      "table": "conversations",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "user2_id",
+      "type": "integer",
+      "table": "conversations",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "last_message_at",
+      "type": "timestamp without time zone",
+      "table": "conversations",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "conversations",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "helper_categories",
+      "default": "nextval('helper_categories_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "helper_id",
+      "type": "integer",
+      "table": "helper_categories",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "category_id",
+      "type": "integer",
+      "table": "helper_categories",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "experience_years",
+      "type": "integer",
+      "table": "helper_categories",
+      "default": "0",
+      "not_null": false
+    },
+    {
+      "name": "hourly_rate",
+      "type": "numeric(10,2)",
+      "table": "helper_categories",
+      "default": "0",
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "helper_categories",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "helper_services",
+      "default": "nextval('helper_services_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "helper_id",
+      "type": "integer",
+      "table": "helper_services",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "category_id",
+      "type": "integer",
+      "table": "helper_services",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "service_name",
+      "type": "character varying(200)",
+      "table": "helper_services",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "table": "helper_services",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "price",
+      "type": "numeric(10,2)",
+      "table": "helper_services",
+      "default": "0",
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "helper_services",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "helpers",
+      "default": "nextval('helpers_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "user_id",
+      "type": "integer",
+      "table": "helpers",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "bio",
+      "type": "text",
+      "table": "helpers",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "hourly_rate",
+      "type": "numeric(10,2)",
+      "table": "helpers",
+      "default": "0",
+      "not_null": false
+    },
+    {
+      "name": "is_verified",
+      "type": "boolean",
+      "table": "helpers",
+      "default": "false",
+      "not_null": false
+    },
+    {
+      "name": "avg_rating",
+      "type": "numeric(3,2)",
+      "table": "helpers",
+      "default": "0",
+      "not_null": false
+    },
+    {
+      "name": "total_reviews",
+      "type": "integer",
+      "table": "helpers",
+      "default": "0",
+      "not_null": false
+    },
+    {
+      "name": "is_available",
+      "type": "boolean",
+      "table": "helpers",
+      "default": "true",
+      "not_null": false
+    },
+    {
+      "name": "experience_years",
+      "type": "integer",
+      "table": "helpers",
+      "default": "0",
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "helpers",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp without time zone",
+      "table": "helpers",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "job_applications",
+      "default": "nextval('job_applications_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "job_id",
+      "type": "integer",
+      "table": "job_applications",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "helper_id",
+      "type": "integer",
+      "table": "job_applications",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "cover_message",
+      "type": "text",
+      "table": "job_applications",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "proposed_price",
+      "type": "numeric(10,2)",
+      "table": "job_applications",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "status",
+      "type": "character varying(20)",
+      "table": "job_applications",
+      "default": "'pending'::character varying",
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "job_applications",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "jobs",
+      "default": "nextval('jobs_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "user_id",
+      "type": "integer",
+      "table": "jobs",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "category_id",
+      "type": "integer",
+      "table": "jobs",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "title",
+      "type": "character varying(200)",
+      "table": "jobs",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "table": "jobs",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "budget",
+      "type": "numeric(10,2)",
+      "table": "jobs",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "location",
+      "type": "character varying(255)",
+      "table": "jobs",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "latitude",
+      "type": "numeric(10,8)",
+      "table": "jobs",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "longitude",
+      "type": "numeric(11,8)",
+      "table": "jobs",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "status",
+      "type": "character varying(20)",
+      "table": "jobs",
+      "default": "'open'::character varying",
+      "not_null": false
+    },
+    {
+      "name": "preferred_date",
+      "type": "timestamp without time zone",
+      "table": "jobs",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "jobs",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp without time zone",
+      "table": "jobs",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "messages",
+      "default": "nextval('messages_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "conversation_id",
+      "type": "integer",
+      "table": "messages",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "sender_id",
+      "type": "integer",
+      "table": "messages",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "content",
+      "type": "text",
+      "table": "messages",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "is_read",
+      "type": "boolean",
+      "table": "messages",
+      "default": "false",
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "messages",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "payments",
+      "default": "nextval('payments_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "booking_id",
+      "type": "integer",
+      "table": "payments",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "user_id",
+      "type": "integer",
+      "table": "payments",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "helper_id",
+      "type": "integer",
+      "table": "payments",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "amount",
+      "type": "numeric(10,2)",
+      "table": "payments",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "status",
+      "type": "character varying(20)",
+      "table": "payments",
+      "default": "'pending'::character varying",
+      "not_null": false
+    },
+    {
+      "name": "payment_method",
+      "type": "character varying(50)",
+      "table": "payments",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "payments",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "reviews",
+      "default": "nextval('reviews_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "user_id",
+      "type": "integer",
+      "table": "reviews",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "helper_id",
+      "type": "integer",
+      "table": "reviews",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "booking_id",
+      "type": "integer",
+      "table": "reviews",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "rating",
+      "type": "integer",
+      "table": "reviews",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "comment",
+      "type": "text",
+      "table": "reviews",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "reviews",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "id",
+      "type": "integer",
+      "table": "users",
+      "default": "nextval('users_id_seq'::regclass)",
+      "not_null": true
+    },
+    {
+      "name": "name",
+      "type": "character varying(100)",
+      "table": "users",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "email",
+      "type": "character varying(255)",
+      "table": "users",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "password_hash",
+      "type": "character varying(255)",
+      "table": "users",
+      "default": null,
+      "not_null": true
+    },
+    {
+      "name": "phone",
+      "type": "character varying(20)",
+      "table": "users",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "avatar_url",
+      "type": "character varying(500)",
+      "table": "users",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "role",
+      "type": "character varying(20)",
+      "table": "users",
+      "default": "'household'::character varying",
+      "not_null": true
+    },
+    {
+      "name": "location",
+      "type": "character varying(255)",
+      "table": "users",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "latitude",
+      "type": "numeric(10,8)",
+      "table": "users",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "longitude",
+      "type": "numeric(11,8)",
+      "table": "users",
+      "default": null,
+      "not_null": false
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "table": "users",
+      "default": "true",
+      "not_null": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp without time zone",
+      "table": "users",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp without time zone",
+      "table": "users",
+      "default": "CURRENT_TIMESTAMP",
+      "not_null": false
+    }
+  ],
+  "indexes": [
+    {
+      "name": "idx_users_role",
+      "definition": "CREATE INDEX idx_users_role ON public.users USING btree (role)"
+    },
+    {
+      "name": "idx_users_email",
+      "definition": "CREATE INDEX idx_users_email ON public.users USING btree (email)"
+    },
+    {
+      "name": "idx_helpers_user_id",
+      "definition": "CREATE INDEX idx_helpers_user_id ON public.helpers USING btree (user_id)"
+    },
+    {
+      "name": "idx_helper_services_helper_id",
+      "definition": "CREATE INDEX idx_helper_services_helper_id ON public.helper_services USING btree (helper_id)"
+    },
+    {
+      "name": "idx_helper_services_category_id",
+      "definition": "CREATE INDEX idx_helper_services_category_id ON public.helper_services USING btree (category_id)"
+    },
+    {
+      "name": "idx_bookings_user_id",
+      "definition": "CREATE INDEX idx_bookings_user_id ON public.bookings USING btree (user_id)"
+    },
+    {
+      "name": "idx_bookings_helper_id",
+      "definition": "CREATE INDEX idx_bookings_helper_id ON public.bookings USING btree (helper_id)"
+    },
+    {
+      "name": "idx_reviews_helper_id",
+      "definition": "CREATE INDEX idx_reviews_helper_id ON public.reviews USING btree (helper_id)"
+    },
+    {
+      "name": "idx_messages_conversation_id",
+      "definition": "CREATE INDEX idx_messages_conversation_id ON public.messages USING btree (conversation_id)"
+    },
+    {
+      "name": "idx_jobs_user_id",
+      "definition": "CREATE INDEX idx_jobs_user_id ON public.jobs USING btree (user_id)"
+    },
+    {
+      "name": "idx_jobs_category_id",
+      "definition": "CREATE INDEX idx_jobs_category_id ON public.jobs USING btree (category_id)"
+    },
+    {
+      "name": "idx_job_applications_job_id",
+      "definition": "CREATE INDEX idx_job_applications_job_id ON public.job_applications USING btree (job_id)"
+    },
+    {
+      "name": "idx_job_applications_helper_id",
+      "definition": "CREATE INDEX idx_job_applications_helper_id ON public.job_applications USING btree (helper_id)"
+    },
+    {
+      "name": "idx_helper_categories_helper_id",
+      "definition": "CREATE INDEX idx_helper_categories_helper_id ON public.helper_categories USING btree (helper_id)"
+    },
+    {
+      "name": "idx_helper_categories_category_id",
+      "definition": "CREATE INDEX idx_helper_categories_category_id ON public.helper_categories USING btree (category_id)"
+    },
+    {
+      "name": "idx_complaints_complainant_id",
+      "definition": "CREATE INDEX idx_complaints_complainant_id ON public.complaints USING btree (complainant_id)"
+    },
+    {
+      "name": "idx_complaints_accused_id",
+      "definition": "CREATE INDEX idx_complaints_accused_id ON public.complaints USING btree (accused_id)"
+    },
+    {
+      "name": "idx_complaints_status",
+      "definition": "CREATE INDEX idx_complaints_status ON public.complaints USING btree (status)"
+    }
+  ],
+  "constraints": [
+    {
+      "name": "bookings_status_check",
+      "type": "c",
+      "table": "bookings",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'confirmed'::character varying, 'in_progress'::character varying, 'completed'::character varying, 'cancelled'::character varying])::text[])))"
+    },
+    {
+      "name": "complaints_status_check",
+      "type": "c",
+      "table": "complaints",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['open'::character varying, 'reviewing'::character varying, 'resolved'::character varying, 'dismissed'::character varying])::text[])))"
+    },
+    {
+      "name": "job_applications_status_check",
+      "type": "c",
+      "table": "job_applications",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'accepted'::character varying, 'rejected'::character varying])::text[])))"
+    },
+    {
+      "name": "jobs_status_check",
+      "type": "c",
+      "table": "jobs",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['open'::character varying, 'in_progress'::character varying, 'completed'::character varying, 'cancelled'::character varying])::text[])))"
+    },
+    {
+      "name": "payments_status_check",
+      "type": "c",
+      "table": "payments",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'completed'::character varying, 'refunded'::character varying])::text[])))"
+    },
+    {
+      "name": "reviews_rating_check",
+      "type": "c",
+      "table": "reviews",
+      "definition": "CHECK (((rating >= 1) AND (rating <= 5)))"
+    },
+    {
+      "name": "users_role_check",
+      "type": "c",
+      "table": "users",
+      "definition": "CHECK (((role)::text = ANY ((ARRAY['household'::character varying, 'helper'::character varying, 'admin'::character varying])::text[])))"
+    },
+    {
+      "name": "bookings_helper_id_fkey",
+      "type": "f",
+      "table": "bookings",
+      "definition": "FOREIGN KEY (helper_id) REFERENCES helpers(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "bookings_service_id_fkey",
+      "type": "f",
+      "table": "bookings",
+      "definition": "FOREIGN KEY (service_id) REFERENCES helper_services(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "bookings_user_id_fkey",
+      "type": "f",
+      "table": "bookings",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "complaints_accused_id_fkey",
+      "type": "f",
+      "table": "complaints",
+      "definition": "FOREIGN KEY (accused_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "complaints_complainant_id_fkey",
+      "type": "f",
+      "table": "complaints",
+      "definition": "FOREIGN KEY (complainant_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "conversations_user1_id_fkey",
+      "type": "f",
+      "table": "conversations",
+      "definition": "FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "conversations_user2_id_fkey",
+      "type": "f",
+      "table": "conversations",
+      "definition": "FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "helper_categories_category_id_fkey",
+      "type": "f",
+      "table": "helper_categories",
+      "definition": "FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "helper_categories_helper_id_fkey",
+      "type": "f",
+      "table": "helper_categories",
+      "definition": "FOREIGN KEY (helper_id) REFERENCES helpers(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "helper_services_category_id_fkey",
+      "type": "f",
+      "table": "helper_services",
+      "definition": "FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "helper_services_helper_id_fkey",
+      "type": "f",
+      "table": "helper_services",
+      "definition": "FOREIGN KEY (helper_id) REFERENCES helpers(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "helpers_user_id_fkey",
+      "type": "f",
+      "table": "helpers",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "job_applications_helper_id_fkey",
+      "type": "f",
+      "table": "job_applications",
+      "definition": "FOREIGN KEY (helper_id) REFERENCES helpers(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "job_applications_job_id_fkey",
+      "type": "f",
+      "table": "job_applications",
+      "definition": "FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "jobs_category_id_fkey",
+      "type": "f",
+      "table": "jobs",
+      "definition": "FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "jobs_user_id_fkey",
+      "type": "f",
+      "table": "jobs",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "messages_conversation_id_fkey",
+      "type": "f",
+      "table": "messages",
+      "definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "messages_sender_id_fkey",
+      "type": "f",
+      "table": "messages",
+      "definition": "FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "payments_booking_id_fkey",
+      "type": "f",
+      "table": "payments",
+      "definition": "FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "payments_helper_id_fkey",
+      "type": "f",
+      "table": "payments",
+      "definition": "FOREIGN KEY (helper_id) REFERENCES helpers(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "payments_user_id_fkey",
+      "type": "f",
+      "table": "payments",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "reviews_booking_id_fkey",
+      "type": "f",
+      "table": "reviews",
+      "definition": "FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "reviews_helper_id_fkey",
+      "type": "f",
+      "table": "reviews",
+      "definition": "FOREIGN KEY (helper_id) REFERENCES helpers(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "reviews_user_id_fkey",
+      "type": "f",
+      "table": "reviews",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "bookings_pkey",
+      "type": "p",
+      "table": "bookings",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "categories_pkey",
+      "type": "p",
+      "table": "categories",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "complaints_pkey",
+      "type": "p",
+      "table": "complaints",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "conversations_pkey",
+      "type": "p",
+      "table": "conversations",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "helper_categories_pkey",
+      "type": "p",
+      "table": "helper_categories",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "helper_services_pkey",
+      "type": "p",
+      "table": "helper_services",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "helpers_pkey",
+      "type": "p",
+      "table": "helpers",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "job_applications_pkey",
+      "type": "p",
+      "table": "job_applications",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "jobs_pkey",
+      "type": "p",
+      "table": "jobs",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "messages_pkey",
+      "type": "p",
+      "table": "messages",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "payments_pkey",
+      "type": "p",
+      "table": "payments",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "reviews_pkey",
+      "type": "p",
+      "table": "reviews",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "users_pkey",
+      "type": "p",
+      "table": "users",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "conversations_user1_id_user2_id_key",
+      "type": "u",
+      "table": "conversations",
+      "definition": "UNIQUE (user1_id, user2_id)"
+    },
+    {
+      "name": "helper_categories_helper_id_category_id_key",
+      "type": "u",
+      "table": "helper_categories",
+      "definition": "UNIQUE (helper_id, category_id)"
+    },
+    {
+      "name": "helpers_user_id_key",
+      "type": "u",
+      "table": "helpers",
+      "definition": "UNIQUE (user_id)"
+    },
+    {
+      "name": "job_applications_job_id_helper_id_key",
+      "type": "u",
+      "table": "job_applications",
+      "definition": "UNIQUE (job_id, helper_id)"
+    },
+    {
+      "name": "users_email_key",
+      "type": "u",
+      "table": "users",
+      "definition": "UNIQUE (email)"
+    }
+  ]
+}

@@ -13,6 +13,7 @@ const ssl=process.env.DB_SSL==='false' || isLocalDatabaseUrl ? false : {
   rejectUnauthorized:process.env.DB_SSL_ALLOW_SELF_SIGNED!=='true',
   ...(process.env.DB_SSL_CA ? {ca:process.env.DB_SSL_CA.replace(/\\n/g,'\n')} : {}),
 };
+if (process.env.NODE_ENV==='production' && !isLocalDatabaseUrl && (ssl===false || ssl.rejectUnauthorized===false)) throw new Error('Production remote PostgreSQL requires verified TLS; configure the provider CA instead of disabling verification.');
 
 const poolConfig = process.env.DATABASE_URL
   ? {
@@ -28,7 +29,7 @@ const poolConfig = process.env.DATABASE_URL
       ssl,
     };
 
-const pool = new Pool({ ...poolConfig, connectionTimeoutMillis: 5000 });
+const pool = new Pool({ ...poolConfig, max:Number(process.env.DB_POOL_MAX || 5), connectionTimeoutMillis: 10000, idleTimeoutMillis:30000 });
 
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err.code || err.name);

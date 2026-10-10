@@ -2,8 +2,10 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { apiRequest } from '../api/client';
+import { useNotifications } from '../context/NotificationContext';
 
 export default function AdminDashboardScreen() {
+  const { revision } = useNotifications();
   const [tab,setTab]=useState('overview'), [stats,setStats]=useState(null), [users,setUsers]=useState([]), [complaints,setComplaints]=useState([]);
   const [search,setSearch]=useState(''), [notes,setNotes]=useState({}), [loading,setLoading]=useState(true), [error,setError]=useState(''), [busy,setBusy]=useState(false);
   const load=useCallback(async()=>{
@@ -16,7 +18,7 @@ export default function AdminDashboardScreen() {
     } catch(err) { setError(err.message); }
     finally { setLoading(false); }
   },[tab,search]);
-  useFocusEffect(useCallback(()=>{load();},[load]));
+  useFocusEffect(useCallback(()=>{load();},[load,revision]));
   const update=async(path,body)=>{
     if(busy) return;
     setBusy(true);
