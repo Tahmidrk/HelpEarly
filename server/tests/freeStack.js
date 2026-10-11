@@ -31,7 +31,7 @@ async function startApi(env) {
   const deadline = Date.now()+20000;
   while(Date.now()<deadline) {
     if(api.exitCode!==null) throw new Error('Isolated API startup failed');
-    try { if((await fetch(base+'/ready')).ok) return; } catch {}
+    try { const response=await fetch(base+'/ready'); if(response.ok) { assert.equal((await response.json()).schema,4); return; } } catch {}
     await new Promise(resolve=>setTimeout(resolve,200));
   }
   throw new Error('Isolated API did not become ready');

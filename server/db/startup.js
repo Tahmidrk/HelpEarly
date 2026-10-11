@@ -2,6 +2,7 @@ const pool = require('../config/db');
 async function assertSchema() {
   const result = await pool.query('SELECT version FROM helpearly_schema WHERE version=4');
   if (!result.rows.length) throw new Error('Database migrations need review and approval before deployment');
+  return result.rows[0].version;
 }
 async function startup() {
   const host = process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL).hostname : process.env.DB_HOST || 'localhost';

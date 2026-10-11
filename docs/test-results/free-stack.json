@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-11T15:09:32.283Z",
+  "executed_at": "2026-10-11T16:47:00.045Z",
   "database": "isolated local replica of Supabase schema; synthetic records only",
   "results": {
     "Production startup refuses unmigrated database without changing schema": "PASS",

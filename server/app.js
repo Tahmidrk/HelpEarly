@@ -66,7 +66,7 @@ app.get('/api/health', async (req, res) => {
   catch { res.status(503).json({ status: 'unavailable', database: 'disconnected' }); }
 });
 app.get('/api/ready', async (req,res) => {
-  try { await require('./db/startup').assertSchema(); res.json({status:'ready',schema:3}); }
+  try { const schema=await require('./db/startup').assertSchema(); res.json({status:'ready',schema}); }
   catch { res.status(503).json({status:'unavailable',message:'Database schema is not ready'}); }
 });
 app.use((req,res) => res.status(404).json({message:'Route not found'}));

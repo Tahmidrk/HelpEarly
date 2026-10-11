@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-11T15:09:30.453Z",
+  "executed_at": "2026-10-11T16:46:58.150Z",
   "database": "Disposable isolated PostgreSQL; synthetic records only",
   "results": {
     "New-account chat works; opposite dual-role threads and REST authorization remain isolated; unrelated household discovery denied": "PASS",

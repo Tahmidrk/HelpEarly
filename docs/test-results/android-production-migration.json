@@ -1,0 +1,34 @@
+{
+  "executed_at": "2026-10-11T16:13:11.561Z",
+  "status": "PASS",
+  "approval": "User approved reviewed schema 4 migration and existing-service deployments after fresh verified backup/restore",
+  "project": "gjwkrqlzroujlueexcxc",
+  "schemaVersion": 4,
+  "originalBusinessRowsAndContentPreserved": true,
+  "syncRevisions": "Original entries retained; monotonically advanced",
+  "preexistingNotificationAudiencesPreserved": true,
+  "tableRlsAndGrantsUnchanged": true,
+  "newTriggerPublicExecuteRevoked": true,
+  "mediaObjectsVerified": 5,
+  "legacyAssignment": {
+    "conversations": {
+      "total": 9,
+      "unassigned": 0
+    },
+    "ai_messages": {
+      "total": 16,
+      "unassigned": 4
+    },
+    "complaints": {
+      "total": 4,
+      "unassigned": 0
+    },
+    "push_devices": {
+      "total": 1,
+      "unassigned": 0
+    }
+  },
+  "backupDirectory": "H:\\apps\\HelpEarly-backups\\android-role-2026-10-11T16-10-52-017Z",
+  "migrationSHA256": "c51486f2b9865480c4cbf417b44b582532eca87e3af7802839b4a71ae65b7d46",
+  "transactionCommitted": true
+}
