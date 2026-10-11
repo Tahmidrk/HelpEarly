@@ -1,0 +1,12 @@
+{
+  "executed_at": "2026-10-11T11:37:27.310Z",
+  "status": "PASS",
+  "approval": "User approved exact admin migration and existing Render/Vercel deployments after fresh verified backup/restore",
+  "project": "gjwkrqlzroujlueexcxc",
+  "schemaVersion": 3,
+  "originalRowsPreserved": true,
+  "directPublicGrants": 0,
+  "backupDirectory": "H:/apps/HelpEarly-backups/admin-production-2026-10-11T11-35-29-059Z",
+  "migrationSHA256": "ea0e309dc292419a390a53c82c8e0f9a0d1d095da310ad11855b6ce8fd3a0e55",
+  "transactionCommitted": true
+}

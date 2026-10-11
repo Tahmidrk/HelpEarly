@@ -1,0 +1,112 @@
+{
+  "executed_at": "2026-10-11T08:28:38.754Z",
+  "status": "PASS",
+  "scope": "Actual in-app browser against disposable local PostgreSQL, Express and React; synthetic records only; no production writes",
+  "results": [
+    {
+      "test": "Browser Accounts table",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser Workers table",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser Categories table",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser Services table",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser Bookings table",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser Jobs table",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser Proposals table",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser Emergencies table",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser Complaints table",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser Reviews table",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser Audit log table",
+      "status": "PASS"
+    },
+    {
+      "test": "Confirmation cancellation causes no saved category",
+      "status": "PASS"
+    },
+    {
+      "test": "Category saved by browser and refetched from real database",
+      "status": "PASS"
+    },
+    {
+      "test": "Category hidden in real table and shared Footer discovery",
+      "status": "PASS"
+    },
+    {
+      "test": "Worker verification browser action persists",
+      "status": "PASS"
+    },
+    {
+      "test": "Complaint resolved with durable notes through browser",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser hide/restore Jobs",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser hide/restore Reviews",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser account deactivate/restore and disabled self-controls",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser role filter removes unrelated rows",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser real filtered zero-result state",
+      "status": "PASS"
+    },
+    {
+      "test": "Confirmation Escape returns to editor",
+      "status": "PASS"
+    },
+    {
+      "test": "Real duplicate-category error displayed; editor and controls recover",
+      "status": "PASS"
+    },
+    {
+      "test": "Browser audit displays real SUCCESS/REJECTED rows without mutation controls",
+      "status": "PASS"
+    },
+    {
+      "test": "Household direct admin route redirects to login without administration controls",
+      "status": "PASS"
+    }
+  ],
+  "screenshots": [
+    "H:/apps/HelpEarly-artifacts/admin-local-browser-overview-20261011.png",
+    "H:/apps/HelpEarly-artifacts/admin-local-browser-audit-20261011.png"
+  ],
+  "physical_android": "NOT RUN"
+}

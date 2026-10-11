@@ -26,10 +26,10 @@
     "databaseTLS": "PASS"
   },
   "migrationWithoutApproval": "PASS: refused with exit 1",
-  "browserFinalInteraction": "BLOCKED: stale native confirmation",
+  "browserFinalInteraction": "PASS: 25 actual browser checks; see admin-browser.json",
   "physicalAndroid": "IMPLEMENTED/UNVERIFIED",
   "newSignedAPK": "BLOCKED: no new EAS build submitted",
-  "production": "BLOCKED: separate approval required",
+  "production": "APPROVED: schema 3 applied; existing Render/Vercel deployments in progress",
   "stagedWhitespaceAndCredentialScan": {
     "status": "PASS",
     "files": 54,

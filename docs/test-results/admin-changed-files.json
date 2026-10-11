@@ -1,5 +1,5 @@
 {
-  "recorded_at": "2026-10-11T08:19:43.872Z",
+  "recorded_at": "2026-10-11T11:37:43.013Z",
   "scope": "Local central administration implementation; unrelated untracked files excluded",
   "files": [
     "README.md",
@@ -14,10 +14,12 @@
     "docs/WEB_ADMIN_COMPLETION.md",
     "docs/WEB_ADMIN_ROADMAP.md",
     "docs/test-results/admin-backup-restore.json",
+    "docs/test-results/admin-browser.json",
     "docs/test-results/admin-builds.json",
     "docs/test-results/admin-changed-files.json",
     "docs/test-results/admin-components.json",
     "docs/test-results/admin-local.json",
+    "docs/test-results/admin-production-migration.json",
     "docs/test-results/admin-react-integration.json",
     "docs/test-results/android-parity.json",
     "docs/test-results/free-stack.json",

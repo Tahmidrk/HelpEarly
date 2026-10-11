@@ -1,9 +1,9 @@
 {
-  "executed_at": "2026-10-11T08:07:58.919Z",
+  "executed_at": "2026-10-11T11:35:56.184Z",
   "status": "PASS",
   "productionMode": "read-only snapshot/Storage downloads; no migrations, writes or deployments",
-  "backupDirectory": "H:/apps/HelpEarly-backups/admin-production-2026-10-11T08-07-31-832Z",
-  "dumpSHA256": "dc31494f7558e390d77702c010538916ed1e79671db8a2eaf79da3e31ceeb70f",
+  "backupDirectory": "H:/apps/HelpEarly-backups/admin-production-2026-10-11T11-35-29-059Z",
+  "dumpSHA256": "82d940186a7e13fefbb8ff7c872f7c82d51d4e975647182bed0fcc34e4024b8e",
   "migrationSHA256": "ea0e309dc292419a390a53c82c8e0f9a0d1d095da310ad11855b6ce8fd3a0e55",
   "originalTableCount": 22,
   "resultTableCount": 23,

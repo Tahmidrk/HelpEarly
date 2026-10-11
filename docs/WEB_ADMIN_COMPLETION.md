@@ -1,8 +1,8 @@
 # HelpEarly centralized Web-only administration — local completion
 
-October 11, 2026. **LOCAL IMPLEMENTATION: PASS. PRODUCTION ROLLOUT: BLOCKED pending separate approval.**
+October 11, 2026. **LOCAL IMPLEMENTATION: PASS. PRODUCTION MIGRATION: PASS after explicit approval. BACKEND/WEB DEPLOYMENT: IN PROGRESS.**
 
-Actual source, SQL and tests are implemented. This report is not a roadmap or a claim that the new dashboard is live. Existing Vercel, Render, Supabase, Firebase, Gemini and EAS/signing settings were not changed. No EAS build, production migration, role/grant change, paid service or deployment was performed in this phase.
+Actual source, SQL and tests are implemented. The local implementation did not change live services. After separate user approval, a fresh backup/restore passed and the exact schema-3 candidate was committed at 11:37 UTC. All original records were preserved. Backend/web deployment is in progress; no updated APK or physical-device result is claimed yet. Existing Firebase, Gemini and EAS/signing settings are preserved.
 
 ## Implemented functionality
 
@@ -40,12 +40,12 @@ Actual source, SQL and tests are implemented. This report is not a roadmap or a 
 - **PASS:** admin verification/category/service/complaint/moderation mutations reached both client API modules. Real authenticated Socket.IO hints and PostgreSQL revision changes were asserted. Suspension disconnected the actual socket and rejected REST and reconnect. Missing updates were recovered through authoritative reads without a socket; offline read retry/forced foreground refresh and process restart persistence passed.
 - **PASS:** 11 actual React table component resources/actions, disabled self/busy controls, read-only monitors, empty states and HTML escaping.
 - **PASS:** 9 actual React lifecycle/action groups against a separately disposable PostgreSQL API: all tabs load real rows; category save/cancel; backend validation error with no fabricated success; worker verify/unverify; complaint resolution/inbox; account deactivate/reactivate; reversible jobs/reviews; filtered zero-result count; persisted audit rows. Auth/sync/native focus boundaries use test bindings; backend successes are real HTTP/SQL results.
-- **BLOCKED:** final interactive browser mutation/screenshot verification. Initial browser table navigation loaded 11 resources, but a stale native confirmation blocked further browser input/navigation. Native confirmations were replaced with in-page dialogs and those actions passed the real React/SQL integration above. Browser pixels/focus behavior are not marked passed; dismiss/close the stale localhost test confirmation before repeating browser verification.
+- **PASS:** final interactive browser verification against a fresh disposable PostgreSQL/Express fixture. All 11 tables loaded; category save/cancel/hide, worker verification, complaint notes/status, account suspension/restore, job/review hide/restore, role filters, empty results, Escape confirmation cancellation, real duplicate-category error recovery and immutable SUCCESS/REJECTED audit rows passed. An authenticated household opening `/admin` was redirected to login without administration controls. No production record was changed. Screenshots: `H:/apps/HelpEarly-artifacts/admin-local-browser-overview-20261011.png` and `H:/apps/HelpEarly-artifacts/admin-local-browser-audit-20261011.png`. This verifies browser behavior, not physical Android pixels.
 - **IMPLEMENTED/UNVERIFIED:** paired physical Android/Web synchronization, native FCM delivery and foreground/background device transitions. Native Platform/AsyncStorage bindings in protocol tests are simulated; no phone evidence is fabricated.
 
 AI provider error tests intentionally use a mocked provider with real PostgreSQL history/auth; Storage HTTP-contract tests use a mock provider. Those are explicitly not live Gemini/FCM/Storage delivery tests. Previously approved live Gemini/FCM configuration and the signed APK checkpoint remain intact; no new provider deployment was attempted here.
 
-Machine-readable evidence: [admin/security](test-results/admin-local.json), [full isolated stack](test-results/free-stack.json), [two-way protocol](test-results/next-phase-protocol.json), [React tables](test-results/admin-components.json), [React with real API](test-results/admin-react-integration.json), [Android baseline](test-results/android-parity.json), [backup/restore](test-results/admin-backup-restore.json), [build/config checks](test-results/admin-builds.json), [modified-file manifest](test-results/admin-changed-files.json).
+Machine-readable evidence: [admin/security](test-results/admin-local.json), [full isolated stack](test-results/free-stack.json), [two-way protocol](test-results/next-phase-protocol.json), [React tables](test-results/admin-components.json), [React with real API](test-results/admin-react-integration.json), [browser](test-results/admin-browser.json), [Android baseline](test-results/android-parity.json), [backup/restore](test-results/admin-backup-restore.json), [build/config checks](test-results/admin-builds.json), [modified-file manifest](test-results/admin-changed-files.json).
 
 ## Build/export and APK status
 
@@ -57,7 +57,7 @@ Machine-readable evidence: [admin/security](test-results/admin-local.json), [ful
 - **PASS — Whitespace/staged credential scan:** recorded after final staging; environment files, FCM/signing material and actual credential values excluded.
 - **BLOCKED — Newly signed preview APK with these admin changes:** no EAS build was requested/submitted to conserve the free allowance. Existing `H:/apps/HelpEarly-artifacts/HelpEarly-preview-FCM-20261011.apk` is signed but predates this phase and still contains its old admin UI. Android export is not an installable APK.
 
-## Exact proposed production migration — not applied
+## Exact production migration — applied after approval
 
 Candidate: [20261011073853_centralized_web_admin.sql](../supabase/migrations/20261011073853_centralized_web_admin.sql).
 
@@ -80,7 +80,7 @@ Preserved production counts include 31 users, 22 workers, 10 bookings, 12 jobs, 
 
 ## Approval, rollout and rollback plan
 
-**BLOCKED — Live rollout requires your separate explicit approval.** Approval must cover this exact schema/grant/trigger candidate and subsequent existing Render/Vercel deployments. Do not reuse the earlier schema-2 or push-configuration approvals.
+**PASS — Separate explicit approval received** for this exact schema/grant/trigger candidate and existing Render/Vercel deployments, conditional on a fresh verified backup/restore. That gate passed; migration committed with unchanged original row hashes. Evidence: [approved production migration](test-results/admin-production-migration.json). Fresh private backup: `H:/apps/HelpEarly-backups/admin-production-2026-10-11T11-35-29-059Z`; [fresh backup verification](test-results/admin-backup-restore.json) contains the current dump hash. The earlier 08:07 backup below remains a historical checkpoint.
 
 After approval, the safe order is:
 
