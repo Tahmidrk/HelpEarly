@@ -1,0 +1,57 @@
+{
+  "executed_at": "2026-10-11T19:23:22.982Z",
+  "stagedSecretScan": "PASS",
+  "files": [
+    {
+      "file": "docs/ANDROID_PERFORMANCE_CORRECTIONS.md",
+      "sha256": "7cbc3ed3274c24754da08d8c443a28ae7bbbf9140625bfe1f10a938266fe5e2b"
+    },
+    {
+      "file": "docs/test-results/android-native/signed-login-keyboard-small-threebutton.png",
+      "sha256": "8b26d867ef5851c1bf66dc162c28fa22461bb886c9a7e210f77805656fb1289d"
+    },
+    {
+      "file": "docs/test-results/android-native/signed-login-keyboard-small-threebutton.xml",
+      "sha256": "cb5d6cfc10a047981d899a8582dd92d8af9be0362d495faf9e82d67124792929"
+    },
+    {
+      "file": "docs/test-results/android-native/signed-login-keyboard.png",
+      "sha256": "53219898e598ec940bf33120b9f41bb63534bd8abb6d0b7ddb497222a1048507"
+    },
+    {
+      "file": "docs/test-results/android-native/signed-login-keyboard.xml",
+      "sha256": "6e118c2d8b6e61a3b50772e39ebbf88ea30d33679bb59cae030df9870b4f9459"
+    },
+    {
+      "file": "docs/test-results/android-native/signed-signup-keyboard-small-threebutton.png",
+      "sha256": "6d7b6e252dc82bc6ff1d51a862631f6c4574e4660d4e937a52925c6825f5fe3e"
+    },
+    {
+      "file": "docs/test-results/android-native/signed-signup-keyboard-small-threebutton.xml",
+      "sha256": "4f8013bdaa650da0a1ef73e85f1077f316a3e609b6931a0728f2f6ffb32670ba"
+    },
+    {
+      "file": "docs/test-results/android-native/signed-signup-keyboard.png",
+      "sha256": "39379af809cce4796a776df12d518644cdf20225a0b06816bffbae740f080e2c"
+    },
+    {
+      "file": "docs/test-results/android-native/signed-signup-keyboard.xml",
+      "sha256": "cef65add11822cee5504bbd64a65f0fbdc68a335b788e2cde7cdaaf9e2b9af7e"
+    },
+    {
+      "file": "docs/test-results/android-performance-preview-build.json",
+      "sha256": "7c0545b663d02746aed7cb75b78386aab5d3d5a664551502bed82bebf74b4adf"
+    },
+    {
+      "file": "docs/test-results/android-performance-signed-native-small-threebutton.json",
+      "sha256": "ee336516c4eb46434c168fe789d1e7e040f4097eb9955021d7c436cc407990c4"
+    },
+    {
+      "file": "docs/test-results/android-performance-signed-native.json",
+      "sha256": "3dfd85cb2cdb71b436e0940f5d599e8bd1c8c60cdecafcdb7e6a68a019ebd9ed"
+    }
+  ],
+  "productionChanges": "None; mobile source and test/documentation changes only",
+  "database": "No migration, permission change or production record mutation",
+  "releaseTarget": "existing EAS preview / com.atyourservice.app"
+}

@@ -1,0 +1,21 @@
+{
+  "executed_at": "2026-10-11T19:19:47.284Z",
+  "results": {
+    "Actual signed APK starts without Metro; Login field/action accessible with real keyboard": "PASS",
+    "Actual signed APK signup last field/Create Account scroll above keyboard; no production registration submitted": "PASS"
+  },
+  "buildId": "c02a63c6-2d20-4505-88ec-78637f360845",
+  "source": "74ea614aaac8539dc69ba0ffcdb732b35be9d33b",
+  "runtime": "Actual signed standalone APK on disposable Android 16 emulator",
+  "package": "com.atyourservice.app",
+  "device": {
+    "android": "16",
+    "api": 36,
+    "size": "Physical size: 720x1600",
+    "navigation": "[x] com.android.internal.systemui.navbar.gestural"
+  },
+  "physicalPhone": "NOT RUN",
+  "authenticatedReleaseWorkflows": "NOT RUN; authenticated source workflows ran against isolated PostgreSQL in Expo Go",
+  "fcm": "NOT RUN; requires physical-device evidence",
+  "productionMutations": "None; no registration/login submitted"
+}

@@ -1,0 +1,43 @@
+{
+  "executed_at": "2026-10-11T19:11:55.082Z",
+  "buildId": "c02a63c6-2d20-4505-88ec-78637f360845",
+  "status": "FINISHED",
+  "profile": "preview",
+  "projectId": "af6f6973-68c9-4e56-af9f-1e8896877b9d",
+  "package": "com.atyourservice.app",
+  "sdk": "57.0.0",
+  "version": "1.0.0",
+  "versionCode": "1",
+  "createdAt": "2026-10-11T19:02:55.676Z",
+  "completedAt": "2026-10-11T19:10:27.636Z",
+  "apk": "H:/apps/HelpEarly-artifacts/HelpEarly-preview-performance-fixes-20261012.apk",
+  "bytes": 83795730,
+  "sha256": "56a5923eb7c53832d6f17d20ff7f6aa4dffb53eaaa9f429e0441fb3139388a5f",
+  "source": {
+    "baseCommit": "74ea614aaac8539dc69ba0ffcdb732b35be9d33b",
+    "workingTree": "Build uploaded from isolated clean snapshot of commit 74ea614aaac8539dc69ba0ffcdb732b35be9d33b; private settings and unrelated files excluded; Firebase client file supplied by existing EAS secret file variable",
+    "fingerprint": "aa9b2365d48f6164e22da1cdf2fdd634838dd4e4"
+  },
+  "signing": {
+    "v2": "PASS",
+    "certificateSHA256": "90cb140d12144596e8287484c2fec5d6d117e0048772350abbda3dcf9699ca33",
+    "matchesExistingEASKeystore": "PASS"
+  },
+  "firebaseNativeResources": "PASS: real Firebase app ID, sender ID and project compiled into APK",
+  "displayName": "At Your Service (preserved)",
+  "debuggable": false,
+  "artifactChecks": {
+    "zipCRC": "PASS",
+    "allEntriesKnownSecretScan": "PASS",
+    "actualRenderAPI": "PASS",
+    "hermesSHA256": "efd0d1a6e70e12b06d87b4f3975417fcf1aa20d509168d286f308e8922b62af5",
+    "oldAdminScreenMarkersAbsent": "PASS: three markers present in old APK absent in new APK"
+  },
+  "fixesEvidence": {
+    "approvedFixStrings": "PASS: date picker, confirmed service area and role sections in actual APK bytecode",
+    "nativeDatePicker": "PASS: RNDatePicker native module in compiled DEX",
+    "nativeResizeAndPermissions": "PASS: adjustResize, notification and location permissions in actual manifest"
+  },
+  "physicalAndroid": "NOT RUN",
+  "expoPushTicketsReceipts": "Previous real provider receipts exist; new APK physical display NOT RUN"
+}
