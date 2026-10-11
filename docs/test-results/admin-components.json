@@ -1,0 +1,6 @@
+{
+  "executed_at": "2026-10-11T08:12:32.941Z",
+  "status": "PASS",
+  "scope": "Actual React AdminTable rendering/action callbacks across 11 resources; self-admin/busy disabled controls; read-only monitors; empty state; HTML escaping. Dependency boundaries stubbed, no backend results mocked.",
+  "browserInteractions": "See separate browser evidence"
+}

@@ -11,7 +11,6 @@ import ChatScreen from './src/screens/ChatScreen';
 import AiAssistantScreen from './src/screens/AiAssistantScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import WorkerDashboardScreen from './src/screens/WorkerDashboardScreen';
-import AdminDashboardScreen from './src/screens/AdminDashboardScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import HelperDetailScreen from './src/screens/HelperDetailScreen';
@@ -29,7 +28,6 @@ function MainTabs() {
   const { user, activeRole } = useAuth();
   const insets = useSafeAreaInsets();
   const isWorker = activeRole === 'helper';
-  const isAdmin = user?.role === 'admin';
 
   // Ensure bottom tab bar floats above Android system navigation buttons
   const bottomInset = insets.bottom > 0 ? insets.bottom : 12;
@@ -37,10 +35,10 @@ function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: isAdmin ? '#1e293b' : '#0d9488', elevation: 0, shadowOpacity: 0 },
+        headerStyle: { backgroundColor: '#0d9488', elevation: 0, shadowOpacity: 0 },
         headerTitleStyle: { fontWeight: '800', fontSize: 18 },
         headerTintColor: '#ffffff',
-        tabBarActiveTintColor: isAdmin ? '#1e293b' : '#0d9488',
+        tabBarActiveTintColor: '#0d9488',
         tabBarInactiveTintColor: '#94a3b8',
         tabBarLabelStyle: { fontSize: 11, fontWeight: '700', marginBottom: 2 },
         tabBarStyle: {
@@ -56,23 +54,23 @@ function MainTabs() {
     >
       <Tab.Screen
         name="Home"
-        component={isAdmin ? AdminDashboardScreen : isWorker ? WorkerDashboardScreen : HomeScreen}
+        component={isWorker ? WorkerDashboardScreen : HomeScreen}
         options={{
           headerShown: false,
           tabBarLabel: 'Home',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name={isAdmin ? 'shield-checkmark' : isWorker ? 'construct' : 'home'} color={color} size={22} />
+            <Ionicons name={isWorker ? 'construct' : 'home'} color={color} size={22} />
           ),
         }}
       />
 
-      {!isWorker && !isAdmin ? (
+      {!isWorker ? (
         <Tab.Screen
           name="Explore"
           component={ExploreScreen}
           options={{
             headerTitle: 'Book Helpers',
-            headerStyle: { backgroundColor: isAdmin ? '#1e293b' : '#0d9488', elevation: 0, shadowOpacity: 0 },
+            headerStyle: { backgroundColor: '#0d9488', elevation: 0, shadowOpacity: 0 },
             tabBarLabel: 'Helpers',
             tabBarIcon: ({ color, size }) => <Ionicons name="people" color={color} size={22} />,
           }}
@@ -89,24 +87,24 @@ function MainTabs() {
           }}
         />
 
-      {!isAdmin && <Tab.Screen
+      {<Tab.Screen
         name="Jobs"
         component={JobsScreen}
         options={{
           headerTitle: isWorker ? 'Job Feed' : 'Post Requests',
-          headerStyle: { backgroundColor: isAdmin ? '#1e293b' : '#0d9488', elevation: 0, shadowOpacity: 0 },
+          headerStyle: { backgroundColor: '#0d9488', elevation: 0, shadowOpacity: 0 },
           tabBarLabel: isWorker ? 'Job Feed' : 'Posts',
           tabBarIcon: ({ color, size }) => <Ionicons name={isWorker ? 'briefcase' : 'document-text'} color={color} size={22} />,
         }}
       />}
 
-      {!isAdmin && (
+      {(
         <Tab.Screen
           name="AiAssistant"
           component={AiAssistantScreen}
           options={{
             headerTitle: 'Platform AI',
-            headerStyle: { backgroundColor: isAdmin ? '#1e293b' : '#0d9488', elevation: 0, shadowOpacity: 0 },
+            headerStyle: { backgroundColor: '#0d9488', elevation: 0, shadowOpacity: 0 },
             tabBarLabel: 'AI Assistant',
             tabBarIcon: ({ color, size }) => <Ionicons name="sparkles" color={color} size={22} />,
           }}
@@ -118,7 +116,7 @@ function MainTabs() {
         component={ProfileScreen}
         options={{
           headerTitle: 'User Profile',
-          headerStyle: { backgroundColor: isAdmin ? '#1e293b' : '#0d9488', elevation: 0, shadowOpacity: 0 },
+          headerStyle: { backgroundColor: '#0d9488', elevation: 0, shadowOpacity: 0 },
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={22} />,
         }}

@@ -1,6 +1,6 @@
 const pool = require('../config/db');
 async function assertSchema() {
-  const result = await pool.query('SELECT version FROM helpearly_schema WHERE version=2');
+  const result = await pool.query('SELECT version FROM helpearly_schema WHERE version=3');
   if (!result.rows.length) throw new Error('Database migrations need review and approval before deployment');
 }
 async function startup() {

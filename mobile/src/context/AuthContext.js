@@ -19,6 +19,7 @@ export function AuthProvider({ children }) {
       const token = await AsyncStorage.getItem('token');
       if (token) {
         const me = await authAPI.getMe();
+        if (me.role === 'admin') throw Object.assign(new Error('Administration is available on the website only'),{status:403});
         const savedRole = await AsyncStorage.getItem('activeRole');
         const role = me.role === 'both' && ['household','helper'].includes(savedRole) ? savedRole : (me.role === 'admin' ? 'admin' : me.role === 'helper' ? 'helper' : 'household');
         await AsyncStorage.setItem('activeRole',role);
@@ -35,6 +36,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const data = await authAPI.login({ email, password });
+    if (data.user.role === 'admin') throw new Error('Administration is available on the website only');
     await AsyncStorage.setItem('token', data.token);
     const initialRole = data.user.role === 'admin' ? 'admin' : (data.user.role === 'helper' ? 'helper' : 'household');
     setActiveRole(initialRole);
@@ -70,6 +72,7 @@ export function AuthProvider({ children }) {
     if (!token) return;
     try {
       const me = await authAPI.getMe();
+      if (me.role === 'admin') throw Object.assign(new Error('Administration is available on the website only'),{status:403});
       if (await AsyncStorage.getItem('token') === token) setUser(previous => previous && Number(previous.id) === Number(me.id) && JSON.stringify(previous) !== JSON.stringify(me) ? me : previous);
     } catch (error) {
       if ([401, 403].includes(error.status) && await AsyncStorage.getItem('token') === token) {

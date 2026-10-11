@@ -23,7 +23,7 @@ exports.createJob = async (req, res) => {
     // Resolve numeric category_id if text category name is sent
     if (!category_id && (category || req.body.category_name)) {
       const catName = category || req.body.category_name;
-      const catRes = await pool.query('SELECT id FROM categories WHERE name ILIKE $1 LIMIT 1', [catName]);
+      const catRes = await pool.query('SELECT id FROM categories WHERE name ILIKE $1 AND is_visible LIMIT 1', [catName]);
       if (catRes.rows.length > 0) {
         category_id = catRes.rows[0].id;
       }
@@ -33,6 +33,8 @@ exports.createJob = async (req, res) => {
     if (!category_id || !title?.trim() || !description?.trim() || !Number.isFinite(Number(budget)) || Number(budget) <= 0 || Number.isNaN(preferredDate.getTime())) {
       return res.status(400).json({ message: 'Category, title, description, a positive budget, and preferred date are required' });
     }
+
+    if (!(await pool.query('SELECT 1 FROM categories WHERE id=$1 AND is_visible',[category_id])).rows.length) return res.status(400).json({message:'Category is unavailable'});
 
     // Collect uploaded photo paths (relative URLs the client can fetch)
     const photoPaths = (req.files || []).map(f => `/uploads/${f.filename}`);
@@ -57,7 +59,7 @@ exports.getJobs = async (req, res) => {
   try {
     const { category, location, status = 'open', page = 1, limit = 10 } = req.query;
     const offset = (Number(page) - 1) * Number(limit);
-    const conditions = ['j.status = $1'];
+    const conditions = ['j.status = $1', 'NOT j.is_hidden', 'c.is_visible'];
     const params = [status];
 
     if ((req.activeRole === 'helper' || req.user?.role === 'helper') && !conditions.some(c => c.includes('user_id'))) {
@@ -109,7 +111,7 @@ exports.getJobsForHelper = async (req, res) => {
     }
 
     const params = [status];
-    const conditions = ['j.status = $1'];
+    const conditions = ['j.status = $1', 'NOT j.is_hidden', 'c.is_visible'];
     const helperPlaceholders = helperCategoryIds.map((_, index) => `$${params.length + index + 1}`).join(', ');
     conditions.push(`j.category_id IN (${helperPlaceholders})`);
     params.push(...helperCategoryIds);
@@ -150,8 +152,8 @@ exports.getJob = async (req, res) => {
       FROM jobs j
       JOIN users u ON j.user_id = u.id
       LEFT JOIN categories c ON j.category_id = c.id
-      WHERE j.id = $1 AND u.is_active = true
-    `, [id]);
+      WHERE j.id = $1 AND u.is_active = true AND (j.user_id=$2 OR (NOT j.is_hidden AND c.is_visible))
+    `, [id,req.user?.id || null]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Job not found' });
@@ -260,7 +262,7 @@ exports.applyForJob = async (req, res) => {
       `SELECT j.id, j.user_id, j.category_id, j.status
        FROM jobs j
        JOIN users u ON j.user_id = u.id
-       WHERE j.id = $1 AND u.is_active = true`,
+       WHERE j.id = $1 AND u.is_active = true AND NOT j.is_hidden AND EXISTS(SELECT 1 FROM categories c WHERE c.id=j.category_id AND c.is_visible)`,
       [id]
     );
 

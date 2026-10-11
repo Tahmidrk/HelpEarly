@@ -1,6 +1,6 @@
 # HelpEarly preview installation and real Android test
 
-**Status: physical tests NOT RUN.** Use the latest FCM-configured preview below for functionality and push tests. Its native configuration and signing passed artifact checks; actual delivery still requires a phone. It uses the existing backend and Supabase records. Preserve existing user records; use explicitly labeled test accounts and ordinary supervised actions. The web-only admin requirement is planned: this preview still contains the existing mobile admin dashboard.
+**Status: physical tests NOT RUN.** Use the existing FCM-configured preview below for its checkpoint functionality and push tests. Its native configuration and signing passed artifact checks; actual delivery still requires a phone. Current Android source/export removes admin access, but this APK predates that change. See [local admin implementation/report](WEB_ADMIN_COMPLETION.md). Do not use this old APK as proof of admin removal. Preserve existing user records and use explicitly labeled test accounts.
 
 ## Install
 

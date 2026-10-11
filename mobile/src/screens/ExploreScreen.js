@@ -1,3 +1,4 @@
+import useMarketplaceCategories from '../utils/useMarketplaceCategories';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -156,7 +157,7 @@ export default function ExploreScreen({ route, navigation }) {
     setMapModal(true);
   };
 
-  const categories = ['All', 'Cleaning', 'Plumbing', 'Electrical', 'Gardening', 'Babysitting', 'Moving', 'Cooking'];
+  const categories = ['All', ...useMarketplaceCategories()];
 
   useEffect(() => {
     if (route.params) {

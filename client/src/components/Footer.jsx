@@ -1,6 +1,17 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { categoriesAPI } from '../utils/api';
+import { useSync } from '../context/SyncContext';
+import { getCategoryIcon } from '../utils/iconMap';
 
 export default function Footer() {
+  const [categories, setCategories] = useState([]);
+  const revision = useSync('helpers', 'jobs');
+  useEffect(() => {
+    let active = true;
+    categoriesAPI.getAll().then(rows => { if (active) setCategories(rows); }).catch(() => {});
+    return () => { active = false; };
+  }, [revision]);
   return (
     <footer className="footer">
       <div className="container">
@@ -22,11 +33,9 @@ export default function Footer() {
           </div>
           <div className="footer-links-group">
             <h4>Services</h4>
-            <Link to="/helpers?category=1"><i className="fas fa-broom" /> Cleaning</Link>
-            <Link to="/helpers?category=2"><i className="fas fa-wrench" /> Plumbing</Link>
-            <Link to="/helpers?category=3"><i className="fas fa-bolt" /> Electrical</Link>
-            <Link to="/helpers?category=4"><i className="fas fa-hammer" /> Carpentry</Link>
-            <Link to="/helpers?category=5"><i className="fas fa-tools" /> Handyman</Link>
+            {categories.slice(0, 5).map(category => (
+              <Link key={category.id} to={`/helpers?category=${category.id}`}><i className={getCategoryIcon(category.name)} /> {category.name}</Link>
+            ))}
           </div>
           <div className="footer-links-group">
             <h4>Support</h4>

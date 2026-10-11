@@ -4,7 +4,7 @@ const pool = require('../config/db');
 exports.getCategories = async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT * FROM categories ORDER BY name ASC'
+      'SELECT * FROM categories WHERE is_visible ORDER BY name ASC'
     );
     res.json(result.rows);
   } catch (error) {
@@ -17,7 +17,7 @@ exports.getCategories = async (req, res) => {
 exports.getCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const categoryResult = await pool.query('SELECT * FROM categories WHERE id = $1', [id]);
+    const categoryResult = await pool.query('SELECT * FROM categories WHERE id = $1 AND is_visible', [id]);
     if (categoryResult.rows.length === 0) {
       return res.status(404).json({ message: 'Category not found' });
     }
@@ -28,7 +28,7 @@ exports.getCategory = async (req, res) => {
       FROM helpers h
       JOIN users u ON h.user_id = u.id
       JOIN helper_services hs ON hs.helper_id = h.id
-      WHERE hs.category_id = $1 AND u.is_active = true
+      WHERE hs.category_id = $1 AND u.is_active = true AND NOT hs.is_hidden
       ORDER BY h.avg_rating DESC
     `, [id]);
 

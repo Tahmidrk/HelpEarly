@@ -143,6 +143,6 @@ async function main() {
   const relogin = await mobile.authAPI.login({ email: home.user.email, password: 'fixture-password' }); M(relogin);
   assert((await mobile.bookingsAPI.getMyBookings()).some(b => b.id === booking.id));
   pass('Android protocol relogin retains records');
-  await fs.writeFile(path.resolve(__dirname, '../../docs/test-results/next-phase-protocol.json'), JSON.stringify({ executedAt: new Date().toISOString(), scope: 'Disposable local PostgreSQL + real Web/Android API modules; native Platform/AsyncStorage bindings simulated', results, liveGemini: 'NOT RUN: free-tier/production approval pending', realDevice: 'NOT RUN', nativeFCM: 'NOT RUN' }, null, 2) + '\n');
+  await fs.writeFile(path.resolve(__dirname, '../../docs/test-results/next-phase-protocol.json'), JSON.stringify({ executedAt: new Date().toISOString(), scope: 'Disposable local PostgreSQL + real Web/Android API modules; native Platform/AsyncStorage bindings simulated', results, liveGemini: 'NOT RUN in this isolated suite; see production checkpoint evidence', realDevice: 'NOT RUN', nativeFCM: 'NOT RUN' }, null, 2) + '\n');
 }
 main().catch(error => { console.log('Next-phase test failed: ' + error.message); process.exitCode = 1; }).finally(() => pool.end());

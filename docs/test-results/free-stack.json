@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-10T21:26:13.285Z",
+  "executed_at": "2026-10-11T08:12:29.476Z",
   "database": "isolated local replica of Supabase schema; synthetic records only",
   "results": {
     "Production startup refuses unmigrated database without changing schema": "PASS",
@@ -10,6 +10,7 @@
     "14 database-backed MVP groups": "PASS",
     "20 authorization/concurrency/outbox groups": "PASS",
     "Next-phase two-way client workflows and isolated AI provider failures": "PASS",
+    "Central web administration, audit, authorization and cross-platform integration": "PASS",
     "Actual web and Android API modules share persisted profiles and worker services": "PASS",
     "AI history and inbox read state synchronize across real APIs; unrelated user denied private history": "PASS",
     "Socket.IO browser origin allowlist": "PASS",
@@ -22,5 +23,5 @@
     "Sync retries offline reads, deduplicates revisions, forces foreground refresh": "PASS",
     "Dedicated worker process restart preserves and deduplicates pending push jobs (delivery disabled)": "PASS"
   },
-  "live_storage_push_device": "NOT RUN: credentials/device pending"
+  "live_storage_push_device": "NOT RUN in this isolated suite; physical push delivery requires a device"
 }

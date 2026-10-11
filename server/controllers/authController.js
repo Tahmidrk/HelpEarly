@@ -44,13 +44,13 @@ exports.register = async (req, res) => {
       const { bio, hourly_rate, experience_years } = req.body;
       let selectedCategories = req.body.selectedCategories;
       if (!selectedCategories && req.body.category) {
-        const category = await db.query('SELECT id FROM categories WHERE LOWER(name) = LOWER($1)', [req.body.category]);
+        const category = await db.query('SELECT id FROM categories WHERE LOWER(name) = LOWER($1) AND is_visible', [req.body.category]);
         selectedCategories = category.rows.map(c => c.id);
       }
       if (!Array.isArray(selectedCategories) || !selectedCategories.length || selectedCategories.some(id => !Number.isInteger(Number(id)))) {
         return res.status(400).json({ message: 'Select a valid work category' });
       }
-      const valid = await db.query('SELECT id FROM categories WHERE id = ANY($1::int[])', [selectedCategories]);
+      const valid = await db.query('SELECT id FROM categories WHERE id = ANY($1::int[]) AND is_visible', [selectedCategories]);
       if (valid.rows.length !== new Set(selectedCategories.map(Number)).size) return res.status(400).json({ message: 'Unknown work category' });
       const helperResult = await db.query(
         `INSERT INTO helpers (user_id, bio, hourly_rate, experience_years)

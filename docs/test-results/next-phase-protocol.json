@@ -1,5 +1,5 @@
 {
-  "executedAt": "2026-10-10T21:26:11.475Z",
+  "executedAt": "2026-10-11T08:12:26.411Z",
   "scope": "Disposable local PostgreSQL + real Web/Android API modules; native Platform/AsyncStorage bindings simulated",
   "results": {
     "Two-way profiles through actual Web and Android API modules": "PASS",
@@ -12,7 +12,7 @@
     "AI authenticated owner/role history isolation, real SQL persistence and sanitized provider failures with mocked provider": "PASS",
     "Android protocol relogin retains records": "PASS"
   },
-  "liveGemini": "NOT RUN: free-tier/production approval pending",
+  "liveGemini": "NOT RUN in this isolated suite; see production checkpoint evidence",
   "realDevice": "NOT RUN",
   "nativeFCM": "NOT RUN"
 }

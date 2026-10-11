@@ -1,8 +1,8 @@
 # HelpEarly centralized web-only administration roadmap
 
-Added October 11, 2026 from the owner's supplied requirements. **Status: planned, not implemented or deployed.** This is a roadmap addition. The current Android preview still contains its existing admin dashboard. Complete this functional phase before branding; preserve ordinary Android household, worker and dual-role screens, layouts, icons, styling and behavior.
+Added October 11, 2026 from the owner's supplied requirements. **Status: implemented and tested locally; production rollout and physical verification pending.** See [actual completion report](WEB_ADMIN_COMPLETION.md), which supersedes the historical gap assessment below. Current Android source/export removes administration; the existing signed preview APK predates this change. Branding remains unapproved.
 
-## Existing foundation and remaining gaps
+## Original foundation and gap assessment (historical)
 
 Reuse `client/src/pages/AdminDashboard.jsx`, the existing Express admin/complaint routes, authenticated Socket.IO revision recovery and the existing Supabase PostgreSQL database. The current website already has account search/filtering, activation controls, helper verification, complaint notes/status and database-backed overview statistics. Existing admin routes apply authentication and server-side administrator authorization. Account updates already guard self-deactivation/demotion and disconnect inactive accounts' sockets.
 

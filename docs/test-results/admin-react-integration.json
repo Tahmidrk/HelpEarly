@@ -1,0 +1,16 @@
+{
+  "executed_at": "2026-10-11T08:16:29.995Z",
+  "status": "PASS",
+  "scope": "Actual React hooks/lifecycle/actions and real HTTP responses from disposable PostgreSQL + Express; auth/sync/native DOM focus boundaries simulated. No backend success mocked. This is not browser pixels or physical Android.",
+  "results": {
+    "allDatabaseBackedDashboardTabs": "PASS",
+    "categorySaveConfirmationCancellationAndPersistence": "PASS",
+    "realBackendValidationFailureRenderedNoFakeSuccess": "PASS",
+    "workerVerificationAndUnverification": "PASS",
+    "complaintDecisionAndDurableHouseholdNotification": "PASS",
+    "selfControlsDisabledAndAccountDeactivationReactivation": "PASS",
+    "reversibleJobAndReviewModeration": "PASS",
+    "realFilteredCountAndEmptyState": "PASS",
+    "realAuditRowsVisible": "PASS"
+  }
+}

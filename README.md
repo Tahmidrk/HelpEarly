@@ -6,7 +6,7 @@ Current zero-budget implementation/deployment strategy and approval gates: [docs
 
 Project roadmap: [operational completion, separate branding approvals, regression/device testing and signed APK/AAB release](docs/FREE_STACK_STRATEGY.md#project-roadmap-and-final-branding-approval-gates). Android visuals remain unchanged until the future branding phase is explicitly approved.
 
-New functional requirement: [centralized web-only administration](docs/WEB_ADMIN_ROADMAP.md) before branding. Planned, not yet implemented: the current Android preview still includes its existing admin dashboard. Ordinary Android household/worker/dual screens must remain unchanged during that implementation.
+Centralized web-only administration is implemented and tested **locally**: [completion report](docs/WEB_ADMIN_COMPLETION.md). Production schema/deployments remain unchanged pending separate approval. The existing signed preview APK predates Android admin removal; current Android source/export removes it and preserves ordinary screen styles, icons and navigation.
 
 Render deployment: [actual service/build/runtime report](docs/RENDER_DEPLOYMENT.md). Production database/security/media changes were [approved and completed after verified production backup and isolated restore](docs/SUPABASE_RELEASE_APPROVAL.md).
 

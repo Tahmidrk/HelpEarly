@@ -1,3 +1,4 @@
+import useMarketplaceCategories from '../utils/useMarketplaceCategories';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -20,10 +21,10 @@ import { useAuth } from '../context/AuthContext';
 import MapViewModal from '../components/MapViewModal';
 import { useNotifications } from '../context/NotificationContext';
 
-const WORK_CATEGORIES = ['Cleaning', 'Plumbing', 'Electrical', 'Gardening', 'Babysitting', 'Moving', 'Cooking'];
 
 export default function JobsScreen({ navigation, route }) {
   const { revision } = useNotifications();
+  const WORK_CATEGORIES = useMarketplaceCategories();
   const { user, activeRole, updateUserProfile, saveWorkerSettings } = useAuth();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);

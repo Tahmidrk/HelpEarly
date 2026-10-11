@@ -1,3 +1,4 @@
+import useMarketplaceCategories from '../utils/useMarketplaceCategories';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -42,16 +43,9 @@ export default function HomeScreen({ navigation }) {
     setMapModal(true);
   };
 
-  const categories = [
-    { name: 'All', icon: 'apps' },
-    { name: 'Cleaning', icon: 'broom' },
-    { name: 'Plumbing', icon: 'pipe' },
-    { name: 'Electrical', icon: 'flash' },
-    { name: 'Gardening', icon: 'flower' },
-    { name: 'Babysitting', icon: 'baby-carriage' },
-    { name: 'Moving', icon: 'truck-delivery' },
-    { name: 'Cooking', icon: 'silverware-fork-knife' },
-  ];
+  const categoryNames = useMarketplaceCategories();
+  const categoryIcons = {Cleaning:'broom',Plumbing:'pipe',Electrical:'flash',Gardening:'flower',Babysitting:'baby-carriage',Moving:'truck-delivery',Cooking:'silverware-fork-knife'};
+  const categories = [{name:'All',icon:'apps'}, ...categoryNames.map(name=>({name,icon:categoryIcons[name]||'apps'}))];
 
   useEffect(() => {
     fetchTopHelpers();
@@ -70,7 +64,7 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  const ALLOWED_CATS = ['cleaning', 'plumbing', 'electrical', 'gardening', 'babysitting', 'moving', 'cooking'];
+  const ALLOWED_CATS = categoryNames.map(name=>name.toLowerCase());
 
   const filteredHelpers = helpers.filter((h) => {
     if (Number(h.user_id) === Number(user?.id)) return false;
@@ -336,15 +330,7 @@ export default function HomeScreen({ navigation }) {
             {/* Service Category Picker - Standard app categories */}
             <Text style={styles.fieldLabel}>1. Select Needed Service Type</Text>
             <View style={styles.serviceTypesRow}>
-              {[
-                'Cleaning',
-                'Plumbing',
-                'Electrical',
-                'Gardening',
-                'Babysitting',
-                'Moving',
-                'Cooking',
-              ].map((s) => (
+              {categoryNames.map((s) => (
                 <TouchableOpacity
                   key={s}
                   style={[styles.serviceTypeChip, selectedServiceType === s && styles.serviceTypeChipActive]}

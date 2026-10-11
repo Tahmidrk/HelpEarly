@@ -34,13 +34,13 @@ exports.getHelperReviews = async (req, res) => {
       SELECT r.*, u.id as reviewer_id, u.name as reviewer_name, u.avatar_url as reviewer_avatar
       FROM reviews r
       JOIN users u ON r.user_id = u.id
-      WHERE r.helper_id = $1
+      WHERE r.helper_id = $1 AND NOT r.is_hidden
       ORDER BY r.created_at DESC
       LIMIT $2 OFFSET $3
     `, [id, parseInt(limit), parseInt(offset)]);
 
     const countResult = await pool.query(
-      'SELECT COUNT(*) FROM reviews WHERE helper_id = $1', [id]
+      'SELECT COUNT(*) FROM reviews WHERE helper_id = $1 AND NOT is_hidden', [id]
     );
 
     res.json({

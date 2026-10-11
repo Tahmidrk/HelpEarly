@@ -11,7 +11,7 @@ exports.triggerEmergencyAlert = async (req,res) => {
     const location = typeof req.body.location==='string' ? req.body.location.trim() : profile.location;
     const phone = typeof req.body.contact_phone==='string' ? req.body.contact_phone.trim() : profile.phone;
     if (!location || !phone) throw fail(400,'Location and contact phone are required');
-    const category = (await pool.query('SELECT id,name FROM categories WHERE id=$1 OR lower(name)=lower($2) LIMIT 1',[req.body.category_id || null,req.body.category_name || null])).rows[0];
+    const category = (await pool.query('SELECT id,name FROM categories WHERE is_visible AND (id=$1 OR lower(name)=lower($2)) LIMIT 1',[req.body.category_id || null,req.body.category_name || null])).rows[0];
     if (!category) throw fail(400,'Select a valid emergency category');
     const description = typeof req.body.description==='string' && req.body.description.trim() ? req.body.description.trim() : 'Immediate assistance required';
     if (description.length>5000 || location.length>500 || phone.length>50) throw fail(400,'Emergency details are too long');

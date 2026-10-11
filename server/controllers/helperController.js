@@ -9,8 +9,8 @@ exports.getHelpers = async (req, res) => {
     let query = `
       SELECT h.*, u.name, u.location, u.avatar_url, u.latitude, u.longitude,
              COALESCE(
-               (SELECT c2.name FROM helper_categories hc2 JOIN categories c2 ON hc2.category_id = c2.id WHERE hc2.helper_id = h.id LIMIT 1),
-               (SELECT c3.name FROM helper_services hs3 JOIN categories c3 ON hs3.category_id = c3.id WHERE hs3.helper_id = h.id LIMIT 1)
+               (SELECT c2.name FROM helper_categories hc2 JOIN categories c2 ON hc2.category_id = c2.id WHERE hc2.helper_id = h.id AND c2.is_visible LIMIT 1),
+               (SELECT c3.name FROM helper_services hs3 JOIN categories c3 ON hs3.category_id = c3.id WHERE hs3.helper_id = h.id AND c3.is_visible AND NOT hs3.is_hidden LIMIT 1)
              ) as primary_category,
              COALESCE(json_agg(DISTINCT jsonb_build_object(
                'id', hs.id, 'service_name', hs.service_name, 'price', hs.price,
@@ -18,7 +18,7 @@ exports.getHelpers = async (req, res) => {
              )) FILTER (WHERE hs.id IS NOT NULL), '[]') as services
       FROM helpers h
       JOIN users u ON h.user_id = u.id
-      LEFT JOIN helper_services hs ON hs.helper_id = h.id
+      LEFT JOIN helper_services hs ON hs.helper_id = h.id AND NOT hs.is_hidden AND EXISTS(SELECT 1 FROM categories vc WHERE vc.id=hs.category_id AND vc.is_visible)
       LEFT JOIN categories c ON hs.category_id = c.id
       WHERE u.is_active = true
     `;
@@ -40,7 +40,7 @@ exports.getHelpers = async (req, res) => {
     // Filter by category
     if (category) {
       paramCount++;
-      query += ` AND (EXISTS (SELECT 1 FROM helper_categories hc WHERE hc.helper_id = h.id AND hc.category_id = $${paramCount}) OR EXISTS (SELECT 1 FROM helper_services sx WHERE sx.helper_id = h.id AND sx.category_id = $${paramCount}))`;
+      query += ` AND (EXISTS (SELECT 1 FROM helper_categories hc WHERE hc.helper_id = h.id AND hc.category_id = $${paramCount} AND EXISTS(SELECT 1 FROM categories vc WHERE vc.id=hc.category_id AND vc.is_visible)) OR EXISTS (SELECT 1 FROM helper_services sx WHERE sx.helper_id = h.id AND sx.category_id = $${paramCount} AND NOT sx.is_hidden AND EXISTS(SELECT 1 FROM categories vc WHERE vc.id=sx.category_id AND vc.is_visible)))`;
       params.push(category);
     }
 
@@ -142,7 +142,7 @@ exports.getHelper = async (req, res) => {
       SELECT hs.*, c.name as category_name, c.icon as category_icon
       FROM helper_services hs
       JOIN categories c ON hs.category_id = c.id
-      WHERE hs.helper_id = $1
+      WHERE hs.helper_id = $1 AND NOT hs.is_hidden AND c.is_visible
     `, [id]);
 
     // Get reviews
@@ -150,12 +150,12 @@ exports.getHelper = async (req, res) => {
       SELECT r.*, u.id as reviewer_id, u.name as reviewer_name, u.avatar_url as reviewer_avatar
       FROM reviews r
       JOIN users u ON r.user_id = u.id
-      WHERE r.helper_id = $1 AND u.is_active = true
+      WHERE r.helper_id = $1 AND NOT r.is_hidden AND u.is_active = true
       ORDER BY r.created_at DESC
       LIMIT 20
     `, [id]);
 
-    const cats = await pool.query('SELECT c.* FROM categories c JOIN helper_categories hc ON c.id = hc.category_id WHERE hc.helper_id = $1 ORDER BY c.id', [helper.id]);
+    const cats = await pool.query('SELECT c.* FROM categories c JOIN helper_categories hc ON c.id = hc.category_id WHERE hc.helper_id = $1 AND c.is_visible ORDER BY c.id', [helper.id]);
     helper.categories = cats.rows;
     helper.primary_category = cats.rows[0]?.name || null;
     helper.services = servicesResult.rows;
@@ -198,6 +198,7 @@ exports.addService = async (req, res) => {
   try {
     const { category_id, service_name, description, price } = req.body;
     if(!category_id || typeof service_name!=='string' || !service_name.trim() || !Number.isFinite(Number(price)) || Number(price)<0) return res.status(400).json({message:'Category, service name and a valid nonnegative price are required'});
+    if(!(await pool.query('SELECT 1 FROM categories WHERE id=$1 AND is_visible',[category_id])).rows.length) return res.status(400).json({message:'Category is unavailable'});
 
     // Get helper id from user id
     const helperResult = await pool.query('SELECT id FROM helpers WHERE user_id = $1', [req.user.id]);
@@ -262,7 +263,7 @@ exports.getMyHelperProfile = async (req, res) => {
       WHERE hs.helper_id = $1
     `, [helper.id]);
 
-    const cats = await pool.query('SELECT c.* FROM categories c JOIN helper_categories hc ON c.id = hc.category_id WHERE hc.helper_id = $1 ORDER BY c.id', [helper.id]);
+    const cats = await pool.query('SELECT c.* FROM categories c JOIN helper_categories hc ON c.id = hc.category_id WHERE hc.helper_id = $1 AND c.is_visible ORDER BY c.id', [helper.id]);
     helper.categories = cats.rows;
     helper.primary_category = cats.rows[0]?.name || null;
     helper.services = servicesResult.rows;

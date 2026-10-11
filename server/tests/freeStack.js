@@ -17,9 +17,9 @@ function pass(name) { results[name] = 'PASS'; console.log(`PASS ${name}`); }
 function run(file, env, args = []) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [file, ...args], { cwd: root, env, windowsHide: true, stdio: ['ignore','pipe','pipe'] });
-    let output = ''; child.stdout.on('data', value => output += value); child.stderr.resume();
+    let output = ''; child.stdout.on('data', value => output += value); child.stderr.on('data', value => output += value);
     child.on('error', reject); child.on('close', code => {
-      if (code !== 0 && file === 'tests/nextPhase.js') console.error(output.trim());
+      if (code !== 0) console.error(output.trim());
       code === 0 ? resolve(output) : reject(new Error(`${path.basename(file)} failed (${code})`));
     });
   });
@@ -27,7 +27,7 @@ function run(file, env, args = []) {
 async function stopApi() { if (!api) return; const child=api; api=null; await new Promise(resolve => { child.once('exit',resolve); child.kill(); }); }
 async function startApi(env) {
   api = spawn(process.execPath,['server.js'],{cwd:root,env,windowsHide:true,stdio:['ignore','pipe','pipe']});
-  api.stdout.resume(); api.stderr.resume();
+  api.stdout.resume(); api.stderr.on('data', value => process.stderr.write(value));
   const deadline = Date.now()+20000;
   while(Date.now()<deadline) {
     if(api.exitCode!==null) throw new Error('Isolated API startup failed');
@@ -106,6 +106,7 @@ async function main() {
   console.log((await run('tests/mvpFlows.js',env)).trim()); pass('14 database-backed MVP groups');
   console.log((await run('tests/productionFlows.js',env)).trim()); pass('20 authorization/concurrency/outbox groups');
   console.log((await run('tests/nextPhase.js',env)).trim()); pass('Next-phase two-way client workflows and isolated AI provider failures');
+  console.log((await run('tests/adminFlows.js',env)).trim()); pass('Central web administration, audit, authorization and cross-platform integration');
   const home=await request('/auth/login',null,'POST',{email:'home@fixture.test',password:'fixture-password'});
   const worker=await request('/auth/login',null,'POST',{email:'worker@fixture.test',password:'fixture-password'});
   const third=await request('/auth/register',null,'POST',{name:'Unrelated',email:'third@fixture.test',password:'fixture-password',role:'household',nid_number:'fixture-third'},201);
@@ -189,7 +190,7 @@ async function main() {
   let background=await launchWorker();const queued=await waitForJob();assert.equal(queued[0].status,'pending');await new Promise(resolve=>{background.once('exit',resolve);background.kill();});
   background=await launchWorker();const recovered=await waitForJob();assert.deepEqual(recovered,queued);await new Promise(resolve=>{background.once('exit',resolve);background.kill();});pass('Dedicated worker process restart preserves and deduplicates pending push jobs (delivery disabled)');
   web.stop();mobile.stop();
-  await fs.mkdir(path.join(root,'../docs/test-results'),{recursive:true});await fs.writeFile(path.join(root,'../docs/test-results/free-stack.json'),JSON.stringify({executed_at:new Date().toISOString(),database:'isolated local replica of Supabase schema; synthetic records only',results,live_storage_push_device:'NOT RUN: credentials/device pending'},null,2)+'\n');
+  await fs.mkdir(path.join(root,'../docs/test-results'),{recursive:true});await fs.writeFile(path.join(root,'../docs/test-results/free-stack.json'),JSON.stringify({executed_at:new Date().toISOString(),database:'isolated local replica of Supabase schema; synthetic records only',results,live_storage_push_device:'NOT RUN in this isolated suite; physical push delivery requires a device'},null,2)+'\n');
 }
 main().catch(error=>{console.error('Free-stack test failed:',error.message);process.exitCode=1;}).finally(async()=>{
   sockets.forEach(socket=>socket.disconnect()); await stopApi(); if(db)await db.end();

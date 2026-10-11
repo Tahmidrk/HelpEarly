@@ -1,0 +1,38 @@
+{
+  "recorded_at": "2026-10-11T08:19:43.744Z",
+  "web": {
+    "status": "PASS",
+    "modules": 104,
+    "path": "H:\\apps\\HelpEarly\\client\\dist",
+    "bundle": "index-mCm8owEo.js",
+    "sha256": "dd31c62f8eae58012ddd346a25b733f43998999a2ea4d6724fc37a3a2734f2e4",
+    "productionAPIEmbedded": true
+  },
+  "android": {
+    "status": "PASS",
+    "modules": 1050,
+    "path": "H:/apps/HelpEarly-artifacts/admin-local-android-export-final-20261011",
+    "bundle": "index-32d784f487118d078c5d16c4142f0c9e.hbc",
+    "sha256": "d5fd9ecd11f1c640cf8ed8c53eadf5970d4353ea4c56e47d40d010413b02dff0",
+    "productionAPIEmbedded": true,
+    "installableAPK": false
+  },
+  "expoDoctor": {
+    "status": "PASS",
+    "checks": "21/21"
+  },
+  "configuration": {
+    "web": "PASS",
+    "databaseTLS": "PASS"
+  },
+  "migrationWithoutApproval": "PASS: refused with exit 1",
+  "browserFinalInteraction": "BLOCKED: stale native confirmation",
+  "physicalAndroid": "IMPLEMENTED/UNVERIFIED",
+  "newSignedAPK": "BLOCKED: no new EAS build submitted",
+  "production": "BLOCKED: separate approval required",
+  "stagedWhitespaceAndCredentialScan": {
+    "status": "PASS",
+    "files": 54,
+    "excluded": "Private database/Gemini/Supabase/FCM/signing credentials; deleted admin screen excluded from blob scan"
+  }
+}

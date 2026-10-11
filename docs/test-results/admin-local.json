@@ -1,0 +1,18 @@
+{
+  "executed_at": "2026-10-11T08:12:27.631Z",
+  "database": "suite-owned isolated PostgreSQL; synthetic records",
+  "results": {
+    "Every admin resource/mutation rejects non-admins; DB role overrides forged JWT; registration/profile cannot promote": "PASS",
+    "Filtered counts, private-field exclusion, validation, self-lockout and destructive endpoint rejection": "PASS",
+    "Web admin verification/profile changes reach actual Web/Android modules; authenticated Socket.IO hint and persisted revisions/inbox": "PASS",
+    "Category creation/edit/visibility and service moderation synchronize; reconnect authority invalidates discovery without deleting relationships": "PASS",
+    "Reversible jobs/reviews moderation preserves source and rating rows; complaint decision reaches mobile and durable inbox": "PASS",
+    "All ten monitor queries execute on PostgreSQL; statistics match real records including inactive/history": "PASS",
+    "Account suspension disconnects live socket and denies existing REST/token/reconnect access": "PASS",
+    "Concurrent mutual demotion retains administrator under READ COMMITTED and REPEATABLE READ; DB rejects last-admin deactivation/deletion": "PASS",
+    "Real PostgreSQL audit-write failure rolls back account mutation and surfaces 503": "PASS",
+    "Audit actor/action/target/time/outcomes persist across migration rerun; append-only UPDATE/DELETE/TRUNCATE enforcement": "PASS"
+  },
+  "physicalAndroid": "IMPLEMENTED/UNVERIFIED: phone required",
+  "production": "BLOCKED: separate migration/deployment approval required"
+}

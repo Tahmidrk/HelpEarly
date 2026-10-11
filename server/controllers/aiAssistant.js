@@ -4,13 +4,13 @@ const instructions = `You are the At Your Service assistant for a household/work
 async function getContext(user) {
   const queries = {
     workers: [`SELECT h.id,h.user_id,u.name,u.location,h.bio,h.hourly_rate,h.is_available,h.is_verified,h.avg_rating,h.total_reviews,
-      COALESCE((SELECT json_agg(c.name) FROM categories c JOIN helper_categories hc ON hc.category_id=c.id WHERE hc.helper_id=h.id),'[]') AS categories,
-      COALESCE((SELECT json_agg(json_build_object('name',service_name,'price',price)) FROM helper_services WHERE helper_id=h.id),'[]') AS services
+      COALESCE((SELECT json_agg(c.name) FROM categories c JOIN helper_categories hc ON hc.category_id=c.id WHERE hc.helper_id=h.id AND c.is_visible),'[]') AS categories,
+      COALESCE((SELECT json_agg(json_build_object('name',service_name,'price',price)) FROM helper_services hs JOIN categories c ON c.id=hs.category_id WHERE helper_id=h.id AND NOT hs.is_hidden AND c.is_visible),'[]') AS services
       FROM helpers h JOIN users u ON u.id=h.user_id WHERE u.is_active=true AND u.id<>$1 ORDER BY h.id`, [user.id]],
-    categories: ['SELECT id,name,description FROM categories ORDER BY id'],
-    open_jobs: [`SELECT j.id,j.title,j.description,j.budget,j.status,j.location,c.name AS category,u.name AS poster FROM jobs j JOIN users u ON u.id=j.user_id LEFT JOIN categories c ON c.id=j.category_id WHERE j.status='open' AND u.is_active=true AND j.user_id<>$1 ORDER BY j.id`, [user.id]],
+    categories: ['SELECT id,name,description FROM categories WHERE is_visible ORDER BY id'],
+    open_jobs: [`SELECT j.id,j.title,j.description,j.budget,j.status,j.location,c.name AS category,u.name AS poster FROM jobs j JOIN users u ON u.id=j.user_id LEFT JOIN categories c ON c.id=j.category_id WHERE NOT j.is_hidden AND c.is_visible AND j.status='open' AND u.is_active=true AND j.user_id<>$1 ORDER BY j.id`, [user.id]],
     my_bookings: [`SELECT b.*,u.name AS household_name,w.name AS worker_name FROM bookings b JOIN helpers h ON h.id=b.helper_id JOIN users u ON u.id=b.user_id JOIN users w ON w.id=h.user_id WHERE b.user_id=$1 OR h.user_id=$1 ORDER BY b.id`, [user.id]],
-    reviews: [`SELECT r.rating,r.comment,r.created_at,u.name AS reviewer,w.name AS worker FROM reviews r JOIN users u ON u.id=r.user_id JOIN helpers h ON h.id=r.helper_id JOIN users w ON w.id=h.user_id ORDER BY r.id`],
+    reviews: [`SELECT r.rating,r.comment,r.created_at,u.name AS reviewer,w.name AS worker FROM reviews r JOIN users u ON u.id=r.user_id JOIN helpers h ON h.id=r.helper_id JOIN users w ON w.id=h.user_id WHERE NOT r.is_hidden ORDER BY r.id`],
     my_jobs: ['SELECT id,title,description,budget,status FROM jobs WHERE user_id=$1 ORDER BY id', [user.id]],
     my_complaints: ['SELECT id,subject,description,status,admin_notes FROM complaints WHERE complainant_id=$1 ORDER BY id', [user.id]],
     my_payments: ['SELECT id,amount,status,booking_id FROM payments WHERE user_id=$1 OR helper_id IN (SELECT id FROM helpers WHERE user_id=$1) ORDER BY id', [user.id]],

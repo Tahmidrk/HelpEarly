@@ -1,3 +1,4 @@
+import useMarketplaceCategories from '../utils/useMarketplaceCategories';
 import React, { useState } from 'react';
 import {
   View,
@@ -30,11 +31,7 @@ export default function RegisterScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
 
   // Real website categories list (excl. Painting, Tutoring, Handyman)
-  const websiteCategories = [
-    'Cleaning', 'Plumbing', 'Electrical',
-    'Gardening', 'Babysitting', 'Moving',
-    'Cooking'
-  ];
+  const websiteCategories = useMarketplaceCategories();
 
   // Selected Worker Skill Category
   const [category, setCategory] = useState('');

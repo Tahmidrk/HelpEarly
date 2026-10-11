@@ -68,8 +68,9 @@ async function ensureSchema() {
     for (const file of ['production.sql','free-stack.sql','api-security.sql']) {
       await db.query(fs.readFileSync(path.join(__dirname, 'migrations', file), 'utf8'));
     }
+    await db.query(fs.readFileSync(path.join(__dirname, '../../supabase/migrations/20261011073853_centralized_web_admin.sql'), 'utf8'));
     await db.query('COMMIT');
-    console.log('HelpEarly schema version 2 ready');
+    console.log('HelpEarly schema version 3 ready');
   } catch (err) {
     await db.query('ROLLBACK');
     throw err;

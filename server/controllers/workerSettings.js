@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
       return res.status(400).json({ message: 'Valid category, services, prices, and experience are required' });
     }
     await db.query('BEGIN');
-    const cats = await db.query('SELECT id FROM categories WHERE LOWER(name) = LOWER($1)', [category]);
+    const cats = await db.query('SELECT id FROM categories WHERE LOWER(name) = LOWER($1) AND is_visible', [category]);
     if (!cats.rows[0]) return res.status(400).json({ message: 'Unknown category' });
     const catId = cats.rows[0].id;
     const { rows } = await db.query('UPDATE helpers SET bio=$1, hourly_rate=$2, experience_years=$3 WHERE user_id=$4 RETURNING id', [bio || '', hourly_rate, experience_years, req.user.id]);
@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
         keep.push(added.rows[0].id);
       }
     }
-    await db.query('DELETE FROM helper_services WHERE helper_id=$1 AND NOT (id=ANY($2::int[]))', [id,keep]);
+    await db.query('DELETE FROM helper_services WHERE helper_id=$1 AND NOT is_hidden AND NOT (id=ANY($2::int[]))', [id,keep]);
     const user = await db.query('SELECT id,name,email,phone,role,location FROM users WHERE id=$1', [req.user.id]);
     const result = await attachHelper(user.rows[0],db);
     await db.query('COMMIT');

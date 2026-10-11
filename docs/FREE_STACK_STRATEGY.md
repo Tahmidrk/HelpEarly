@@ -26,6 +26,8 @@ The existing Supabase project is healthy and now has schema version 2 and 22 pub
 
 ## Implemented locally
 
+Centralized web-only administration is now implemented locally with schema version **3** as a candidate only. Live Supabase remains version **2** / 22 public tables; production requires fresh backup/restore and separate approval before applying the exact candidate. Current candidate API startup requires version 3 and must not be deployed first. [Features, test evidence, migration and rollback plan](WEB_ADMIN_COMPLETION.md).
+
 ### Durable two-way synchronization
 
 Database triggers increment `sync_revisions` in the transaction that changes each resource. `/api/sync` returns authenticated global and personal revision tokens, without private row IDs or records. Private booking/message/complaint revisions are limited to their account; admin revisions are visible only to admins. Global helper/job/category/emergency revisions contain no private content.
@@ -34,7 +36,7 @@ Successful API writes broadcast a payload-free `sync_hint` only to authenticated
 
 The visible/active 30-second fallback performs a full refresh as well, so a screen read that failed after a successful revision lookup is retried even if no new write occurs. Booking dashboards retain previously loaded records and show refresh errors instead of replacing them with an empty list. Web session restoration retries temporary backend failures without erasing the stored token.
 
-Web discovery, helper profile, booking dashboards, proposals/job detail/listings, chat, complaints and admin lists now refresh relevant data. Mobile's existing revision mechanism now also recovers missed updates, reloads bookings/discovery and refreshes the admin screen. Existing booking/proposal/chat/emergency logic remains authoritative.
+Web discovery, helper profile, booking dashboards, proposals/job detail/listings, chat, complaints and admin lists refresh relevant data. Mobile recovers missed updates and reloads bookings/discovery; current local source has no admin screen. Category selectors use the authoritative visible category list while retaining ordinary layouts/styles/icons. Existing booking/proposal/chat/emergency logic remains authoritative.
 
 Socket.IO rejects missing/invalid/expired JWTs, inactive accounts and unapproved browser origins. Personal rooms are assigned by the server. Conversation joins/typing/read events check participation; socket message writes are rejected in favor of the authenticated REST transaction. JWTs are rechecked on packets; expiry disconnects the socket. Chat rejoins its selected conversation after reconnect.
 

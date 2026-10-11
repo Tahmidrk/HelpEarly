@@ -168,6 +168,10 @@ export const jobsAPI = {
 
 // Admin
 export const adminAPI = {
+  monitor: (resource,params={}) => request(`/admin/monitor/${resource}?${new URLSearchParams(params)}`),
+  updateHelper: (id,data) => request(`/admin/helpers/${id}`,{method:'PUT',body:JSON.stringify(data)}),
+  saveCategory: (id,data) => request(`/admin/categories${id?'/'+id:''}`,{method:id?'PUT':'POST',body:JSON.stringify(data)}),
+  moderate: (resource,id,data) => request(`/admin/${resource}/${id}`,{method:'PUT',body:JSON.stringify(data)}),
   getStats: () => request('/admin/stats'),
   getUsers: (params) => {
     const query = params ? new URLSearchParams(params).toString() : '';

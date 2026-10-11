@@ -21,7 +21,7 @@ exports.createBooking = async (req, res) => {
     const description = String(req.body.service_description || req.body.sub_service || notes || '').trim();
     if (!description || !address?.trim() || !Number.isFinite(Number(total_price)) || Number(total_price) <= 0) return res.status(400).json({ message: 'Describe the work, enter an address, and offer a positive fee' });
     if (service_id) {
-      const service = await pool.query('SELECT id FROM helper_services WHERE id=$1 AND helper_id=$2', [service_id,helper_id]);
+      const service = await pool.query('SELECT hs.id FROM helper_services hs JOIN categories c ON c.id=hs.category_id WHERE hs.id=$1 AND helper_id=$2 AND NOT hs.is_hidden AND c.is_visible', [service_id,helper_id]);
       if (!service.rows.length) return res.status(400).json({ message: 'Service does not belong to this worker' });
     }
     const finalBookingDate = new Date(booking_date || service_date);
