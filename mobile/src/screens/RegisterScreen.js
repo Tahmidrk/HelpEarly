@@ -1,3 +1,4 @@
+import {FormTextInput as TextInput} from '../components/FormLayout';
 import { FormScrollView as ScrollView } from '../components/FormLayout';
 import { Alert } from '../components/Feedback';
 import useMarketplaceCategories from '../utils/useMarketplaceCategories';
@@ -6,7 +7,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -39,6 +39,7 @@ export default function RegisterScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
+    if(loading)return;
     const cleanEmail = email ? email.trim().toLowerCase() : '';
     if (!name || !cleanEmail || !password || !nidNumber) {
       Alert.alert('Required Fields', 'Please fill in Name, Email, Password, and NID Number.');

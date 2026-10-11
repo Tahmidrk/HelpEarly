@@ -1,3 +1,4 @@
+import {FormTextInput as TextInput} from '../components/FormLayout';
 import { FormScrollView as ScrollView } from '../components/FormLayout';
 import { FormModal as Modal } from '../components/FormLayout';
 import { Alert } from '../components/Feedback';
@@ -10,7 +11,6 @@ import {
   FlatList,
   ActivityIndicator,
   Switch,
-  TextInput,
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,15 +21,15 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import MapViewModal from '../components/MapViewModal';
 
-export default function WorkerDashboardScreen({ navigation }) {
-  const {revision}=useNotifications();
-  useFocusEffect(React.useCallback(()=>{loadWorkerData();},[revision]));
+export default function WorkerDashboardScreen({ navigation, embeddedSections=false }) {
+  const {revision}=useNotifications('bookings,jobs');
   const { user, activeRole, switchMode } = useAuth();
   const [activeTab, setActiveTab] = useState('bookings');
   const [isAvailable, setIsAvailable] = useState(user?.helperProfile?.is_available !== false);
   const [bookings, setBookings] = useState([]);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dataError,setDataError]=useState('');
 
   // Complaint / Report Modal State (Matched to Household mode)
   const [complaintBooking, setComplaintBooking] = useState(null);
@@ -53,9 +53,9 @@ export default function WorkerDashboardScreen({ navigation }) {
   };
 
   useEffect(() => {
-    loadWorkerData();
     setIsAvailable(user?.helperProfile?.is_available !== false);
   }, [user?.id, activeRole, user?.helperProfile?.is_available]);
+  useFocusEffect(React.useCallback(()=>{let current=true;loadWorkerData(()=>current);return()=>{current=false;};},[revision,user?.id,activeRole]));
 
   const handleAvailability = async (value) => {
     try {
@@ -66,19 +66,17 @@ export default function WorkerDashboardScreen({ navigation }) {
     }
   };
 
-  const loadWorkerData = async () => {
+  const loadWorkerData = async (current=()=>true) => {
     try {
-      setLoading(true);
-      const [bData, aData] = await Promise.all([
-        bookingsAPI.getMyBookings(),
-        jobsAPI.getApplications(),
+      await Promise.all([
+        bookingsAPI.getMyBookings().then(rows=>{if(current()){setBookings(rows);setLoading(false);}}),
+        jobsAPI.getApplications().then(rows=>{if(current())setApplications(rows);}),
       ]);
-      setBookings(bData);
-      setApplications(aData);
+      if(current())setDataError('');
     } catch (err) {
-      Alert.alert('Could Not Load Dashboard', err.message);
+      if(current() && err.name!=='AbortError')setDataError(err.message);
     } finally {
-      setLoading(false);
+      if(current())setLoading(false);
     }
   };
 
@@ -133,7 +131,7 @@ export default function WorkerDashboardScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Top Header Banner matching status bar height */}
-      <View style={styles.topHeaderBanner} />
+      {!embeddedSections && <View style={styles.topHeaderBanner} />}
 
       {/* Top User Greeting Bar (Identical layout to Household Mode) */}
       <View style={styles.userGreetingHeader}>
@@ -217,6 +215,7 @@ export default function WorkerDashboardScreen({ navigation }) {
       </View>
 
       {/* Content */}
+      {dataError?<Text accessibilityRole="alert" style={{color:'#b91c1c',padding:12}} onPress={()=>loadWorkerData()}>{dataError} — Tap to retry</Text>:null}
       {loading ? (
         <ActivityIndicator size="large" color="#0d9488" style={{ marginTop: 30 }} />
       ) : activeTab === 'bookings' ? (

@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-11T15:23:06.402Z",
+  "executed_at": "2026-10-11T18:47:25.385Z",
   "status": "PASS",
   "results": [
     "Actual Web AI component rejects late previous-role replies and clears old history/input",

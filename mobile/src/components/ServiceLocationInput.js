@@ -1,5 +1,6 @@
+import {FormTextInput as TextInput} from './FormLayout';
 import React,{useState,useRef,useEffect} from 'react';
-import {View,Text,TextInput,TouchableOpacity,ActivityIndicator,Linking} from 'react-native';
+import {View,Text,TouchableOpacity,ActivityIndicator,Linking} from 'react-native';
 import * as Location from 'expo-location';
 export default function ServiceLocationInput({value,onChangeText,onSelection,style}) {
   const [candidates,setCandidates]=useState([]),[busy,setBusy]=useState(false),[error,setError]=useState(''),[confirmed,setConfirmed]=useState(false);

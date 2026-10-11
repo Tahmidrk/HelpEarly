@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authAPI, bookingsAPI, helpersAPI, bookingDate, notificationsAPI } from '../api/client';
+import { authAPI, bookingsAPI, helpersAPI, bookingDate, notificationsAPI, setApiSession } from '../api/client';
 import { Alert } from '../components/Feedback';
 
 const AuthContext = createContext(null);
@@ -12,110 +12,140 @@ export function AuthProvider({ children }) {
   const scope = useRef('');
   scope.current = `${user?.id || ''}:${activeRole}`;
   const bookingRequest = useRef(0);
+  const epoch = useRef(0), credentials = useRef(null);
+  const installSession = async (data) => {
+    const requested=epoch.current;
+    if (data.user.role === 'admin') throw new Error('Administration is available on the website only');
+    const role = data.user.role === 'helper' ? 'helper' : 'household';
+    credentials.current = data.token;
+    setApiSession(data.token, role);
+    try {
+      await AsyncStorage.multiSet([['token',data.token],['activeRole',role]]);
+    } catch(error) {
+      if(requested===epoch.current){credentials.current=null;setApiSession(null,'household');}
+      await AsyncStorage.removeItem('token');
+      throw error;
+    }
+    if(requested!==epoch.current) {
+      if(await AsyncStorage.getItem('token')===data.token)await AsyncStorage.multiRemove(['token','activeRole']);
+      throw new Error('Sign-in cancelled');
+    }
+    setActiveRole(role); setUser(data.user);
+    return data.user;
+  };
 
   useEffect(() => {
     loadUser();
   }, []);
 
   const loadUser = async () => {
+    const requested = epoch.current;
     try {
       const token = await AsyncStorage.getItem('token');
       if (token) {
+        credentials.current = token;
         const me = await authAPI.getMe();
         if (me.role === 'admin') throw Object.assign(new Error('Administration is available on the website only'),{status:403});
         const savedRole = await AsyncStorage.getItem('activeRole');
         const role = me.role === 'both' && ['household','helper'].includes(savedRole) ? savedRole : (me.role === 'admin' ? 'admin' : me.role === 'helper' ? 'helper' : 'household');
         await AsyncStorage.setItem('activeRole',role);
+        if (requested !== epoch.current) return;
+        setApiSession(token,role);
         setActiveRole(role);
         setUser(me);
       }
     } catch (e) {
-      if (e.status === 401 || e.status === 403) await AsyncStorage.removeItem('token');
-      setUser(null);
+      if (requested===epoch.current && (e.status === 401 || e.status === 403)) {
+        credentials.current=null;setApiSession(null,'household');await AsyncStorage.removeItem('token');
+      }
+      if (requested === epoch.current) {credentials.current=null;setApiSession(null,'household');setUser(null);}
     } finally {
       setLoading(false);
     }
   };
 
   const login = async (email, password) => {
+    const requested = ++epoch.current;
     const data = await authAPI.login({ email, password });
-    if (data.user.role === 'admin') throw new Error('Administration is available on the website only');
-    await AsyncStorage.setItem('token', data.token);
-    const initialRole = data.user.role === 'admin' ? 'admin' : (data.user.role === 'helper' ? 'helper' : 'household');
-    setActiveRole(initialRole);
-    await AsyncStorage.setItem('activeRole', initialRole);
-    setUser(data.user);
-    return data.user;
+    if (requested !== epoch.current) throw new Error('Sign-in cancelled');
+    return installSession(data);
   };
 
   const register = async (formData) => {
+    const requested = ++epoch.current;
     const data = await authAPI.register(formData);
-    await AsyncStorage.setItem('token', data.token);
-    const initialRole = data.user.role === 'admin' ? 'admin' : (data.user.role === 'helper' ? 'helper' : 'household');
-    setActiveRole(initialRole);
-    await AsyncStorage.setItem('activeRole', initialRole);
-    setUser(data.user);
-    return data.user;
+    if (requested !== epoch.current) throw new Error('Registration cancelled');
+    return installSession(data);
   };
 
   const updateUserProfile = async (updatedData) => {
+    const requested=epoch.current;
     await authAPI.updateProfile(updatedData);
     const me = await authAPI.getMe();
-    setUser(me);
+    if(requested===epoch.current)setUser(me);
     return me;
   };
   const saveWorkerSettings = async (data) => {
+    const requested=epoch.current;
     const me = await helpersAPI.saveSettings(data);
-    setUser(me);
+    if(requested===epoch.current)setUser(me);
     return me;
   };
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
+    const requested=epoch.current;
     const token = await AsyncStorage.getItem('token');
     if (!token) return;
     try {
       const me = await authAPI.getMe();
       if (me.role === 'admin') throw Object.assign(new Error('Administration is available on the website only'),{status:403});
-      if (await AsyncStorage.getItem('token') === token) setUser(previous => previous && Number(previous.id) === Number(me.id) && JSON.stringify(previous) !== JSON.stringify(me) ? me : previous);
+      if (requested===epoch.current && await AsyncStorage.getItem('token') === token) setUser(previous => previous && Number(previous.id) === Number(me.id) && JSON.stringify(previous) !== JSON.stringify(me) ? me : previous);
     } catch (error) {
       if ([401, 403].includes(error.status) && await AsyncStorage.getItem('token') === token) {
+        epoch.current++; credentials.current=null; setApiSession(null,'household');
         await AsyncStorage.removeItem('token'); setUser(null); setUserBookings([]);
       }
     }
-  };
+  },[]);
 
   const logout = async () => {
+    const token=credentials.current, role=activeRole, account=user?.id;
+    epoch.current++;
+    const requested=epoch.current;
     bookingRequest.current++;
-    try {
-      if (await AsyncStorage.getItem('pushEnabled') === 'true') {
-        const deviceId = await AsyncStorage.getItem('pushDeviceId');
-        if (deviceId) await notificationsAPI.removeDevice(deviceId);
-        await AsyncStorage.removeItem('pushEnabled');
-      }
-    } catch (error) { Alert.alert('Logout needs a connection','Reconnect so this device can stop receiving your account notifications, then retry.'); return; }
-    await AsyncStorage.removeItem('token');
-    await AsyncStorage.removeItem('activeRole');
-    setUser(null);
-    setUserBookings([]);
+    credentials.current=null; scope.current='';
+    setApiSession(null,'household');
+    setUser(null); setUserBookings([]); setBookingsError(''); setActiveRole('household');
+    const deviceId=await AsyncStorage.getItem('pushDeviceId');
+    // No credentials are persisted for cleanup. Retry only after the same account signs in.
+    if(requested===epoch.current) {
+      if(deviceId && account) await AsyncStorage.setItem('pendingPushCleanup',JSON.stringify({deviceId,account}));
+      await AsyncStorage.multiRemove(['token','activeRole','pushEnabled','pushDeviceId','pendingNotification']);
+    }
+    if(deviceId && token) notificationsAPI.removeDevice(deviceId,{detached:true,timeoutMs:5000,headers:{Authorization:`Bearer ${token}`,'X-Active-Role':role}})
+      .then(async()=>{const pending=await AsyncStorage.getItem('pendingPushCleanup');if(pending===JSON.stringify({deviceId,account}))await AsyncStorage.removeItem('pendingPushCleanup');}).catch(()=>{});
   };
 
   const switchMode = async (mode) => {
     if (user?.role !== 'both' || !['household','helper'].includes(mode)) return;
-    const previous=activeRole;
+    if(mode===activeRole)return;
+    epoch.current++;
     bookingRequest.current++;
     try {
-      await AsyncStorage.setItem('activeRole',mode);
-      const id=await AsyncStorage.getItem('pushDeviceId');
-      if(id) await notificationsAPI.audience(id);
+      scope.current=`${user.id}:${mode}`;
+      setApiSession(credentials.current,mode);
       setUserBookings([]);
       setActiveRole(mode);
-    }catch(error){await AsyncStorage.setItem('activeRole',previous);Alert.alert('Role switch failed','Reconnect and retry: '+error.message);throw error;}
+      await AsyncStorage.setItem('activeRole',mode);
+      // NotificationProvider refreshes the device audience independently of navigation.
+    }catch(error){Alert.alert('Role preference not saved',error.message);throw error;}
   };
 
   const [userBookings, setUserBookings] = useState([]);
   const [bookingsError, setBookingsError] = useState('');
-  const fetchUserBookings = async () => {
+  const fetchUserBookings = useCallback(async () => {
     const requestedScope=scope.current, request=++bookingRequest.current;
+    if(!credentials.current)return;
     try {
       const rows = await bookingsAPI.getMyBookings();
       if(requestedScope!==scope.current || request!==bookingRequest.current)return;
@@ -129,7 +159,7 @@ export function AuthProvider({ children }) {
       })));
       setBookingsError('');
     } catch (error) { if(requestedScope===scope.current && request===bookingRequest.current)setBookingsError(error.message); }
-  };
+  },[]);
   useEffect(() => {
     setUserBookings([]);
     if (user) fetchUserBookings();

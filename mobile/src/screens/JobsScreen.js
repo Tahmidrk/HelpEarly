@@ -1,3 +1,4 @@
+import {FormTextInput as TextInput} from '../components/FormLayout';
 import ServiceLocationInput from '../components/ServiceLocationInput';
 import { FormScrollView as ScrollView } from '../components/FormLayout';
 import { FormModal as Modal } from '../components/FormLayout';
@@ -12,7 +13,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  TextInput,
   ActivityIndicator,
   Image,
 } from 'react-native';
@@ -26,11 +26,12 @@ import { useNotifications } from '../context/NotificationContext';
 
 
 export default function JobsScreen({ navigation, route }) {
-  const { revision } = useNotifications();
+  const { revision } = useNotifications('jobs');
   const WORK_CATEGORIES = useMarketplaceCategories();
   const { user, activeRole, updateUserProfile, saveWorkerSettings } = useAuth();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError,setLoadError]=useState('');
   const [postModal, setPostModal] = useState(false);
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'my_posts'
 
@@ -65,6 +66,7 @@ export default function JobsScreen({ navigation, route }) {
   const [applyModalJob, setApplyModalJob] = useState(null);
   const [bargainBudget, setBargainBudget] = useState('');
   const [appliedJobIds, setAppliedJobIds] = useState({});
+  const [submittingApplication,setSubmittingApplication]=useState(false);
   const [applicationSuccessModal, setApplicationSuccessModal] = useState(null);
 
   // View details modal
@@ -78,13 +80,12 @@ export default function JobsScreen({ navigation, route }) {
     React.useCallback(() => {
       loadJobs();
       checkWorkerSetup();
-    }, [user, activeRole])
+    }, [user?.id, activeRole, revision])
   );
 
   useEffect(() => {
-    loadJobs();
     checkWorkerSetup();
-  }, [user, activeRole]);
+  }, [user?.id, activeRole, user?.helperProfile?.services?.length]);
 
   const checkWorkerSetup = async () => {
     if (activeRole === 'helper' && user?.id) {
@@ -135,13 +136,12 @@ export default function JobsScreen({ navigation, route }) {
     } else {
       setLocation('Dhaka, Bangladesh');
     }
-  }, [user, postModal]);
+  }, [user?.id, postModal]);
 
   const loadJobs = async () => {
     try {
-      setLoading(true);
       const [data, applicationRows] = await Promise.all([
-        activeRole === 'household' ? jobsAPI.getMine() : jobsAPI.getAll(),
+        (activeRole === 'household' ? jobsAPI.getMine() : jobsAPI.getAll()).then(rows=>{setJobs(Array.isArray(rows)?rows:[]);setLoading(false);return rows;}),
         activeRole === 'helper' ? jobsAPI.getApplications() : Promise.resolve([]),
       ]);
       setJobs(Array.isArray(data) ? data : []);
@@ -149,8 +149,9 @@ export default function JobsScreen({ navigation, route }) {
         status: application.status,
         offeredRate: application.proposed_price,
       }])));
+      setLoadError('');
     } catch (err) {
-      Alert.alert('Could Not Load Jobs', err.message);
+      if(err.name!=='AbortError')setLoadError(err.message);
     } finally {
       setLoading(false);
     }
@@ -248,13 +249,14 @@ export default function JobsScreen({ navigation, route }) {
   };
 
   const submitApplicationWithBargain = async () => {
-    if (!applyModalJob) return;
+    if (!applyModalJob || submittingApplication) return;
     const finalRate = Number(bargainBudget);
     if (!Number.isFinite(finalRate) || finalRate <= 0) {
       Alert.alert('Invalid Offer', 'Enter a positive amount.');
       return;
     }
     try {
+      setSubmittingApplication(true);
       await jobsAPI.apply(applyModalJob.rawId || applyModalJob.id, { proposed_price: finalRate });
       setAppliedJobIds((prev) => ({ ...prev, [applyModalJob.id]: { status: 'pending', offeredRate: finalRate } }));
 
@@ -269,7 +271,7 @@ export default function JobsScreen({ navigation, route }) {
       setApplyModalJob(null);
     } catch (error) {
       Alert.alert('Application Failed', error.message);
-    }
+    } finally {setSubmittingApplication(false);}
   };
 
   const openMapForJob = (loc) => {
@@ -294,6 +296,7 @@ export default function JobsScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+      {loadError?<Text accessibilityRole="alert" style={{color:'#b91c1c',padding:12}} onPress={loadJobs}>{loadError} — Tap to retry</Text>:null}
 
       {/* Post Request Action Bar (Household users) */}
       {activeRole === 'household' && (
@@ -818,8 +821,9 @@ export default function JobsScreen({ navigation, route }) {
               <TouchableOpacity
                 style={{ flex: 1, backgroundColor: '#0d9488', paddingVertical: 12, borderRadius: 12, alignItems: 'center' }}
                 onPress={submitApplicationWithBargain}
+                disabled={submittingApplication}
               >
-                <Text style={{ color: '#ffffff', fontWeight: '800', fontSize: 14 }}>Send Offer & Apply</Text>
+                <Text style={{ color: '#ffffff', fontWeight: '800', fontSize: 14 }}>{submittingApplication?'Sending offer…':'Send Offer & Apply'}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity

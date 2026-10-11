@@ -1,3 +1,4 @@
+import {FormTextInput as TextInput} from '../components/FormLayout';
 import { FormScrollView as ScrollView } from '../components/FormLayout';
 import { FormModal as Modal } from '../components/FormLayout';
 import { Alert } from '../components/Feedback';
@@ -9,7 +10,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  TextInput,
   ActivityIndicator,
   BackHandler,
   Image,
@@ -23,7 +23,7 @@ import DateInput from '../components/DateInput';
 import { useNotifications } from '../context/NotificationContext';
 
 export default function ExploreScreen({ route, navigation }) {
-  const { revision } = useNotifications();
+  const { revision } = useNotifications('helpers,bookings');
   const { user, activeRole, userBookings, fetchUserBookings, cancelBooking, updateBookingSchedule } = useAuth();
   const { selectedCategory: paramCat, highlightHelperId: paramHighlightId, openSubTab } = route.params || {};
 
@@ -148,6 +148,7 @@ export default function ExploreScreen({ route, navigation }) {
   };
   const [helpers, setHelpers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError,setLoadError]=useState('');
   const [selectedCategory, setSelectedCategory] = useState(paramCat || 'All');
   const [highlightId, setHighlightId] = useState(paramHighlightId || null);
   const [search, setSearch] = useState('');
@@ -187,13 +188,12 @@ export default function ExploreScreen({ route, navigation }) {
 
   const loadHelpers = async () => {
     try {
-      setLoading(true);
       const data = await helpersAPI.getAll({ limit: 50 });
       const list = Array.isArray(data) ? data : (data?.helpers || []);
       setHelpers(list);
+      setLoadError('');
     } catch (e) {
-      console.log(e);
-      setHelpers([]);
+      if(e.name!=='AbortError')setLoadError(e.message);
     } finally {
       setLoading(false);
     }
@@ -225,6 +225,7 @@ export default function ExploreScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
+      {loadError?<Text accessibilityRole="alert" style={{color:'#b91c1c',padding:12}} onPress={loadHelpers}>{loadError} — Tap to retry</Text>:null}
       {/* Sub-Tab Header Switcher inside Helpers screen */}
       <View style={styles.segmentedContainer}>
         <TouchableOpacity

@@ -1,10 +1,11 @@
+import {KeyboardViewport} from '../components/FormLayout';
+import {FormTextInput as TextInput} from '../components/FormLayout';
 import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
-  TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
@@ -17,7 +18,7 @@ import { chatbotAPI } from '../api/client';
 import { useNotifications } from '../context/NotificationContext';
 
 export default function AiAssistantScreen() {
-  const { revision } = useNotifications();
+  const { revision } = useNotifications('ai');
   const { activeRole,user } = useAuth();
   const [messages, setMessages] = useState([
     {
@@ -91,6 +92,7 @@ export default function AiAssistantScreen() {
         enabled={Platform.OS === 'ios'} behavior="padding"
         keyboardVerticalOffset={0}
       >
+<KeyboardViewport style={{flex:1}}>
         {/* Messages List */}
         <FlatList
           data={messages}
@@ -130,7 +132,7 @@ export default function AiAssistantScreen() {
             <Ionicons name="send" size={18} color="#ffffff" />
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardViewport></KeyboardAvoidingView>
     </View>
   );
 }

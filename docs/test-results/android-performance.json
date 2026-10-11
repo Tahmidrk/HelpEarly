@@ -1,0 +1,39 @@
+{
+  "executed_at": "2026-10-11T18:58:05.610Z",
+  "results": {
+    "Role switch and logout render before slow push replies; local token/role/push state cleared": "PASS",
+    "Concurrent identical scoped GETs produce one actual fetch; no mutation retry": "PASS",
+    "Role change aborts in-flight transport and rejects stale response": "PASS",
+    "Unresponsive transport exits within explicit deadline even when fetch ignores cancellation": "PASS",
+    "Logout cancels pending profile response; session cannot be restored by stale transport": "PASS",
+    "Unchanged polling/socket reconnect causes no refetch loop; forced foreground recovery still works": "PASS",
+    "Worker dashboard loads once on focus/revision; ordinary rerenders do not refetch": "PASS",
+    "Role subtabs match actual Household Helpers container, spacing, radius, palette and active indicator": "PASS",
+    "Worker Home complaint section is history-only, including persisted administrator response": "PASS",
+    "Actual profile renders identity before personal details, preserving worker/role controls": "PASS",
+    "Background profile synchronization preserves unsaved personal form input": "PASS"
+  },
+  "measurements": {
+    "controlledSlowNetwork": {
+      "before": {
+        "role_ms": 517,
+        "logout_ms": 515,
+        "roleChangedBeforeServerReply": false,
+        "logoutBeforeServerReply": false,
+        "notificationAudienceCalls": 1,
+        "bookingCalls": 2
+      },
+      "after": {
+        "role_ms": 29,
+        "logout_ms": 31,
+        "roleChangedBeforeServerReply": true,
+        "logoutBeforeServerReply": true,
+        "notificationAudienceCalls": 0,
+        "bookingCalls": 2
+      },
+      "description": "Actual AuthProvider using React 19 renderer, memory storage and held notification-server replies; JS state timing, not phone latency."
+    },
+    "unresponsiveTransport_ms": 31
+  },
+  "native": "NOT RUN by this suite; React 19 host boundaries simulated"
+}

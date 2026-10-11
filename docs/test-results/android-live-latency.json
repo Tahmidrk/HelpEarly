@@ -1,0 +1,78 @@
+{
+  "executed_at": "2026-10-11T18:09:02.268Z",
+  "public_api": [
+    {
+      "endpoint": "/ready",
+      "sample": 1,
+      "status": 200,
+      "ms": 544
+    },
+    {
+      "endpoint": "/ready",
+      "sample": 2,
+      "status": 200,
+      "ms": 894
+    },
+    {
+      "endpoint": "/ready",
+      "sample": 3,
+      "status": 200,
+      "ms": 336
+    },
+    {
+      "endpoint": "/categories",
+      "sample": 1,
+      "status": 200,
+      "ms": 386
+    },
+    {
+      "endpoint": "/categories",
+      "sample": 2,
+      "status": 200,
+      "ms": 405
+    },
+    {
+      "endpoint": "/categories",
+      "sample": 3,
+      "status": 200,
+      "ms": 384
+    },
+    {
+      "endpoint": "/helpers?limit=50",
+      "sample": 1,
+      "status": 200,
+      "ms": 1018
+    },
+    {
+      "endpoint": "/helpers?limit=50",
+      "sample": 2,
+      "status": 200,
+      "ms": 385
+    },
+    {
+      "endpoint": "/helpers?limit=50",
+      "sample": 3,
+      "status": 200,
+      "ms": 343
+    }
+  ],
+  "database": [
+    {
+      "operation": "verified TLS connection",
+      "ms": 808
+    },
+    {
+      "operation": "SQL round trip",
+      "ms": 127
+    },
+    {
+      "operation": "SQL round trip",
+      "ms": 125
+    },
+    {
+      "operation": "SQL round trip",
+      "ms": 119
+    }
+  ],
+  "limitations": "Read-only production measurements from development PC; not phone timings. Render service was not intentionally stopped."
+}

@@ -1,5 +1,6 @@
+import {FormTextInput as TextInput} from './FormLayout';
 import React,{useState} from 'react';
-import {View,TextInput,TouchableOpacity,Text,Platform} from 'react-native';
+import {View,TouchableOpacity,Text,Platform} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {Ionicons} from '@expo/vector-icons';
 import {parseDate,dateText} from '../utils/dateOnly';

@@ -1,0 +1,18 @@
+{
+  "executed_at": "2026-10-11T18:43:15.693Z",
+  "results": {
+    "Native worker Home exposes Dashboard / Complaints / Broadcasts below status bar": "PASS",
+    "Native worker complaint history has real database response and no submission action": "PASS",
+    "Native worker Broadcasts opens authorized emergency list with empty state": "PASS",
+    "Native household Posts shows three requested subtabs": "PASS",
+    "Native profile identity precedes personal details": "PASS",
+    "Native logout reaches Login while backend unreachable; no waiting on notification cleanup": "PASS"
+  },
+  "measurements": {
+    "roleSwitchUpperBound_ms": 2491,
+    "offlineLogoutUpperBound_ms": 2460
+  },
+  "runtime": "Actual Android 16 emulator, Expo Go SDK 57, isolated PostgreSQL fixture; adb upper bounds include UI dump overhead",
+  "physicalPhone": "NOT RUN",
+  "fcm": "NOT RUN"
+}

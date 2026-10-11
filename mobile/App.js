@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text} from 'react-native';
+import {Text,ActivityIndicator} from 'react-native';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -142,7 +142,7 @@ function AppNavigator() {
   const { navigationReady } = useNotifications();
 
   if (loading) {
-    return null;
+    return <SafeAreaView style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#f8fafc'}}><ActivityIndicator color="#0d9488"/><Text style={{color:'#475569',marginTop:12}}>Restoring your session…</Text></SafeAreaView>;
   }
 
   return (

@@ -8,7 +8,7 @@ import { useNotifications } from '../context/NotificationContext';
 
 export default function EmergencyScreen({ navigation }) {
   const { activeRole, fetchUserBookings } = useAuth();
-  const { revision } = useNotifications();
+  const { revision } = useNotifications('emergency');
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
@@ -22,8 +22,8 @@ export default function EmergencyScreen({ navigation }) {
     load();
     const timer = setInterval(load, 5000);
     return () => clearInterval(timer);
-  }, [load]));
-  useEffect(() => { load(); }, [load, revision]);
+  }, [load,revision]));
+  // Focus polling already loads on mount; revisions trigger focused recovery.
   useEffect(() => { setRequests([]); setLoading(true); }, [activeRole]);
 
   const act = async (id, action) => {

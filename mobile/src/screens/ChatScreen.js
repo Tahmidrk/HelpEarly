@@ -1,3 +1,5 @@
+import {KeyboardViewport} from '../components/FormLayout';
+import {FormTextInput as TextInput} from '../components/FormLayout';
 import { Alert } from '../components/Feedback';
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -5,7 +7,6 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
@@ -20,7 +21,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 export default function ChatScreen({ route, navigation }) {
   const { user, activeRole } = useAuth();
-  const { revision } = useNotifications();
+  const { revision } = useNotifications('messages');
   const isWorker = activeRole === 'helper';
   const { helperName, helperId, helperUserId, helperProfileId, conversationId } = route.params || {};
 
@@ -33,6 +34,7 @@ export default function ChatScreen({ route, navigation }) {
   const [activeChat, setActiveChat] = useState(null);
   const [messagesMap, setMessagesMap] = useState({});
   const [input, setInput] = useState('');
+  const [sending,setSending]=useState(false),sendLock=useRef(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [chatError, setChatError] = useState('');
   useFocusEffect(React.useCallback(()=>{
@@ -135,7 +137,8 @@ export default function ChatScreen({ route, navigation }) {
   },[isWorker,searchQuery,revision]));
 
   const handleSendMessage = async () => {
-    if (!input.trim() || !activeChat) return;
+    if (!input.trim() || !activeChat || sendLock.current) return;
+    sendLock.current=true;setSending(true);
     const userText = input;
     setInput('');
     try {
@@ -145,7 +148,7 @@ export default function ChatScreen({ route, navigation }) {
     } catch (error) {
       setInput(userText);
       Alert.alert('Message Not Sent', error.message);
-    }
+    } finally {sendLock.current=false;setSending(false);}
   };
 
   const activeConversations = helpers.filter((h) => {
@@ -197,6 +200,7 @@ export default function ChatScreen({ route, navigation }) {
           enabled={Platform.OS === 'ios'} behavior="padding"
           keyboardVerticalOffset={0}
         >
+<KeyboardViewport style={{flex:1}}>
           {/* Messages List */}
           <FlatList
             data={activeMsgs}
@@ -236,11 +240,11 @@ export default function ChatScreen({ route, navigation }) {
               value={input}
               onChangeText={setInput}
             />
-            <TouchableOpacity style={styles.sendBtn} onPress={handleSendMessage}>
-              <Ionicons name="send" size={18} color="#ffffff" />
+            <TouchableOpacity style={styles.sendBtn} onPress={handleSendMessage} disabled={sending} accessibilityLabel="Send message">
+              {sending?<ActivityIndicator color="#ffffff"/>:<Ionicons name="send" size={18} color="#ffffff" />}
             </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
+        </KeyboardViewport></KeyboardAvoidingView>
       </View>
     );
   }

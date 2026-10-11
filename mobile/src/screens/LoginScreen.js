@@ -1,3 +1,4 @@
+import {FormTextInput as TextInput} from '../components/FormLayout';
 import { FormScrollView as ScrollView } from '../components/FormLayout';
 import { Alert } from '../components/Feedback';
 import React, { useState } from 'react';
@@ -5,7 +6,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -22,6 +22,7 @@ export default function LoginScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    if(loading)return;
     const cleanEmail = email ? email.trim().toLowerCase() : '';
     const cleanPassword = password ? password.trim() : '';
     if (!cleanEmail || !cleanPassword) {
@@ -113,7 +114,7 @@ export default function LoginScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f0fdfa' },
-  content: { padding: 20, justifyContent: 'center', minHeight: '100%', paddingBottom: 60 },
+  content: { padding: 20, justifyContent: 'center', flexGrow: 1, paddingBottom: 60 },
   header: { alignItems: 'center', marginBottom: 24 },
   logoBadge: {
     width: 64,

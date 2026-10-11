@@ -1,0 +1,353 @@
+{
+  "executed_at": "2026-10-11T18:59:40.030Z",
+  "stagedSecretScan": "PASS",
+  "files": [
+    {
+      "file": "docs/ANDROID_PERFORMANCE_CORRECTIONS.md",
+      "sha256": "c17af247dd7e272c27da5b1fdd6a297a1f45d081eb1f37503fd2ed8ab220fdd6"
+    },
+    {
+      "file": "docs/test-results/admin-local.json",
+      "sha256": "60f367270ffc2643f3475f03a370e0017710c1becac73554f326b7c85a5226ed"
+    },
+    {
+      "file": "docs/test-results/android-fixes-web-components.json",
+      "sha256": "0f7ef1b12f7c6083f75d3bc87859abe38176f71aebacc9c23c96b01adbb3f5b4"
+    },
+    {
+      "file": "docs/test-results/android-live-latency.json",
+      "sha256": "0961b0ba243a987c25542966b251370ede4d2ee8f5d42b1bb90db6fb4de3c804"
+    },
+    {
+      "file": "docs/test-results/android-native-booking.json",
+      "sha256": "7264013b01358fe54abbdc7769c47d8323a87ed95c5f95f3b3672eaddca7bb56"
+    },
+    {
+      "file": "docs/test-results/android-native-flows.json",
+      "sha256": "b26e8baf1df94d55bef8f0be153c3570f8521e45f373986e9d5b72d12594aed0"
+    },
+    {
+      "file": "docs/test-results/android-native-forms.json",
+      "sha256": "9db520ac60aca67f72edcf419bf681534a9d806ae6b34f4b3c0bc5d0d8ec1d0e"
+    },
+    {
+      "file": "docs/test-results/android-native-review.json",
+      "sha256": "a69726cce9e66b3f98b85db119d9e27b33839824536d13a988a58e4555662180"
+    },
+    {
+      "file": "docs/test-results/android-native-small-threebutton.json",
+      "sha256": "8e5b24b6a4e108fcae36864f08f1ce8a441fd299fe1dc7f44a96ffbbcdbb5f99"
+    },
+    {
+      "file": "docs/test-results/android-native/ai-composer-keyboard.png",
+      "sha256": "706def56357fcb10ed21c804332242a0eccfb12faf31d94cad730aed7225695a"
+    },
+    {
+      "file": "docs/test-results/android-native/ai-composer-keyboard.xml",
+      "sha256": "e3c9b5d6eebeb8f7a9f5d1d3222e0c806f99313a301c79c12110c74791834732"
+    },
+    {
+      "file": "docs/test-results/android-native/booking-action-keyboard.png",
+      "sha256": "f98cfe47021ae9e50906e9941c298825823fa6aadadc790c4c6164988f6a2d28"
+    },
+    {
+      "file": "docs/test-results/android-native/booking-action-keyboard.xml",
+      "sha256": "181b1b97b918d3ba1a2d78e60616d19a39c491cb28743185a9e314dbaa1e39d5"
+    },
+    {
+      "file": "docs/test-results/android-native/booking-fee-keyboard.png",
+      "sha256": "8597134b9fd6f8c312c8a601590b6dcfaf85155983c1e06945eac63a40113479"
+    },
+    {
+      "file": "docs/test-results/android-native/booking-fee-keyboard.xml",
+      "sha256": "7d7723524e2f961dfbb3f16d305805aec0194ddba73916240a9d5b9364e3c47a"
+    },
+    {
+      "file": "docs/test-results/android-native/booking-notes-keyboard.png",
+      "sha256": "3618af04a64c198ec43c51bd074f85098eb6fa5fbe3485ffcf94b8bc907862b8"
+    },
+    {
+      "file": "docs/test-results/android-native/booking-notes-keyboard.xml",
+      "sha256": "377f46c255a31e74ec5a77313d512959a254e0aba8caf61c92d159e3a70d9a22"
+    },
+    {
+      "file": "docs/test-results/android-native/booking-services-keyboard.png",
+      "sha256": "3eef92b05f291451cbb4fe3704a7cf0dac50425047d12e39346cce05b0a396e5"
+    },
+    {
+      "file": "docs/test-results/android-native/booking-services-keyboard.xml",
+      "sha256": "9ff3401b66ef000a485e60c2c806ebb7e7512d8d8c22a8bfa2cb9aeeb1b6e596"
+    },
+    {
+      "file": "docs/test-results/android-native/household-home.png",
+      "sha256": "361153607c9a2d0bf08cd43e6975f0079adf4d9c462bde9da427ea624d12f0b7"
+    },
+    {
+      "file": "docs/test-results/android-native/household-home.xml",
+      "sha256": "dfd6076d1b72423bf58f34837d9c5a0bab1abc547c6217e34c79a1a01e5d5558"
+    },
+    {
+      "file": "docs/test-results/android-native/household-posts.png",
+      "sha256": "1181690f751c3dec9a84ef3944bf603371de35d0d86aa6da6acf99b95d934464"
+    },
+    {
+      "file": "docs/test-results/android-native/household-posts.xml",
+      "sha256": "cb462c0b0404bc9c8790bbf2799a397a2b84a0e3f4469f0e71fd9798085c174c"
+    },
+    {
+      "file": "docs/test-results/android-native/household-profile.png",
+      "sha256": "26a69fa3be8e873134e4c30774798a776622d6280c897732a056c24491312e14"
+    },
+    {
+      "file": "docs/test-results/android-native/household-profile.xml",
+      "sha256": "d11d9b425c12d9d6cd00e4709f486b0ab97db55e2e22a6d90f731ad894322054"
+    },
+    {
+      "file": "docs/test-results/android-native/job-modal-action.png",
+      "sha256": "9862ecf9449aa457f6a6d84150df47ae9c9cd75e54db17545386df90c266adfa"
+    },
+    {
+      "file": "docs/test-results/android-native/job-modal-action.xml",
+      "sha256": "db200399bd599e4dcea96a561f346db6c3db293d99c9b3739fdcee90314af651"
+    },
+    {
+      "file": "docs/test-results/android-native/job-modal-first.png",
+      "sha256": "0662452b3f8de1d95ea25277cd25b5fbe2b646f8af49739559ef6e65e3a59184"
+    },
+    {
+      "file": "docs/test-results/android-native/job-modal-first.xml",
+      "sha256": "900bd98d341f54fc61fdab666da4e71734d9bf8d9f2f3d089d4b7329ee593708"
+    },
+    {
+      "file": "docs/test-results/android-native/job-modal-multiline.png",
+      "sha256": "e12d8c93a2c9929af8287bb2596292f064f8fc01822b2f69d794a80bc2785cad"
+    },
+    {
+      "file": "docs/test-results/android-native/job-modal-multiline.xml",
+      "sha256": "33d63025b053383f92d5229d60c80d99ba96cb0d2b190633650abd035cb51e48"
+    },
+    {
+      "file": "docs/test-results/android-native/login-keyboard.png",
+      "sha256": "493610317b6fe1ed288cd35a280d0441c8b536602fab62043bd239e5861edb5c"
+    },
+    {
+      "file": "docs/test-results/android-native/login-keyboard.xml",
+      "sha256": "ca7509ccef815a1e92e22b01d36b8d5b3b40c0cbecb963792288cd9a57719355"
+    },
+    {
+      "file": "docs/test-results/android-native/offline-logout.png",
+      "sha256": "a48dfd98fdd24914996900daeb2b7748cf66beb0ea4fefa5d81024b80caa85dd"
+    },
+    {
+      "file": "docs/test-results/android-native/offline-logout.xml",
+      "sha256": "a25e385978c1ed76933fcec30822d8a6dd0eefe3bb3dd113210b959c2e3052e7"
+    },
+    {
+      "file": "docs/test-results/android-native/profile-keyboard.png",
+      "sha256": "4be69dc3b8b5162ebc908e914ed97b27f1c8e7d0a2f34daef7e065051dd8faab"
+    },
+    {
+      "file": "docs/test-results/android-native/profile-keyboard.xml",
+      "sha256": "bb7d0b6446d8e4dcae4bfe9cd5f6b316a42bf991a907b85d3dbd2f158a5c27bf"
+    },
+    {
+      "file": "docs/test-results/android-native/profile-numeric.png",
+      "sha256": "1160dec3d1f72a8d916b3deb39dda949ba65241e9397ea899ee66c3615a7ef98"
+    },
+    {
+      "file": "docs/test-results/android-native/profile-numeric.xml",
+      "sha256": "be6364c46a8625d7775d5353bf32598b99fd55017fc1aa3a986227b41b6b3f3f"
+    },
+    {
+      "file": "docs/test-results/android-native/signup-action.png",
+      "sha256": "9b38759b85daaa468a2cd2697fb04806bcb12cfd85efd0e6f50006ff31e73d7d"
+    },
+    {
+      "file": "docs/test-results/android-native/signup-action.xml",
+      "sha256": "f655af1d116d5cf956a04b8a33f6d01b06927ae0211387cb6e620ff4ad8f4da6"
+    },
+    {
+      "file": "docs/test-results/android-native/signup-first-field.xml",
+      "sha256": "0e9477aef442a0b9f3b8791041204e7438ac65f43a6fb871e651c4ad7c18682f"
+    },
+    {
+      "file": "docs/test-results/android-native/signup-password.xml",
+      "sha256": "f655af1d116d5cf956a04b8a33f6d01b06927ae0211387cb6e620ff4ad8f4da6"
+    },
+    {
+      "file": "docs/test-results/android-native/worker-broadcasts.png",
+      "sha256": "05c48b529ebf6953c65e52e38b19c7cbd3da910c98035b375694d523219c437d"
+    },
+    {
+      "file": "docs/test-results/android-native/worker-broadcasts.xml",
+      "sha256": "0737039230f58c4dd64709aa367c5260dc08432689add87797b4d139d857131b"
+    },
+    {
+      "file": "docs/test-results/android-native/worker-complaints.png",
+      "sha256": "7020aa41f536248971e4d7d13b6488adf5935d3c7672c0f84a8217c38cbcdace"
+    },
+    {
+      "file": "docs/test-results/android-native/worker-complaints.xml",
+      "sha256": "bbdd9be8fde92738741bf22748c11cbf8748ef2b268b134e21db0d78f220e5ce"
+    },
+    {
+      "file": "docs/test-results/android-native/worker-home.png",
+      "sha256": "7dc7419d9892ef6d68f4923bbf5ba2699119c75d8ac6c950742ace569faf5865"
+    },
+    {
+      "file": "docs/test-results/android-native/worker-home.xml",
+      "sha256": "a22fa498133d1390e67143a1244ed724d34f241498d07c6dbc689bef3c5d36c2"
+    },
+    {
+      "file": "docs/test-results/android-performance.json",
+      "sha256": "58a34a3dbfb3409e52e5f681852e54f07507755320a89628229e87681b0cd3bc"
+    },
+    {
+      "file": "docs/test-results/android-physical-fixes-backend.json",
+      "sha256": "1c515031b81f58b775ab749b1422aa893924cec4f0b8558680377fb4fe628b3e"
+    },
+    {
+      "file": "docs/test-results/android-physical-fixes-ui.json",
+      "sha256": "9af7b2feaef502061bf37d939848b0f2f5357b3becdf2a2c5a6a033efb3e4550"
+    },
+    {
+      "file": "docs/test-results/android-physical-fixes-visual.json",
+      "sha256": "b925756cab019554525a654190916ad827fe7c7adcfd87456ba290cabb70ffdb"
+    },
+    {
+      "file": "docs/test-results/free-stack.json",
+      "sha256": "5cd7b0bd52254aa6b4c7a2d875ee0e65ec6141e9cd9e61904eb575d919d777a1"
+    },
+    {
+      "file": "docs/test-results/next-phase-protocol.json",
+      "sha256": "549a2581e14a7b759c8f3f914481436c942e3a64d660c9a3b7ce46d68683453c"
+    },
+    {
+      "file": "docs/test-results/password-sessions.json",
+      "sha256": "09c205df5038307ccdf465a09fc0deb57176f0ed5f814e54adc5a938190af5b9"
+    },
+    {
+      "file": "mobile/App.js",
+      "sha256": "08e33d0ef20b1fc290df9c0f47ff21371862f20c0fb589c861103b8552f55c59"
+    },
+    {
+      "file": "mobile/src/api/client.js",
+      "sha256": "279ef73cdd6d16e58828458b925f29912606734e22e1a15de0a0780018c9518a"
+    },
+    {
+      "file": "mobile/src/components/BookingInput.js",
+      "sha256": "589941d149786fec41726212d31273d82598bf84d45d7f0008331d0cdc84f051"
+    },
+    {
+      "file": "mobile/src/components/DateInput.js",
+      "sha256": "3b8a99214d4390c82414a26f070fc41681e805369faf10ce8be106675fafe26f"
+    },
+    {
+      "file": "mobile/src/components/FormLayout.js",
+      "sha256": "6043527f7f9fd46d347624945004443baf2d62449ca2ae608ae16e58b3cf8454"
+    },
+    {
+      "file": "mobile/src/components/ServiceLocationInput.js",
+      "sha256": "09c4511c7fc6c06d4d5589d1add8e26af6ab3e2b2505513fcd1f31913e5291bd"
+    },
+    {
+      "file": "mobile/src/context/AuthContext.js",
+      "sha256": "211ccae01a7e106317abd73cdd098e5b44564618cbe28a84ba27ac87c2eebba8"
+    },
+    {
+      "file": "mobile/src/context/NotificationContext.js",
+      "sha256": "14ade0828033c18d7eab0aff204e1832670693926707574b4d90b825e56ab07f"
+    },
+    {
+      "file": "mobile/src/screens/AiAssistantScreen.js",
+      "sha256": "fd462a3369c516cacc5ce4afe1b356b11f69f90ed8d896c109495a84052b07a4"
+    },
+    {
+      "file": "mobile/src/screens/ChatScreen.js",
+      "sha256": "e6566ce9c830f4a99b5f5349e5e5160d71ddbc3f8d06e003fdc45cb229889626"
+    },
+    {
+      "file": "mobile/src/screens/ComplaintsScreen.js",
+      "sha256": "33c3f915c2dacb45248893d79340531d1056131829fed23431ded74369d7a10d"
+    },
+    {
+      "file": "mobile/src/screens/EmergencyScreen.js",
+      "sha256": "4468afe01f01ceefa3fa67bbc69a6ee3cf16aa3c079ae1c9fbb7391ab08de7fa"
+    },
+    {
+      "file": "mobile/src/screens/ExploreScreen.js",
+      "sha256": "ffdb31d4d89f848de5fee4d67b6b632364649c53574df43e33cac07b61edbd21"
+    },
+    {
+      "file": "mobile/src/screens/HelperDetailScreen.js",
+      "sha256": "f5196c135a921cf9875e8e9a428031ea99a41892f8ff2afa9432f81dddcb7a4c"
+    },
+    {
+      "file": "mobile/src/screens/HomeScreen.js",
+      "sha256": "d7d8b209d88dfe409b9b96a2afc9a1727b5295e55762b4735e1c4d92602657ad"
+    },
+    {
+      "file": "mobile/src/screens/JobsScreen.js",
+      "sha256": "1c2e07131690843edbece2e7f94aaf81d72e0afae64b4e713270b8e40f374c0f"
+    },
+    {
+      "file": "mobile/src/screens/LoginScreen.js",
+      "sha256": "95bc7037ae09174215a75e1eb87c61b43bd41864b7f1af626d043c35ac68a5b6"
+    },
+    {
+      "file": "mobile/src/screens/NotificationsScreen.js",
+      "sha256": "f174654d2c3c0d6a12ae9a04dcd014260eb03b70dae51090a335334e41b78395"
+    },
+    {
+      "file": "mobile/src/screens/ProfileScreen.js",
+      "sha256": "4c3a35512f6a0e12c5d2c4dfdd29e9af1ea373a62ea673b3949249d9a87fbfcc"
+    },
+    {
+      "file": "mobile/src/screens/RegisterScreen.js",
+      "sha256": "79ca0d1ceb997de0e6a636e534db53aed9404a5606c49595c3acebc5587d5344"
+    },
+    {
+      "file": "mobile/src/screens/RoleSections.js",
+      "sha256": "d6745e0a9f2f8faad6d849eaea420bc3bc1166ac551e2419e285b761e75fcb77"
+    },
+    {
+      "file": "mobile/src/screens/WorkerDashboardScreen.js",
+      "sha256": "25797db6c367a4742c1b55a5b73d1372008e1a0149012069b7e80ccb60453e4e"
+    },
+    {
+      "file": "mobile/src/utils/useMarketplaceCategories.js",
+      "sha256": "826632aab005ba8c40809e024b0a51b45382ddcd54e4825b825575a869c6ce09"
+    },
+    {
+      "file": "server/tests/androidFixesVisual.js",
+      "sha256": "619a74f6e42c874aa64dab727870042cee4b060044d214b11ea460b4e89b56e6"
+    },
+    {
+      "file": "server/tests/androidNativeBooking.js",
+      "sha256": "82ca9afac437b91e964c53fcbd41daf71de213ca7607ffd38ebc26bb618ae7fd"
+    },
+    {
+      "file": "server/tests/androidNativeFlows.js",
+      "sha256": "3128d09f00b2c344e9deaca067b939f385629288b8d434363421f3a643e00281"
+    },
+    {
+      "file": "server/tests/androidNativeForms.js",
+      "sha256": "c7fcd9229ad7855d9107332f1a28528e31f886c9a8263bce6783b88a82b0c4bb"
+    },
+    {
+      "file": "server/tests/androidNativeReview.js",
+      "sha256": "f1afa56520277f6d558cec952e4b7537caeb539eea24ce5652e73fcbdcb73900"
+    },
+    {
+      "file": "server/tests/androidPerformance.js",
+      "sha256": "6d354dec44b22a406699975ea089af9243fa54207a2563787522c8d92f440d5c"
+    },
+    {
+      "file": "server/tests/androidUiFixes.js",
+      "sha256": "96d9acb1267599070019fdc46d25d4ea715094ac53510a10e609580ef5639be3"
+    }
+  ],
+  "productionChanges": "None; mobile source and test/documentation changes only",
+  "database": "No migration, permission change or production record mutation",
+  "releaseTarget": "existing EAS preview / com.atyourservice.app"
+}

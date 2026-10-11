@@ -1,3 +1,4 @@
+import {FormTextInput as TextInput} from '../components/FormLayout';
 import ServiceLocationInput from '../components/ServiceLocationInput';
 import { FormScrollView as ScrollView } from '../components/FormLayout';
 import { FormModal as Modal } from '../components/FormLayout';
@@ -8,7 +9,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -38,16 +38,15 @@ export default function ProfileScreen({ navigation }) {
 
   useEffect(() => {
     if (user) {
-      setName(user.name || '');
-      setPhone(user.phone || '');
-      setEmail(user.email || '');
-      setLocation(user.location || '');
+      if(!isEditingPersonal) {
+        setName(user.name || '');setPhone(user.phone || '');setEmail(user.email || '');setLocation(user.location || '');
+      }
 
       if (!user.location || user.location.trim() === '') {
         setMandatoryLocModal(true);
       }
     }
-  }, [user]);
+  }, [user,isEditingPersonal]);
 
   const handleSaveMandatoryLocation = async () => {
     if (!mandatoryLocation.trim()) {
@@ -96,12 +95,13 @@ export default function ProfileScreen({ navigation }) {
   useEffect(() => {
     const profile = user?.helperProfile;
     if (!profile) return;
+    if(isEditingProfile || isEditingServices)return;
     setWorkerCategory(user.primary_category || user.category || '');
     setWorkerServicesList(profile.services || []);
     setWorkerBio(profile.bio || '');
     setWorkerRate(String(profile.hourly_rate || 0));
     setWorkerExp(String(profile.experience_years || 0));
-  }, [user]);
+  }, [user,isEditingProfile,isEditingServices]);
 
   const handleSaveWorkerSettings = async () => {
     try {
@@ -127,6 +127,34 @@ export default function ProfileScreen({ navigation }) {
       keyboardVerticalOffset={0}
     >
       <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+
+        {activeRole === 'helper' ? (
+          <View style={styles.profileCard}>
+            <View style={styles.avatarLarge}>
+              <Text style={styles.avatarTextLarge}>{user?.name?.charAt(0) || 'W'}</Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
+              <Text style={styles.userName}>{user?.name || 'Service Partner'}</Text>
+            </View>
+            <Text style={styles.userEmail}>{user?.email}</Text>
+
+          </View>
+        ) : (
+          <View style={styles.profileCard}>
+            <View style={styles.avatarLarge}>
+              <Text style={styles.avatarTextLarge}>{user?.name?.charAt(0) || 'U'}</Text>
+            </View>
+
+            <Text style={styles.userName}>{user?.name || 'Household User'}</Text>
+            <Text style={styles.userEmail}>{user?.email || 'user@helpearly.com'}</Text>
+
+            <View style={styles.nidBadge}>
+              <Ionicons name="shield-checkmark" size={14} color="#0d9488" />
+              <Text style={styles.nidBadgeText}>{user?.role==='admin'?'Admin account':'Household account'}</Text>
+            </View>
+          </View>
+        )}
 
       {/* Account Personal Details (Username, Phone, Email, Address) */}
       <View style={styles.sectionCard}>
@@ -209,7 +237,6 @@ export default function ProfileScreen({ navigation }) {
         </View>
       </View>
 
-        {/* If activeRole is 'helper', render exact Helper Detail profile view from household mode */}
         {activeRole === 'helper' ? (
           <View style={[styles.profileCard, { marginBottom: 16 }]}>
             <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'flex-end', marginBottom: -10 }}>
@@ -226,14 +253,6 @@ export default function ProfileScreen({ navigation }) {
                 <Ionicons name={isEditingProfile ? 'checkmark-circle' : 'create-outline'} size={15} color="#0d9488" />
                 <Text style={styles.editToggleBtnText}>{isEditingProfile ? 'Save Profile' : 'Edit Profile'}</Text>
               </TouchableOpacity>
-            </View>
-
-            <View style={styles.avatarLarge}>
-              <Text style={styles.avatarTextLarge}>{user?.name?.charAt(0) || 'W'}</Text>
-            </View>
-
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
-              <Text style={styles.userName}>{user?.name || 'Service Partner'}</Text>
             </View>
 
             {/* Category & Verified Badges */}
@@ -318,25 +337,7 @@ export default function ProfileScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         ) : (
-          /* Household Standard Profile Header */
-          <View style={styles.profileCard}>
-            <View style={styles.avatarLarge}>
-              <Text style={styles.avatarTextLarge}>{user?.name?.charAt(0) || 'U'}</Text>
-            </View>
-
-            <Text style={styles.userName}>{user?.name || 'Household User'}</Text>
-            <Text style={styles.userEmail}>{user?.email || 'user@helpearly.com'}</Text>
-
-            <View style={styles.nidBadge}>
-              <Ionicons name="shield-checkmark" size={14} color="#0d9488" />
-              <Text style={styles.nidBadgeText}>{user?.role==='admin'?'Admin account':'Household account'}</Text>
-            </View>
-
-            <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
-              <Ionicons name="log-out-outline" size={16} color="#ef4444" />
-              <Text style={styles.logoutBtnText}>Logout Account</Text>
-            </TouchableOpacity>
-          </View>
+          <View style={styles.sectionCard}><TouchableOpacity style={styles.logoutBtn} onPress={logout}><Ionicons name="log-out-outline" size={16} color="#ef4444"/><Text style={styles.logoutBtnText}>Logout Account</Text></TouchableOpacity></View>
         )}
 
       {/* Account Profile Type */}

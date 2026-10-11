@@ -1,0 +1,23 @@
+{
+  "executed_at": "2026-10-11T18:52:54.286Z",
+  "results": {
+    "Android 16 native login: focused password and Sign In remain above real keyboard": "PASS",
+    "Android 16 native signup: first/last fields and Create Account scroll above keyboard; no registration submitted": "PASS",
+    "Native login reaches real isolated PostgreSQL household dashboard without stuck loading": "PASS"
+  },
+  "measurements": {
+    "loginToHomeUpperBound_ms": 3756
+  },
+  "device": {
+    "serial": "emulator-5554",
+    "android": "16",
+    "api": 36,
+    "size": "Physical size: 720x1600\r\nOverride size: 720x1280",
+    "density": 320,
+    "navigation": "[x] com.android.internal.systemui.navbar.threebutton"
+  },
+  "runtime": "Expo Go SDK 57.0.9, latest local source, isolated PostgreSQL API 5076",
+  "physicalPhone": "NOT RUN",
+  "signedPreview": "NOT RUN by this suite",
+  "fcm": "NOT RUN; Expo Go lacks remote push"
+}

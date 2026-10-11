@@ -1,0 +1,11 @@
+{
+  "executed_at": "2026-10-11T18:58:14.333Z",
+  "results": {
+    "Native booking multiline requested service remains above keyboard": "PASS",
+    "Native booking decimal fee remains above numeric keyboard": "PASS",
+    "Native booking notes and Confirm Booking Request accessible with keyboard open; no booking submitted": "PASS"
+  },
+  "runtime": "Actual Android 16 emulator, Expo Go SDK 57; isolated PostgreSQL fixture",
+  "physicalPhone": "NOT RUN",
+  "mutations": "No booking or payment submitted"
+}

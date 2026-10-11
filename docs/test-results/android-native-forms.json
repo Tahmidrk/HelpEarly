@@ -1,0 +1,12 @@
+{
+  "executed_at": "2026-10-11T18:57:14.090Z",
+  "results": {
+    "Native job modal first/multiline fields and Publish Request accessible with keyboard open; no job submitted": "PASS",
+    "Native profile editing preserves draft and focused field above keyboard": "PASS",
+    "Native fixed AI composer remains above real keyboard; no provider request submitted": "PASS"
+  },
+  "runtime": "Actual Android 16 emulator, Expo Go SDK 57; isolated PostgreSQL backend",
+  "physicalPhone": "NOT RUN",
+  "bookingComplaintChatWorkerSetup": "Shared layout/components checked; remaining native flows require manual retest",
+  "provider": "No Gemini call in isolated fixture"
+}

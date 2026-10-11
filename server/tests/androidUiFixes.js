@@ -11,6 +11,8 @@ const ScrollView=React.forwardRef((props,ref)=>{React.useImperativeHandle(ref,()
 const native={View:'View',Text:'Text',TextInput:'TextInput',TouchableOpacity:'Button',ActivityIndicator:'Spinner',Image:'Image',Modal:'Modal',ScrollView,KeyboardAvoidingView:'KeyboardAvoidingView',Platform:{OS:'android'},StyleSheet:{create:x=>x},Keyboard:{addListener:(name,fn)=>{events[name]=fn;return{remove:()=>delete events[name]};}},BackHandler:{addEventListener:(name,fn)=>{events[name]=fn;return{remove:()=>{if(events[name]===fn)delete events[name];}};}},FlatList:props=>React.createElement('List',{},props.ListHeaderComponent,...(props.data||[]).map((item,index)=>React.createElement(React.Fragment,{key:index},props.renderItem({item,index}))),props.data?.length?null:props.ListEmptyComponent)};
 // Host TextInput remains a function so focused-node measurements can be injected.
 native.TextInput=Object.assign(props=>React.createElement('TextInput',props),{State:{currentlyFocusedInput:()=>({measureInWindow:fn=>fn(0,550,200,30)})}});
+native.StyleSheet.flatten=value=>Array.isArray(value)?Object.assign({},...value.map(native.StyleSheet.flatten)):value||{};
+native.StatusBar={currentHeight:0};
 global.requestAnimationFrame=fn=>fn();
 const navigator=()=>({Navigator:props=>React.createElement('Navigator',props,props.children),Screen:props=>React.createElement('Screen',props,props.name==='Main'?React.createElement(props.component):null)});
 const stubs={
@@ -48,6 +50,9 @@ async function main(){
  pass('Actual Chat hardware/header Back stays in list after refreshed data; first-time profile chat opens without delay workaround');
  const {FormScrollView,FormModal}=await load('mobile/src/components/FormLayout.js');await act(async()=>{tree=renderer.create(React.createElement(FormScrollView,{children:React.createElement('TextInput')}));});await act(async()=>events.keyboardDidShow({endCoordinates:{screenY:400}}));assert.equal(scrolled.y,188);await act(async()=>events.keyboardDidHide());await act(async()=>tree.unmount());await act(async()=>{tree=renderer.create(React.createElement(FormModal,{visible:true},React.createElement('Button')));});assert.equal(tree.root.findByType('KeyboardAvoidingView').props.enabled,false);assert(tree.root.findByType('SafeAreaView').props.edges.includes('bottom'));await act(async()=>tree.unmount());
  pass('Actual form scroll computes focused-input overflow; Android has single keyboard owner; modal bottom safe inset present (simulated measurements)');
+ native.StatusBar.currentHeight=64;scrolled=null;
+ await act(async()=>{tree=renderer.create(React.createElement(FormScrollView,{children:React.createElement('TextInput')}));});await act(async()=>events.keyboardDidShow({endCoordinates:{screenY:400}}));assert.equal(scrolled.y,252);await act(async()=>tree.unmount());native.StatusBar.currentHeight=0;
+ pass('Android status-bar origin converts window measurements to keyboard screen coordinates without fixed padding');
  const date=await load('mobile/src/utils/dateOnly.js');assert.throws(()=>date.parseDate('2026-02-30'));assert.throws(()=>date.parseDate('2020-01-01'));assert.throws(()=>date.parseDate('11/10/2026'));assert.equal(date.dateText(date.parseDate('2028-02-29')),'2028-02-29');
  pass('Manual date rejects rollover, malformed and past dates; valid leap date round-trips');
  const Sections=await load('mobile/src/screens/RoleSections.js',true);

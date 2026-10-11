@@ -1,3 +1,4 @@
+import {FormTextInput as TextInput} from '../components/FormLayout';
 import { FormScrollView as ScrollView } from '../components/FormLayout';
 import { FormModal as Modal } from '../components/FormLayout';
 import { Alert } from '../components/Feedback';
@@ -10,7 +11,6 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  TextInput,
   Image,
   } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
@@ -20,10 +20,11 @@ import MapViewModal from '../components/MapViewModal';
 import { useNotifications } from '../context/NotificationContext';
 
 export default function HomeScreen({ navigation }) {
-  const { revision } = useNotifications();
+  const { revision } = useNotifications('helpers');
   const { user, activeRole, switchMode } = useAuth();
   const [helpers, setHelpers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError,setLoadError]=useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -58,9 +59,9 @@ export default function HomeScreen({ navigation }) {
       const data = await helpersAPI.getAll({ limit: 50 });
       const list = Array.isArray(data) ? data : (data?.helpers || []);
       setHelpers(list);
+      setLoadError('');
     } catch (e) {
-      console.log(e);
-      setHelpers([]);
+      if(e.name!=='AbortError')setLoadError(e.message);
     } finally {
       setLoading(false);
     }
@@ -140,6 +141,7 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {loadError?<Text accessibilityRole="alert" style={{color:'#b91c1c',padding:12}} onPress={fetchTopHelpers}>{loadError} — Tap to retry</Text>:null}
         {/* Role Toggle Switcher */}
         {user?.role === 'both' && (
           <View style={styles.toggleCard}>

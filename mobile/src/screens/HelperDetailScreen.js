@@ -1,3 +1,4 @@
+import {FormTextInput as TextInput} from '../components/FormLayout';
 import DateInput from '../components/DateInput';
 import BookingInput from '../components/BookingInput';
 import { FormScrollView as ScrollView } from '../components/FormLayout';
@@ -10,7 +11,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  TextInput,
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,7 +22,7 @@ import MapViewModal from '../components/MapViewModal';
 import { useNotifications } from '../context/NotificationContext';
 
 export default function HelperDetailScreen({ route, navigation }) {
-  const { revision } = useNotifications();
+  const { revision } = useNotifications('helpers');
   const { user, addBooking } = useAuth();
   const { helperId, helperData, autoOpenBooking } = route.params || {};
   const [helper, setHelper] = useState(helperData || null);

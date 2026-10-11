@@ -49,23 +49,44 @@ export const getMediaUrls = (value) => {
 
 const withMedia = (record) => record ? { ...record, photo_urls: getMediaUrls(record.photos) } : record;
 
+let session, generation = 0;
+const pending = new Set(), reads = new Map();
+export const getSessionGeneration = () => generation;
+export function setApiSession(token, activeRole) {
+  generation++;
+  session = { token, activeRole };
+  pending.forEach(controller => controller.abort());
+  reads.clear();
+}
 export const apiRequest = async (endpoint, options = {}) => {
-  const token = await AsyncStorage.getItem('token');
-  const activeRole = await AsyncStorage.getItem('activeRole');
+  const requestedGeneration = generation;
+  const {timeoutMs = endpoint === '/chatbot' ? 45000 : 20000, detached = false, ...fetchOptions} = options;
+  const credentials = session || {
+    token: await AsyncStorage.getItem('token'), activeRole: await AsyncStorage.getItem('activeRole'),
+  };
+  if (!detached && requestedGeneration !== generation) throw Object.assign(new Error('Session changed'), {name:'AbortError'});
+  const {token, activeRole} = credentials;
   const headers = {
     ...(activeRole ? { 'X-Active-Role': activeRole } : {}),
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers,
+    ...fetchOptions.headers,
   };
 
-  if (options.body instanceof FormData) delete headers['Content-Type'];
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
+  if (fetchOptions.body instanceof FormData) delete headers['Content-Type'];
+  const key = JSON.stringify([endpoint, token, activeRole]);
+  const reusable = !detached && !fetchOptions.signal && (!fetchOptions.method || fetchOptions.method === 'GET');
+  if (reusable && reads.has(key)) return reads.get(key);
+  const controller = new AbortController();
+  if (!detached) pending.add(controller);
+  const cancel = () => controller.abort();
+  fetchOptions.signal?.addEventListener('abort', cancel);
+  if (fetchOptions.signal?.aborted) cancel();
+  let timer;
+  const work = (async () => {
+  const response = await fetch(`${API_BASE}${endpoint}`, {...fetchOptions, headers, signal:controller.signal});
   const responseText = await response.text();
+  if (!detached && requestedGeneration !== generation) throw Object.assign(new Error('Session changed'), {name:'AbortError'});
   let data;
   try {
     data = JSON.parse(responseText);
@@ -82,11 +103,24 @@ export const apiRequest = async (endpoint, options = {}) => {
     throw error;
   }
   return data;
+  })();
+  const request = Promise.race([work, new Promise((resolve, reject) => {
+    timer = setTimeout(() => { reject(Object.assign(new Error('Connection timed out. Check your network and tap retry. The server may be waking up.'), {code:'TIMEOUT'})); controller.abort(); }, timeoutMs);
+  }), new Promise((resolve,reject) => {
+    controller.signal.addEventListener('abort',()=>reject(Object.assign(new Error('Request cancelled'),{name:'AbortError'})),{once:true});
+    if(controller.signal.aborted) reject(Object.assign(new Error('Request cancelled'),{name:'AbortError'}));
+  })]).finally(() => {
+    clearTimeout(timer); pending.delete(controller);
+    fetchOptions.signal?.removeEventListener('abort', cancel);
+    if (reads.get(key) === request) reads.delete(key);
+  });
+  if (reusable) reads.set(key, request);
+  return request;
 };
 
 export const authAPI = {
-  revisions: () => apiRequest('/sync'),
-  login: (credentials) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
+  revisions: () => apiRequest('/sync', {timeoutMs:10000}),
+  login: (credentials) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(credentials),timeoutMs:60000 }),
   register: (data) => apiRequest('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   getMe: () => apiRequest('/auth/me'),
   updateProfile: (data) => apiRequest('/auth/profile', { method: 'PUT', body: JSON.stringify(data) }),
@@ -138,7 +172,7 @@ export const notificationsAPI = {
   list: () => apiRequest('/notifications'),
   read: (id) => apiRequest(`/notifications/${id}/read`, { method: 'PUT' }),
   register: (data) => apiRequest('/notifications/devices', { method: 'POST', body: JSON.stringify(data) }),
-  removeDevice: (id) => apiRequest(`/notifications/devices/${id}`, { method: 'DELETE' }),
+  removeDevice: (id, options = {}) => apiRequest(`/notifications/devices/${id}`, { ...options, method: 'DELETE' }),
 };
 
 export const reviewsAPI = {
