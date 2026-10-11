@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-11T08:12:27.631Z",
+  "executed_at": "2026-10-11T12:10:26.795Z",
   "database": "suite-owned isolated PostgreSQL; synthetic records",
   "results": {
     "Every admin resource/mutation rejects non-admins; DB role overrides forged JWT; registration/profile cannot promote": "PASS",
@@ -14,5 +14,5 @@
     "Audit actor/action/target/time/outcomes persist across migration rerun; append-only UPDATE/DELETE/TRUNCATE enforcement": "PASS"
   },
   "physicalAndroid": "IMPLEMENTED/UNVERIFIED: phone required",
-  "production": "BLOCKED: separate migration/deployment approval required"
+  "production": "NOT RUN by this isolated suite; see separate admin-live-workflows.json and deployment evidence"
 }

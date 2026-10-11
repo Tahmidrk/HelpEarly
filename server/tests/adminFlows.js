@@ -109,6 +109,6 @@ async function main(){
   for(const sql of ['UPDATE admin_audit_logs SET action=\'tamper\'','DELETE FROM admin_audit_logs','TRUNCATE admin_audit_logs'])await assert.rejects(pool.query(sql),e=>e.code==='23514');
   const checkpoint=Number((await pool.query('SELECT count(*) FROM admin_audit_logs')).rows[0].count);await require('../db/ensureSchema')();assert.equal(Number((await pool.query('SELECT count(*) FROM admin_audit_logs')).rows[0].count),checkpoint);
   pass('Audit actor/action/target/time/outcomes persist across migration rerun; append-only UPDATE/DELETE/TRUNCATE enforcement');
-  await fs.writeFile(path.resolve(__dirname,'../../docs/test-results/admin-local.json'),JSON.stringify({executed_at:new Date().toISOString(),database:'suite-owned isolated PostgreSQL; synthetic records',results,physicalAndroid:'IMPLEMENTED/UNVERIFIED: phone required',production:'BLOCKED: separate migration/deployment approval required'},null,2)+'\n');
+  await fs.writeFile(path.resolve(__dirname,'../../docs/test-results/admin-local.json'),JSON.stringify({executed_at:new Date().toISOString(),database:'suite-owned isolated PostgreSQL; synthetic records',results,physicalAndroid:'IMPLEMENTED/UNVERIFIED: phone required',production:'NOT RUN by this isolated suite; see separate admin-live-workflows.json and deployment evidence'},null,2)+'\n');
 }
 main().catch(e=>{console.error('Admin tests failed:',e.message);process.exitCode=1;}).finally(()=>pool.end());

@@ -1,0 +1,16 @@
+{
+  "executed_at": "2026-10-11T12:13:20.452Z",
+  "status": "PASS",
+  "domain": "https://atyour-service.vercel.app",
+  "authenticatedRole": "Existing administrator",
+  "checks": {
+    "labeledAccountSearch": "PASS: accounts 53/54 shown",
+    "categoryEdit": "PASS: owned fixture category visible flag unchecked and saved through in-page confirmation",
+    "authoritativeRefresh": "PASS: table No; footer removes hidden fixture category",
+    "history": "PASS: no deletion",
+    "ownerCredential": "IMPLEMENTED/UNVERIFIED: owner reconnection confirmed, timestamp precedes new password rules",
+    "freshAdminActions": "PASS: live activation and suspension of both owned fixtures after new login"
+  },
+  "screenshot": "H:/apps/HelpEarly-artifacts/admin-live-overview-after-security-20261011.png",
+  "physicalAndroid": "NOT RUN"
+}

@@ -1,0 +1,14 @@
+{
+  "executed_at": "2026-10-11T11:48:46.412Z",
+  "status": "PASS",
+  "mode": "Production read-only verification",
+  "originalCustomerRowsPreserved": "See admin-original-preservation-final.json: original business data preserved; owner password rotation and approved account restoration timestamp differ",
+  "systemRevisions": "Expected to change as real operations invalidate caches",
+  "tables": 23,
+  "rls": 23,
+  "directConsumerGrants": 0,
+  "activeAdministrators": 1,
+  "durableNonAdminDenialAudit": "PASS",
+  "liveMutatingAdminChecks": "PASS: see admin-live-workflows.json",
+  "physicalAndroid": "NOT RUN"
+}

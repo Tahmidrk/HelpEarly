@@ -1,10 +1,10 @@
 # HelpEarly preview installation and real Android test
 
-**Status: physical tests NOT RUN.** Use the existing FCM-configured preview below for its checkpoint functionality and push tests. Its native configuration and signing passed artifact checks; actual delivery still requires a phone. Current Android source/export removes admin access, but this APK predates that change. See [local admin implementation/report](WEB_ADMIN_COMPLETION.md). Do not use this old APK as proof of admin removal. Preserve existing user records and use explicitly labeled test accounts.
+**Status: physical tests NOT RUN.** The updated signed admin-free preview is built and artifact-verified. Use it for acceptance testing. Web Admin, schema 3 and the approved password-session security fix are live on the existing services. See [admin implementation/report](WEB_ADMIN_COMPLETION.md). The older FCM APK still contains Android admin UI and is retained only as a historical checkpoint. Preserve existing records; use your own consenting test accounts.
 
 ## Install
 
-1. Copy `H:/apps/HelpEarly-artifacts/HelpEarly-preview-FCM-20261011.apk` to the phone, or open the [FCM preview EAS build](https://expo.dev/accounts/tahmid_041/projects/at-your-service/builds/dcf6a4bd-1d56-447b-b131-6c8d6b471d3c) and select Install. SHA-256: `8019e0da86bb4902f7695acae4173e7e18be34f43c71c68dc2e6e0593efb4903`.
+1. Copy `H:/apps/HelpEarly-artifacts/HelpEarly-preview-admin-free-20261011.apk` to the phone, or open the [admin-free preview EAS build](https://expo.dev/accounts/tahmid_041/projects/at-your-service/builds/eee25d58-2523-4e9a-bb77-30dcf2203d0d) and select Install. SHA-256: `9bf5e653af7b32d4f5e4b0a86bb6da0a20cd2f6dfa59e50b3376473ad777d8d9`. Existing package `com.atyourservice.app`, same signing certificate. Install over the old preview; don't delete application data to conceal a failure.
 2. Open the APK in Android Files and allow installation from that source when prompted. Turn that permission off afterward. Keep Play Protect enabled. Do not bypass a malware warning.
 3. Launch the app named **At Your Service**, its existing approved name. If Android reports a signature/install conflict, stop and record the error; do not uninstall an existing application automatically. App data must not be deleted to conceal a failure.
 4. Before presentation open https://helpearly-api.onrender.com/api/ready once. Render Free may need 50 seconds or more after sleep. Wait for readiness, then log in on phone and https://atyour-service.vercel.app/.
@@ -12,6 +12,7 @@
 ## Ordered functional checklist
 
 1. Use a household account on phone and worker account on web. Verify worker trade, own services, no invented reviews/rating, and dual-role self-exclusion.
+   Check the ordinary household, worker and dual layouts/icons/navigation against the approved UI. Android admin login must return the Web-only administration error; no admin navigation, dashboard or deep-link target may appear. Old login sessions are intentionally invalidated by the security rollout: sign in again.
 2. Update each account's profile from one client; confirm it from the other after switching to that same account. Do not edit unrelated users.
 3. Phone household: browse Electrical worker → book → type custom service and offered fee → upload photo. Web worker: confirm booking. Confirm identical booking ID, fee, photo and status on both clients.
 4. Web household: post a job with photo. Phone worker: submit proposal. Web household: accept. Phone worker: confirm the resulting booking appears once.

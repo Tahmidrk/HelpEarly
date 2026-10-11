@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-10T17:43:35.053Z",
+  "executed_at": "2026-10-11T12:13:20.452Z",
   "counts": {
     "info": 0,
     "low": 0,
@@ -32,5 +32,111 @@
     "react-native",
     "uuid",
     "xcode"
-  ]
+  ],
+  "automaticFixes": {
+    "@expo/cli": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "@expo/code-signing-certificates": true,
+    "@expo/config": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "@expo/config-plugins": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "@expo/inline-modules": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "@expo/local-build-cache-provider": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "@expo/metro": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "@expo/metro-config": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "@expo/prebuild-config": true,
+    "@react-native/community-cli-plugin": {
+      "name": "react-native",
+      "version": "0.72.17",
+      "isSemVerMajor": true
+    },
+    "@react-native/virtualized-lists": {
+      "name": "react-native",
+      "version": "0.72.17",
+      "isSemVerMajor": true
+    },
+    "braces": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "expo": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "expo-splash-screen": {
+      "name": "expo-splash-screen",
+      "version": "55.0.25",
+      "isSemVerMajor": true
+    },
+    "metro": {
+      "name": "react-native",
+      "version": "0.72.17",
+      "isSemVerMajor": true
+    },
+    "metro-config": {
+      "name": "react-native",
+      "version": "0.72.17",
+      "isSemVerMajor": true
+    },
+    "metro-file-map": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "metro-transform-worker": true,
+    "micromatch": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "node-forge": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "react-native": {
+      "name": "react-native",
+      "version": "0.72.17",
+      "isSemVerMajor": true
+    },
+    "uuid": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    },
+    "xcode": {
+      "name": "expo",
+      "version": "44.0.6",
+      "isSemVerMajor": true
+    }
+  },
+  "changes": "None: incompatible/major automatic fixes are not applied to the approved UI/SDK checkpoint"
 }

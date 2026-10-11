@@ -1,8 +1,10 @@
 # HelpEarly centralized Web-only administration — local completion
 
-October 11, 2026. **LOCAL IMPLEMENTATION: PASS. PRODUCTION MIGRATION: PASS after explicit approval. BACKEND/WEB DEPLOYMENT: IN PROGRESS.**
+October 11, 2026. **LOCAL IMPLEMENTATION: PASS. PRODUCTION MIGRATION AND BACKEND/WEB ADMIN DEPLOYMENT: PASS after explicit approval. UPDATED SIGNED PREVIEW APK: PASS. PHYSICAL VERIFICATION: NOT RUN.** See [release report](WEB_ADMIN_RELEASE.md).
 
-Actual source, SQL and tests are implemented. The local implementation did not change live services. After separate user approval, a fresh backup/restore passed and the exact schema-3 candidate was committed at 11:37 UTC. All original records were preserved. Backend/web deployment is in progress; no updated APK or physical-device result is claimed yet. Existing Firebase, Gemini and EAS/signing settings are preserved.
+Actual source, SQL and tests are implemented. After separate approval and fresh backup/restore, the exact schema-3 candidate committed at 11:37 UTC. Existing Render and Vercel deployments then succeeded. Fourteen live admin/workflow groups passed using labeled fixtures; actual dashboard editing/confirmation/refresh also passed. Existing Firebase, Gemini and EAS/signing settings are preserved. Original-record comparison identified an unexplained deactivation of account 21; the owner requested restoration, which passed through the audited API. No original record was deleted; original business fields match the restored backup. Owner password rotation and the approved restore timestamp differ legitimately. Exact origin of the deactivation remains unresolved. See [live workflows](test-results/admin-live-workflows.json), [preservation](test-results/admin-original-preservation-final.json), and [session security follow-up](PASSWORD_SESSION_RELEASE.md).
+
+One admin-free EAS preview build succeeded after live checks: `eee25d58-2523-4e9a-bb77-30dcf2203d0d`, existing package/project/signing identity. APK signature, native Firebase resources, ZIP integrity, packaged API, private backup hash and known-secret scans passed. Old Android admin screen markers present in the older APK are absent from this artifact. Physical results remain NOT RUN. The genuine password-session revocation gap was fixed/tested in `2b7bd6a` and separately approved/deployed to Render. Old administrative tokens are rejected; fresh login/WSS and real fixture password rotation passed. No SQL migration or extra APK build was needed.
 
 ## Implemented functionality
 
@@ -49,13 +51,17 @@ Machine-readable evidence: [admin/security](test-results/admin-local.json), [ful
 
 ## Build/export and APK status
 
-- **PASS — Web production build:** 104 modules; `H:/apps/HelpEarly/client/dist`, main `assets/index-mCm8owEo.js`; `VITE_API_URL=https://helpearly-api.onrender.com`.
+- **PASS — Web production build/deployment:** 104 modules; `H:/apps/HelpEarly/client/dist`, main `assets/index-DZWDRiog.js`; API and Socket.IO URL `https://helpearly-api.onrender.com`. Exact deployed bytes match the tested local build on both existing domains. Vercel deployment `dpl_3bj89bMEBVGDunqMNnT1h4fskHnF`, unchanged project `client`.
 - **PASS — Android export:** 1,050 modules; `H:/apps/HelpEarly-artifacts/admin-local-android-export-final-20261011`; bundle `_expo/static/js/android/index-32d784f487118d078c5d16c4142f0c9e.hbc`; production API supplied through `EXPO_PUBLIC_API_URL`.
 - **PASS — Expo Doctor:** 21/21. Package identity `com.atyourservice.app`, app configuration, dependency lockfiles, icons, Firebase configuration and signing files remain unchanged in this phase.
 - **PASS — Configuration tests:** shared API/Socket.IO/media/AI URLs and auth headers; production PostgreSQL verified TLS/session pooling; transaction pooling/disabled certificate validation rejected.
-- **PASS — Production gate:** `node db/adminMigration.js` without `--approved` refused execution. Current production/remote startup is read-only and requires candidate schema 3 before this new API version can start.
+- **PASS — Production gate/startup:** migration without `--approved` refused. Approved schema 3 is live; existing Render deployment `dep-db5nafflk1mc73aje6e0` started successfully and `/api/ready` returned HTTP 200/schema 3. Follow-up credential-session rollout is separately approved.
 - **PASS — Whitespace/staged credential scan:** recorded after final staging; environment files, FCM/signing material and actual credential values excluded.
-- **BLOCKED — Newly signed preview APK with these admin changes:** no EAS build was requested/submitted to conserve the free allowance. Existing `H:/apps/HelpEarly-artifacts/HelpEarly-preview-FCM-20261011.apk` is signed but predates this phase and still contains its old admin UI. Android export is not an installable APK.
+- **PASS — New signed preview:** `H:/apps/HelpEarly-artifacts/HelpEarly-preview-admin-free-20261011.apk`, 82,319,461 bytes; SHA256 `9bf5e653af7b32d4f5e4b0a86bb6da0a20cd2f6dfa59e50b3376473ad777d8d9`. Native build completed 12:12 UTC; existing signing identity retained. [Artifact checks](test-results/android-admin-free-preview-build.json). The older FCM APK is not the release candidate. **IMPLEMENTED/UNVERIFIED:** physical installation/UI/admin denial/push and paired device testing.
+
+**PASS — Live regression:** actual HTTPS/WSS, Supabase and the real Web/Android API modules verified verification/inbox/revisions, worker category/settings, category/service visibility, photo booking, lifecycle/review/rating moderation, photo job/proposal→booking, chat, complaint resolution, isolated-category emergency acceptance, suspension, relogin and durable audit outcomes. Native session bindings are simulated; these are not phone results. Real Gemini responses/history/isolation and FCM validation-only checks passed again. No registered physical push device was present. Synthetic accounts were suspended, their category/jobs/review hidden, and their records/media/history retained.
+
+**PASS — Post-release private backup/restore:** `H:/apps/HelpEarly-backups/admin-release-schema3-2026-10-11T12-06-18-636Z`: all 23 tables and 2 media objects copied and verified; isolated schema-3 restore matched every row. [Evidence](test-results/admin-release-backup.json). Five existing mutable-function-search-path warnings remain in read-only Supabase advisors; no unapproved hardening SQL was applied. Dependency audit remains backend 0, web 4, Android tooling 23 advisories; incompatible automatic upgrades were not forced.
 
 ## Exact production migration — applied after approval
 
@@ -132,4 +138,4 @@ node tests/adminDashboardIntegration.cjs
 Set-Content -LiteralPath H:/apps/HelpEarly-test-tools/stop-admin-browser-fixture -Value stop
 ```
 
-No production dependency or lockfile was changed for this test runtime. The disposable fixture uses documented synthetic credentials in its test code; they are not production credentials. Keep source/test evidence in the local Git checkpoint, the verified database backup privately, and preserve Firebase/signing/environment files in their existing ignored/private locations. Do not push/deploy this checkpoint automatically.
+No production dependency or lockfile changed. Disposable fixture credentials are test-only. Approved administration and session-security source checkpoints are pushed/deployed only within their explicit approvals. Keep verified database/media backups and Firebase/signing/environment files private, outside Git. Physical phone gates and branding approval remain separate.

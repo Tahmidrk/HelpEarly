@@ -1,0 +1,25 @@
+{
+  "executed_at": "2026-10-11T11:55:15.272Z",
+  "status": "PASS",
+  "backend": "https://helpearly-api.onrender.com/api",
+  "scope": "Real HTTPS/WSS and Supabase using labeled release records only; native session bindings simulated; no physical device evidence",
+  "results": {
+    "Every live admin monitor executes real SQL": "PASS",
+    "Live self-lockout rejects changes without touching administrator": "PASS",
+    "Verification reaches actual Web/Android household modules, durable worker inbox, revisions and WSS": "PASS",
+    "Worker category/settings synchronize across live platforms": "PASS",
+    "Category/service visibility reversible and authoritative": "PASS",
+    "Photo booking persists in existing private Supabase Storage": "PASS",
+    "Booking completion, genuine rating and reversible review moderation": "PASS",
+    "Photo job moderation, proposal and booking linkage preserved": "PASS",
+    "Two-way saved chat preserved": "PASS",
+    "Complaint decision and durable inbox synchronize": "PASS",
+    "Live emergency acceptance and admin monitor; only owned fixture worker notified": "PASS",
+    "Suspension disconnects live socket and blocks existing authenticated token": "PASS",
+    "Logout/login retains live bookings and history": "PASS",
+    "Durable real actor/action/target/timestamp/outcome audit evidence": "PASS"
+  },
+  "initialProbeCorrections": "Test session must be household to browse worker; jobs response is an array. No application behavior was changed or test bypassed.",
+  "physicalAndroid": "NOT RUN",
+  "nativePushDelivery": "NOT RUN: no registered physical phone"
+}

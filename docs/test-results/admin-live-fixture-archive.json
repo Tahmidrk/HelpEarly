@@ -1,0 +1,14 @@
+{
+  "executed_at": "2026-10-11T12:00:57.379Z",
+  "status": "PASS",
+  "scope": "Only two labeled release-owned accounts and related synthetic rows",
+  "categoryHiddenViaLiveBrowser": "PASS",
+  "syntheticAccountsSuspended": "PASS",
+  "syntheticWorkerUnavailableUnverified": "PASS",
+  "syntheticJobReviewHidden": "PASS",
+  "recordsMediaAuditHistory": "PRESERVED: no deletion",
+  "ordinaryExistingAccounts": "UNCHANGED",
+  "physicalAndroid": "NOT RUN",
+  "finalVerification": "2026-10-11T12:23:49.342Z",
+  "finalStates": "PASS: both labeled accounts inactive after session regression; original account 21 active"
+}

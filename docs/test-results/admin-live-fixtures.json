@@ -1,0 +1,10 @@
+{
+  "executed_at": "2026-10-11T11:46:39.650Z",
+  "status": "PASS",
+  "noDefaultServicesOrRating": "PASS",
+  "nonAdminMonitorDenied": "PASS",
+  "liveAuthenticatedWSS": "PASS",
+  "syntheticAccounts": 2,
+  "physicalAndroid": "NOT RUN",
+  "next": "Existing Web administrator verifies/moderates labeled fixtures; no existing user changed"
+}

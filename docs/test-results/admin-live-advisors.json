@@ -1,0 +1,99 @@
+{
+  "executed_at": "2026-10-11T11:48:41.507Z",
+  "mode": "Read-only Supabase advisors; no permissions changed",
+  "results": [
+    {
+      "type": "security",
+      "lints": [
+        {
+          "name": "rls_enabled_no_policy",
+          "level": "INFO",
+          "count": 23,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+          "objects": [
+            "admin_audit_logs",
+            "ai_messages",
+            "bookings",
+            "categories",
+            "complaints",
+            "conversations",
+            "emergency_declines",
+            "emergency_requests",
+            "helpearly_schema",
+            "helper_categories",
+            "helper_services",
+            "helpers",
+            "job_applications",
+            "jobs",
+            "media_uploads",
+            "messages",
+            "notifications",
+            "payments",
+            "push_deliveries",
+            "push_devices",
+            "reviews",
+            "sync_revisions",
+            "users"
+          ]
+        },
+        {
+          "name": "function_search_path_mutable",
+          "level": "WARN",
+          "count": 5,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable",
+          "objects": [
+            "enqueue_notification",
+            "marketplace_sync",
+            "marketplace_notification",
+            "expire_emergency_notifications",
+            "bump_sync"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "performance",
+      "lints": [
+        {
+          "name": "unindexed_foreign_keys",
+          "level": "INFO",
+          "count": 14,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys",
+          "objects": [
+            "bookings",
+            "conversations",
+            "emergency_declines",
+            "emergency_requests",
+            "emergency_requests",
+            "emergency_requests",
+            "media_uploads",
+            "messages",
+            "payments",
+            "payments",
+            "payments",
+            "push_deliveries",
+            "push_devices",
+            "reviews"
+          ]
+        },
+        {
+          "name": "unused_index",
+          "level": "INFO",
+          "count": 8,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index",
+          "objects": [
+            "bookings",
+            "bookings",
+            "reviews",
+            "messages",
+            "jobs",
+            "complaints",
+            "bookings",
+            "admin_audit_logs"
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": "23 no-policy INFO findings are intentional backend-only deny-by-default Data API configuration. Five legacy function search_path warnings and index advisories remain; no new production changes approved for them."
+}

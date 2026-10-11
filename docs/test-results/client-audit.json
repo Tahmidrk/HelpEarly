@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-10T17:43:25.516Z",
+  "executed_at": "2026-10-11T12:13:20.452Z",
   "counts": {
     "info": 0,
     "low": 0,
@@ -13,5 +13,28 @@
     "react-router",
     "react-router-dom",
     "vite"
-  ]
+  ],
+  "automaticFixes": {
+    "esbuild": {
+      "name": "vite",
+      "version": "8.3.4",
+      "isSemVerMajor": true
+    },
+    "react-router": {
+      "name": "react-router-dom",
+      "version": "7.18.4",
+      "isSemVerMajor": true
+    },
+    "react-router-dom": {
+      "name": "react-router-dom",
+      "version": "7.18.4",
+      "isSemVerMajor": true
+    },
+    "vite": {
+      "name": "vite",
+      "version": "8.3.4",
+      "isSemVerMajor": true
+    }
+  },
+  "changes": "None: incompatible/major automatic fixes are not applied to the approved UI/SDK checkpoint"
 }

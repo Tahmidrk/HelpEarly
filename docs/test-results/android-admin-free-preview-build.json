@@ -1,0 +1,38 @@
+{
+  "executed_at": "2026-10-11T12:17:45.875Z",
+  "buildId": "eee25d58-2523-4e9a-bb77-30dcf2203d0d",
+  "status": "FINISHED",
+  "profile": "preview",
+  "projectId": "af6f6973-68c9-4e56-af9f-1e8896877b9d",
+  "package": "com.atyourservice.app",
+  "sdk": "57.0.0",
+  "version": "1.0.0",
+  "versionCode": "1",
+  "createdAt": "2026-10-11T11:59:14.598Z",
+  "completedAt": "2026-10-11T12:12:26.625Z",
+  "apk": "H:/apps/HelpEarly-artifacts/HelpEarly-preview-admin-free-20261011.apk",
+  "bytes": 82319461,
+  "sha256": "9bf5e653af7b32d4f5e4b0a86bb6da0a20cd2f6dfa59e50b3376473ad777d8d9",
+  "source": {
+    "baseCommit": "7f485b78b9f01a91eb0eee42d45feda228614989",
+    "workingTree": "Source matches committed 7f485b78b9f01a91eb0eee42d45feda228614989; uncommitted documentation/evidence only; Firebase file provided by EAS secret file variable",
+    "fingerprint": "442af21a32a55f2846aafa228c41e30e8837230a"
+  },
+  "signing": {
+    "v2": "PASS",
+    "certificateSHA256": "90cb140d12144596e8287484c2fec5d6d117e0048772350abbda3dcf9699ca33",
+    "matchesExistingEASKeystore": "PASS"
+  },
+  "firebaseNativeResources": "PASS: real Firebase app ID, sender ID and project compiled into APK",
+  "displayName": "At Your Service (preserved)",
+  "debuggable": false,
+  "artifactChecks": {
+    "zipCRC": "PASS",
+    "allEntriesKnownSecretScan": "PASS",
+    "actualRenderAPI": "PASS",
+    "hermesSHA256": "5b4f3a3c10befa7a2195fdb0e647c84193d7262834c9b0551e87d6e6b6ba8f14",
+    "oldAdminScreenMarkersAbsent": "PASS: three markers present in old APK absent in new APK"
+  },
+  "physicalAndroid": "NOT RUN",
+  "expoPushTicketsReceipts": "NOT RUN: no registered phone"
+}

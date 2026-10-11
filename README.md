@@ -136,6 +136,8 @@ Client runs on `http://localhost:5173`
 
 ## Demo Accounts
 
+Local seeded accounts only. These credentials do not identify the current production administrator. Use your privately managed production credentials; never reuse a public demo password for a live admin account.
+
 | Role | Email | Password |
 |---|---|---|
 | Household | fatima@example.com | test123 |

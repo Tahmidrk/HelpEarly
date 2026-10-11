@@ -1,0 +1,26 @@
+{
+  "executed_at": "2026-10-11T11:44:56.534Z",
+  "status": "PASS",
+  "backend": "https://helpearly-api.onrender.com",
+  "deployedCommit": "7f485b78b9f01a91eb0eee42d45feda228614989",
+  "vercelDeployment": "dpl_3bj89bMEBVGDunqMNnT1h4fskHnF",
+  "existingProject": "client",
+  "results": {
+    "https://atyour-service.vercel.app": {
+      "httpStatus": 200,
+      "asset": "/assets/index-DZWDRiog.js",
+      "sha256": "8cdfe6a9f4ff5c0b5bee797cdaae105ef188d8681bbe11be502d47e9abb93f64",
+      "matchesTestedArtifact": true,
+      "cors": "PASS"
+    },
+    "https://client-sigma-dun-96.vercel.app": {
+      "httpStatus": 200,
+      "asset": "/assets/index-DZWDRiog.js",
+      "sha256": "8cdfe6a9f4ff5c0b5bee797cdaae105ef188d8681bbe11be502d47e9abb93f64",
+      "matchesTestedArtifact": true,
+      "cors": "PASS"
+    }
+  },
+  "schema": 3,
+  "untrustedOrigin": "PASS: no CORS grant"
+}

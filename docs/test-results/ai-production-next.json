@@ -1,5 +1,5 @@
 {
-  "executedAt": "2026-10-10T21:22:04.516Z",
+  "executedAt": "2026-10-11T11:45:25.125Z",
   "backend": "https://helpearly-api.onrender.com/api",
   "provider": "Real Gemini; approved free-tier key configured on existing Render service",
   "physicalAndroid": "NOT RUN; actual API module with native session bindings simulated",

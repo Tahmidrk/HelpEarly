@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-10T17:43:23.487Z",
+  "executed_at": "2026-10-11T12:13:20.452Z",
   "counts": {
     "info": 0,
     "low": 0,
@@ -8,5 +8,7 @@
     "critical": 0,
     "total": 0
   },
-  "advisories": []
+  "advisories": [],
+  "automaticFixes": {},
+  "changes": "None: incompatible/major automatic fixes are not applied to the approved UI/SDK checkpoint"
 }

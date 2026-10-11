@@ -1,0 +1,103 @@
+{
+  "executed_at": "2026-10-11T12:04:01.279Z",
+  "status": "PASS",
+  "originalRowsDeleted": 0,
+  "ordinaryOriginalBusinessFieldsChanged": 0,
+  "ownerAdminCredentialChange": "PASS: owner confirmed private password update; public demo password no longer matches",
+  "ownerApprovedAccountRestoration": "PASS: account 21 reactivated to restored backup state through audited API; only updated_at differs",
+  "unexpectedDeactivationInvestigation": "Durable audit shows actor 1 user.update at 11:53:57 UTC. Release automation targets only labeled accounts 53/54; exact origin not established. Owner denied intentional change and explicitly requested restoration.",
+  "systemRevisions": "Expected cache invalidation changes",
+  "tableCounts": {
+    "ai_messages": {
+      "before": 0,
+      "after": 0
+    },
+    "bookings": {
+      "before": 10,
+      "after": 13
+    },
+    "categories": {
+      "before": 10,
+      "after": 11
+    },
+    "complaints": {
+      "before": 2,
+      "after": 3
+    },
+    "conversations": {
+      "before": 4,
+      "after": 5
+    },
+    "emergency_declines": {
+      "before": 0,
+      "after": 0
+    },
+    "emergency_requests": {
+      "before": 0,
+      "after": 1
+    },
+    "helpearly_schema": {
+      "before": 1,
+      "after": 2
+    },
+    "helper_categories": {
+      "before": 31,
+      "after": 32
+    },
+    "helper_services": {
+      "before": 40,
+      "after": 41
+    },
+    "helpers": {
+      "before": 22,
+      "after": 23
+    },
+    "job_applications": {
+      "before": 3,
+      "after": 4
+    },
+    "jobs": {
+      "before": 12,
+      "after": 13
+    },
+    "media_uploads": {
+      "before": 0,
+      "after": 2
+    },
+    "messages": {
+      "before": 27,
+      "after": 29
+    },
+    "notifications": {
+      "before": 0,
+      "after": 32
+    },
+    "payments": {
+      "before": 4,
+      "after": 5
+    },
+    "push_deliveries": {
+      "before": 0,
+      "after": 0
+    },
+    "push_devices": {
+      "before": 0,
+      "after": 0
+    },
+    "reviews": {
+      "before": 5,
+      "after": 6
+    },
+    "sync_revisions": {
+      "before": 33,
+      "after": 48
+    },
+    "users": {
+      "before": 31,
+      "after": 33
+    }
+  },
+  "baseline": "H:/apps/HelpEarly-backups/admin-production-2026-10-11T11-35-29-059Z",
+  "scope": "Fresh backup restored into disposable local PostgreSQL; original primary keys and every original column compared with live DB; only owner password change and approved restore timestamp permitted",
+  "physicalAndroid": "NOT RUN"
+}

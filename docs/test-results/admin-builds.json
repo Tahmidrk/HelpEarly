@@ -1,12 +1,14 @@
 {
-  "recorded_at": "2026-10-11T08:19:43.744Z",
+  "recorded_at": "2026-10-11T12:23:49.434Z",
   "web": {
     "status": "PASS",
     "modules": 104,
     "path": "H:\\apps\\HelpEarly\\client\\dist",
-    "bundle": "index-mCm8owEo.js",
-    "sha256": "dd31c62f8eae58012ddd346a25b733f43998999a2ea4d6724fc37a3a2734f2e4",
-    "productionAPIEmbedded": true
+    "bundle": "index-DZWDRiog.js",
+    "sha256": "8cdfe6a9f4ff5c0b5bee797cdaae105ef188d8681bbe11be502d47e9abb93f64",
+    "productionAPIEmbedded": true,
+    "environment": "VITE_API_URL and VITE_SOCKET_URL both https://helpearly-api.onrender.com",
+    "deployedArtifact": "PASS: exact bundle bytes match existing Vercel domain"
   },
   "android": {
     "status": "PASS",
@@ -28,8 +30,8 @@
   "migrationWithoutApproval": "PASS: refused with exit 1",
   "browserFinalInteraction": "PASS: 25 actual browser checks; see admin-browser.json",
   "physicalAndroid": "IMPLEMENTED/UNVERIFIED",
-  "newSignedAPK": "BLOCKED: no new EAS build submitted",
-  "production": "APPROVED: schema 3 applied; existing Render/Vercel deployments in progress",
+  "newSignedAPK": "PASS: H:/apps/HelpEarly-artifacts/HelpEarly-preview-admin-free-20261011.apk",
+  "production": "PASS: schema 3, existing Vercel Web Admin and Render session-security commit 2b7bd6a live",
   "stagedWhitespaceAndCredentialScan": {
     "status": "PASS",
     "files": 54,
