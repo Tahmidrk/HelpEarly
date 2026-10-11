@@ -19,10 +19,11 @@ async function flushNotifications() {
     locked=(await db.query('SELECT pg_try_advisory_lock(724032) AS locked')).rows[0].locked;
     if (!locked) return;
     await db.query('SELECT expire_emergency_notifications()');
-    const unsent=await db.query('SELECT id,user_id,type,title,data,created_at FROM notifications WHERE socket_sent_at IS NULL ORDER BY id LIMIT 100');
+    const unsent=await db.query('SELECT n.id,n.user_id,n.type,n.title,n.data,n.created_at,u.role AS account_role FROM notifications n JOIN users u ON u.id=n.user_id WHERE n.socket_sent_at IS NULL AND u.is_active ORDER BY n.id LIMIT 100');
     for(const notification of unsent.rows) {
       if (getIO()) {
-        getIO().to(`user_${notification.user_id}`).emit('notification',notification);
+        const audience=notification.data?.audience || (notification.account_role!=='both'?notification.account_role:null);
+        if(audience){const {account_role,...item}=notification;getIO().to(`user_${notification.user_id}_${audience}`).emit('notification',item);}
         await db.query('UPDATE notifications SET socket_sent_at=CURRENT_TIMESTAMP WHERE id=$1',[notification.id]);
       }
     }
@@ -31,17 +32,26 @@ async function flushNotifications() {
       SELECT n.id,d.id,d.token FROM notifications n JOIN push_devices d ON d.user_id=n.user_id AND d.active
       JOIN users u ON u.id=n.user_id AND u.is_active
       WHERE n.created_at>=d.updated_at AND n.created_at>CURRENT_TIMESTAMP-INTERVAL '1 day'
+      AND (n.data->>'audience'=d.audience OR (n.data->>'audience' IS NULL AND u.role<>'both'))
       ON CONFLICT(notification_id,device_id) DO NOTHING`);
     if (process.env.PUSH_ENABLED!=='true') return;
     const pending=await db.query(`SELECT p.*,n.type,n.data FROM push_deliveries p JOIN notifications n ON n.id=p.notification_id
       JOIN push_devices d ON d.id=p.device_id AND d.active AND d.user_id=n.user_id AND d.token=p.token
       JOIN users u ON u.id=n.user_id AND u.is_active
-      WHERE p.status='pending' AND p.attempts<5 AND p.next_attempt_at<=CURRENT_TIMESTAMP ORDER BY p.id LIMIT 50`);
+      WHERE p.status='pending' AND p.attempts<5 AND p.next_attempt_at<=CURRENT_TIMESTAMP
+      AND (n.data->>'audience'=d.audience OR (n.data->>'audience' IS NULL AND u.role<>'both'))
+      AND (n.type<>'emergency_new' OR EXISTS(SELECT 1 FROM emergency_requests e JOIN helpers h ON h.user_id=n.user_id
+        WHERE e.id=(n.data->>'request_id')::int AND e.status='pending' AND e.expires_at>CURRENT_TIMESTAMP AND h.is_available
+        AND u.role IN('helper','both') AND e.household_id<>u.id
+        AND (EXISTS(SELECT 1 FROM helper_categories hc WHERE hc.helper_id=h.id AND hc.category_id=e.category_id)
+        OR EXISTS(SELECT 1 FROM helper_services hs WHERE hs.helper_id=h.id AND hs.category_id=e.category_id AND NOT hs.is_hidden))
+        AND NOT EXISTS(SELECT 1 FROM emergency_declines ed WHERE ed.request_id=e.id AND ed.helper_id=h.id)))
+      ORDER BY p.id LIMIT 50`);
     if(pending.rows.length) {
       // At-most-once on uncertain network outcomes: never blindly resend accepted pushes.
       const ids=pending.rows.map(row=>row.id);
       await db.query("UPDATE push_deliveries SET status='unknown',attempts=attempts+1,last_error='Awaiting provider response' WHERE id=ANY($1::int[])",[ids]);
-      const {response,data}=await expoRequest('send',pending.rows.map(row=>({to:row.token,title:'HelpEarly',body:'You have a new marketplace update.',sound:'default',channelId:'marketplace',data:{notification_id:row.notification_id,type:row.type,...row.data}})));
+      const {response,data}=await expoRequest('send',pending.rows.map(row=>({to:row.token,title:'At Your Service',body:'You have a new marketplace update.',sound:'default',channelId:'marketplace',data:{notification_id:row.notification_id,type:row.type,audience:row.data?.audience}})));
       if(!response.ok) {
         const retry=response.status===429 || response.status>=500;
         await db.query(`UPDATE push_deliveries SET status=$1,last_error=$2,next_attempt_at=CURRENT_TIMESTAMP+INTERVAL '1 minute' WHERE id=ANY($3::int[])`,[retry?'pending':'failed',`Provider HTTP ${response.status}`,ids]);

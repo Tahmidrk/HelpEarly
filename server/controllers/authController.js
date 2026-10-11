@@ -1,5 +1,6 @@
 const { attachHelper } = require('../db/profile');
 const pool = require('../config/db');
+const {locationInput}=require('../utils/location');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { passwordVersion } = require('../utils/passwordSession');
@@ -20,6 +21,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'NID card number is required for security verification' });
     }
 
+    const coordinates=locationInput({...req.body,location:location || undefined});
     // Check if user exists
     const existingUser = await db.query('SELECT id FROM users WHERE LOWER(TRIM(email)) = $1', [cleanEmail]);
     if (existingUser.rows.length > 0) {
@@ -32,10 +34,10 @@ exports.register = async (req, res) => {
 
     // Insert user
     const result = await db.query(
-      `INSERT INTO users (name, email, password_hash, phone, nid_number, role, location, latitude, longitude)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO users (name, email, password_hash, phone, nid_number, role, location, latitude, longitude,location_confirmed)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,$10)
        RETURNING id, name, email, phone, nid_number, role, location, avatar_url, created_at`,
-      [cleanName, cleanEmail, password_hash, phone, nid_number, role || 'household', location, latitude, longitude]
+      [cleanName, cleanEmail, password_hash, phone, nid_number, role || 'household', location, coordinates.latitude,coordinates.longitude,coordinates.confirmed]
     );
 
     let user = result.rows[0];
@@ -84,7 +86,7 @@ exports.register = async (req, res) => {
     res.status(201).json({ token, user });
   } catch (error) {
     console.error('Register error:', error.code || error.name);
-    res.status(error.code === '23505' ? 400 : 500).json({ message: error.code === '23505' ? 'Email already registered' : 'Registration could not be saved' });
+    res.status(error.status || (error.code==='23505'?400:500)).json({message:error.status?error.message:error.code==='23505'?'Email already registered':'Registration could not be saved'});
   } finally {
     await db.query('ROLLBACK');
     db.release();
@@ -142,7 +144,7 @@ exports.login = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, name, email, phone, role, location, latitude, longitude, avatar_url, is_active, created_at
+      `SELECT id, name, email, phone, role, location, latitude, longitude,location_confirmed, avatar_url, is_active, created_at
        FROM users WHERE id = $1`,
       [req.user.id]
     );
@@ -156,7 +158,7 @@ exports.getMe = async (req, res) => {
     res.json(await attachHelper(user));
   } catch (error) {
     console.error('GetMe error:', error.code || error.name);
-    res.status(500).json({ message: 'Server error' });
+    res.status(error.status || 500).json({ message: error.status ? error.message : 'Server error' });
   }
 };
 
@@ -165,19 +167,22 @@ exports.updateProfile = async (req, res) => {
   try {
     const { name, phone, location, latitude, longitude } = req.body;
     if((name!==undefined && !name.trim()) || (req.body.hourly_rate!==undefined && (!Number.isFinite(Number(req.body.hourly_rate)) || Number(req.body.hourly_rate)<0)) || (req.body.experience_years!==undefined && (!Number.isInteger(Number(req.body.experience_years)) || Number(req.body.experience_years)<0)) || (req.body.is_available!==undefined && typeof req.body.is_available!=='boolean')) return res.status(400).json({message:'Valid profile name, rate, experience and availability are required'});
+    const coordinates=locationInput(req.body);
     const avatar_url = req.file ? `/uploads/${req.file.filename}` : undefined;
 
     let query = `UPDATE users SET name = COALESCE($1, name), phone = COALESCE($2, phone),
-                  location = COALESCE($3, location), latitude = COALESCE($4, latitude),
-                  longitude = COALESCE($5, longitude), updated_at = CURRENT_TIMESTAMP`;
-    const params = [name, phone, location, latitude, longitude];
+                  location = COALESCE($3, location),
+                  latitude = CASE WHEN $6 THEN $4 WHEN $3 IS NOT NULL AND $3 IS DISTINCT FROM location THEN NULL ELSE latitude END,
+                  longitude = CASE WHEN $6 THEN $5 WHEN $3 IS NOT NULL AND $3 IS DISTINCT FROM location THEN NULL ELSE longitude END,
+                  location_confirmed=CASE WHEN $6 THEN true WHEN $3 IS NOT NULL AND $3 IS DISTINCT FROM location THEN false ELSE location_confirmed END, updated_at = CURRENT_TIMESTAMP`;
+    const params = [name, phone, location, coordinates.latitude,coordinates.longitude,coordinates.confirmed];
 
     if (avatar_url) {
       query += `, avatar_url = $${params.length + 1}`;
       params.push(avatar_url);
     }
 
-    query += ` WHERE id = $${params.length + 1} RETURNING id, name, email, phone, role, location, avatar_url`;
+    query += ` WHERE id = $${params.length + 1} RETURNING id, name, email, phone, role, location, avatar_url, latitude, longitude, location_confirmed`;
     params.push(req.user.id);
 
     const result = await pool.query(query, params);
@@ -196,7 +201,7 @@ exports.updateProfile = async (req, res) => {
     res.json(result.rows[0]);
   } catch (error) {
     console.error('UpdateProfile error:', error.code || error.name);
-    res.status(500).json({ message: 'Server error' });
+    res.status(error.status || 500).json({message:error.status?error.message:'Server error'});
   }
 };
 
@@ -241,6 +246,6 @@ exports.changePassword = async (req, res) => {
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
     console.error('ChangePassword error:', error.code || error.name);
-    res.status(500).json({ message: 'Server error' });
+    res.status(error.status || 500).json({message:error.status?error.message:'Server error'});
   }
 };

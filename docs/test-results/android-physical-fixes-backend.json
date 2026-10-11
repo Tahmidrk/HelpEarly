@@ -1,0 +1,16 @@
+{
+  "executed_at": "2026-10-11T15:09:30.453Z",
+  "database": "Disposable isolated PostgreSQL; synthetic records only",
+  "results": {
+    "New-account chat works; opposite dual-role threads and REST authorization remain isolated; unrelated household discovery denied": "PASS",
+    "Forged admin active mode denied for dual users, including public optional authentication; malformed/rollover/past job dates rejected": "PASS",
+    "Worker contact search and first contact require real job interaction; no phone/address/email returned": "PASS",
+    "Real SQL AI history and context scoped to active role; provider stub explicitly used, no fake live AI claim": "PASS",
+    "Invalid/unconfirmed coordinates rejected; public map rounded; correcting address clears stale map without changing other records": "PASS",
+    "Emergency audience/contact fallback, full authenticated details and wrong-role read/accept denial": "PASS",
+    "Push registration timestamp stable, role audience switches, outbox tickets/receipts persisted; provider simulated, physical delivery NOT RUN": "PASS",
+    "Logout device deactivation and fresh login retain scoped messages": "PASS"
+  },
+  "physical": "NOT RUN",
+  "push_provider": "Simulated tickets/receipts; not evidence of FCM delivery"
+}

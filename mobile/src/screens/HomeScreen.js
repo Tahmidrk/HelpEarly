@@ -1,18 +1,18 @@
+import { FormScrollView as ScrollView } from '../components/FormLayout';
+import { FormModal as Modal } from '../components/FormLayout';
+import { Alert } from '../components/Feedback';
 import useMarketplaceCategories from '../utils/useMarketplaceCategories';
 import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  Alert,
   TextInput,
   Image,
-  Modal,
-} from 'react-native';
+  } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { emergencyAPI, helpersAPI } from '../api/client';
 import { useAuth } from '../context/AuthContext';
@@ -36,9 +36,11 @@ export default function HomeScreen({ navigation }) {
 
   // Map Modal State
   const [mapModal, setMapModal] = useState(false);
+  const [mapCoordinates,setMapCoordinates]=useState(null);
   const [mapLocation, setMapLocation] = useState('Dhaka, Bangladesh');
 
-  const openMap = (loc) => {
+  const openMap = (loc,coordinates) => {
+    setMapCoordinates(coordinates || null);
     setMapLocation(loc || 'Dhaka, Bangladesh');
     setMapModal(true);
   };
@@ -260,7 +262,7 @@ export default function HomeScreen({ navigation }) {
                     {/* 1. Name */}
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                       <Text style={styles.helperName}>{h.name}</Text>
-                      {h.is_verified && <Ionicons name="checkmark-circle" size={15} color="#0d9488" />}
+
                     </View>
 
                     {/* 2. Category */}
@@ -268,7 +270,7 @@ export default function HomeScreen({ navigation }) {
 
                     {/* 3. Location */}
                     <TouchableOpacity
-                      onPress={() => openMap(h.location)}
+                      onPress={() => openMap(h.location,h)}
                       style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 }}
                     >
                       <Ionicons name="location-outline" size={13} color="#0d9488" />
@@ -385,7 +387,7 @@ export default function HomeScreen({ navigation }) {
       </Modal>
 
       {/* Interactive Map Modal */}
-      <MapViewModal
+      <MapViewModal coordinates={mapCoordinates}
         visible={mapModal}
         onClose={() => setMapModal(false)}
         locationName={mapLocation}

@@ -1,120 +1,20 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  Linking,
-  Platform,
-  Dimensions,
-  Image,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
-
-// Location coordinate map for popular locations in Dhaka / Bangladesh
-const LOCATION_COORDS = {
-  'dhaka': { lat: 23.8103, lng: 90.4125 },
-  'dhanmondi': { lat: 23.7461, lng: 90.3742 },
-  'gulshan': { lat: 23.7925, lng: 90.4078 },
-  'banani': { lat: 23.7937, lng: 90.4066 },
-  'uttara': { lat: 23.8759, lng: 90.3795 },
-  'mirpur': { lat: 23.8069, lng: 90.3687 },
-  'mohammadpur': { lat: 23.7658, lng: 90.3580 },
-  'badda': { lat: 23.7806, lng: 90.4267 },
-  'motijheel': { lat: 23.7330, lng: 90.4170 },
-  'chittagong': { lat: 22.3569, lng: 91.7832 },
-  'sylhet': { lat: 24.8949, lng: 91.8687 },
-};
-
-export default function MapViewModal({ visible, onClose, locationName = 'Dhaka, Bangladesh' }) {
-  // Resolve lat/lng from location string
-  const cleanLoc = (locationName || '').toLowerCase().trim();
-  let coords = { lat: 23.8103, lng: 90.4125 }; // Default Dhaka Central
-
-  for (const [key, val] of Object.entries(LOCATION_COORDS)) {
-    if (cleanLoc.includes(key)) {
-      coords = val;
-      break;
-    }
-  }
-
-  const { lat, lng } = coords;
-
-  const openExternalMap = () => {
-    const labelStr = encodeURIComponent(locationName);
-    const mapsAppUrl = Platform.select({
-      ios: `maps:0,0?q=${labelStr}`,
-      android: `geo:0,0?q=${labelStr}`,
-    });
-    const webUrl = `https://www.google.com/maps?q=${labelStr}`;
-
-    Linking.openURL(mapsAppUrl || webUrl).catch(() => {
-      Linking.openURL(webUrl);
-    });
-  };
-
-  // Dynamic OpenStreetMap static tile url centered on coordinates with red pin
-  const osmStaticUrl = `https://static-maps.yandex.ru/1.x/?ll=${lng},${lat}&z=14&l=map&size=600,450&pt=${lng},${lat},pm2rdm`;
-
-  return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <View style={styles.modalCard}>
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.titleRow}>
-              <Ionicons name="map" size={20} color="#0d9488" />
-              <Text style={styles.titleText}>Location Map</Text>
-            </View>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-              <Ionicons name="close" size={22} color="#64748b" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Location Bar */}
-          <View style={styles.locationBar}>
-            <Ionicons name="location" size={16} color="#0d9488" />
-            <Text style={styles.locationText} numberOfLines={1}>
-              {locationName}
-            </Text>
-          </View>
-
-          {/* Map Preview Container */}
-          <TouchableOpacity style={styles.mapContainer} activeOpacity={0.9} onPress={openExternalMap}>
-            <Image
-              source={{ uri: osmStaticUrl }}
-              style={styles.mapImage}
-              resizeMode="cover"
-            />
-
-            {/* Custom Map Pin Overlay */}
-            <View style={styles.pinOverlay}>
-              <View style={styles.pinBubble}>
-                <Ionicons name="navigate" size={14} color="#ffffff" />
-                <Text style={styles.pinText}>Approximate Area</Text>
-              </View>
-              <Ionicons name="location-sharp" size={32} color="#dc2626" style={{ marginTop: -4 }} />
-            </View>
-
-            {/* Tap hint overlay */}
-            <View style={styles.tapHint}>
-              <Ionicons name="open-outline" size={14} color="#ffffff" />
-              <Text style={styles.tapHintText}>Tap to open in Phone Maps App</Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Action Button */}
-          <TouchableOpacity style={styles.openAppBtn} onPress={openExternalMap}>
-            <Ionicons name="compass" size={18} color="#ffffff" />
-            <Text style={styles.openAppBtnText}>Open Full Map App</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
+import React,{useState,useEffect} from 'react';
+import {View,Text,TouchableOpacity,Linking,Platform,StyleSheet,Dimensions} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {Ionicons} from '@expo/vector-icons';
+import {FormModal as Modal} from './FormLayout';
+import {Alert} from './Feedback';
+const {width}=Dimensions.get('window');
+export default function MapViewModal({visible,onClose,locationName='',coordinates}) {
+ const [failed,setFailed]=useState(false);
+ useEffect(()=>setFailed(false),[visible,locationName,coordinates?.latitude,coordinates?.longitude]);
+ const valid=coordinates?.location_confirmed && coordinates.latitude!=null && coordinates.longitude!=null && Number.isFinite(Number(coordinates.latitude)) && Number.isFinite(Number(coordinates.longitude));
+ const lat=valid?Number(Number(coordinates.latitude).toFixed(2)):null,lng=valid?Number(Number(coordinates.longitude).toFixed(2)):null;
+ const query=valid?lat+','+lng:locationName;
+ const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);
+ const open=()=>{if(!query.trim())return Alert.alert('Location unavailable','Ask the worker to confirm their service area.');Linking.openURL(Platform.OS==='android'?'geo:0,0?q='+encodeURIComponent(query):url).catch(()=>Linking.openURL(url).catch(()=>Alert.alert('Maps unavailable','No maps app or browser could be opened.')));};
+ const map=valid?'https://www.openstreetmap.org/export/embed.html?bbox='+[lng-.02,lat-.02,lng+.02,lat+.02].join(',')+'&layer=mapnik&marker='+lat+','+lng:null;
+ return <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}><View style={styles.overlay}><View style={styles.modalCard}><View style={styles.header}><View style={styles.titleRow}><Ionicons name="map" size={20} color="#0d9488"/><Text style={styles.titleText}>Service Area Map</Text></View><TouchableOpacity accessibilityLabel="Close map" onPress={onClose} style={styles.closeBtn}><Ionicons name="close" size={24} color="#64748b"/></TouchableOpacity></View><View style={styles.locationBar}><Text style={styles.locationText}>{locationName || 'Location not supplied'}</Text></View>{valid&&!failed?<View style={styles.mapContainer}>{Platform.OS==='web'?<iframe title="Confirmed service area" src={map} style={{width:'100%',height:'100%',border:0}}/>:<WebView source={{uri:map}} originWhitelist={['https://www.openstreetmap.org']} javaScriptEnabled onError={()=>setFailed(true)} onHttpError={()=>setFailed(true)} onShouldStartLoadWithRequest={request=>request.url.startsWith('https://www.openstreetmap.org/')}/>}</View>:<View style={[styles.mapContainer,{justifyContent:'center',padding:20}]}><Text style={{color:'#475569',textAlign:'center'}}>{failed?'Map preview unavailable. Open Maps below.':'Unverified address. Ask worker to correct and confirm service area. Address search below does not imply a verified map pin.'}</Text></View>}<Text style={{color:'#64748b',fontSize:12,marginTop:10}}>{valid?'Confirmed approximate service area; precise home coordinates are not shown. © OpenStreetMap contributors':'Service area has not been confirmed.'}</Text><TouchableOpacity style={styles.openAppBtn} onPress={open}><Ionicons name="compass" size={18} color="#fff"/><Text style={styles.openAppBtnText}>{valid?'Open Full Map App':'Search Address in Maps'}</Text></TouchableOpacity></View></View></Modal>;
 }
 
 const styles = StyleSheet.create({

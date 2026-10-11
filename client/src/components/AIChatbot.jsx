@@ -34,7 +34,7 @@ function formatText(text) {
 }
 
 export default function AIChatbot() {
-  const { user } = useAuth();
+  const { user,activeRole } = useAuth();
   const revision = useSync('ai');
   const [retry, setRetry] = useState(0), [historyLoading, setHistoryLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -45,7 +45,10 @@ export default function AIChatbot() {
   const [showQuick, setShowQuick] = useState(true);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+  const scope=useRef('');
+  scope.current=`${user?.id}:${activeRole}`;
 
+  useEffect(()=>{setMessages([WELCOME_MESSAGE]);setInput('');setError('');setLoading(false);setHistoryLoading(false);},[user?.id,activeRole]);
   useEffect(() => {
     if (!user || !open || loading) return;
     let disposed = false;
@@ -59,7 +62,7 @@ export default function AIChatbot() {
       .catch((err) => { if (!disposed) setError(err.message); })
       .finally(() => { if (!disposed) setHistoryLoading(false); });
     return () => { disposed = true; };
-  }, [user?.id, open, revision, loading, retry]);
+  }, [user?.id,activeRole, open, revision, loading, retry]);
 
   useEffect(() => {
     if (open) {
@@ -69,6 +72,7 @@ export default function AIChatbot() {
   }, [open, messages]);
 
   async function sendMessage(text) {
+    const requestedScope=scope.current;
     const userText = (text || input).trim();
     if (!userText || loading || historyLoading) return;
     if (!user) { setError('Log in to use the AI assistant and your private history.'); return; }
@@ -81,12 +85,13 @@ export default function AIChatbot() {
 
     try {
       const data = await chatbotAPI.send(userText);
-
+      if(requestedScope!==scope.current)return;
       setMessages((prev) => [...prev, { role: 'assistant', text: data.reply }]);
     } catch (err) {
+      if(requestedScope!==scope.current)return;
       setError(err.message || 'Something went wrong. Please try again.');
     } finally {
-      setLoading(false);
+      if(requestedScope===scope.current)setLoading(false);
     }
   }
 

@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
+const parser=require('../../mobile/node_modules/@babel/parser'),traverse=require('../../mobile/node_modules/@babel/traverse').default;
+const root=path.resolve(__dirname,'../..'),baseline='d0737dde2662a25ff5679975c3ae319a55e7374f';
+const normalize=node=>JSON.parse(JSON.stringify(node,(key,value)=>['start','end','loc','extra','comments','leadingComments','trailingComments','innerComments'].includes(key)?undefined:value));
+function styles(source){let found;traverse(parser.parse(source,{sourceType:'module',plugins:['jsx']}),{CallExpression(p){if(p.node.callee.object?.name==='StyleSheet'&&p.node.callee.property?.name==='create')found=normalize(p.node.arguments[0]);}});return found;}
+let checked=0;const approved=[];
+for(const file of cp.execFileSync('git',['ls-tree','-r','--name-only',baseline,'mobile/src/screens','mobile/src/components'],{cwd:root,encoding:'utf8'}).trim().split('\n')){
+ if(!file.endsWith('.js')||!fs.existsSync(path.join(root,file)))continue;
+ const old=cp.execFileSync('git',['show',baseline+':'+file],{cwd:root,encoding:'utf8'}),current=fs.readFileSync(path.join(root,file),'utf8');let before=styles(old),after=styles(current);
+ if(file.endsWith('/EmergencyScreen.js')){const row=after.properties.find(p=>p.key.name==='row');const flex=row.value.properties.find(p=>p.key.name==='flexWrap');assert.equal(flex.value.value,'wrap');row.value.properties=row.value.properties.filter(p=>p!==flex);approved.push(file+': action row wraps for font scaling');}
+ assert.deepEqual(after,before,'Unapproved existing stylesheet change: '+file);checked++;
+}
+const protectedFiles=cp.execFileSync('git',['ls-tree','-r','--name-only',baseline,'mobile/assets','mobile/eas.json','mobile/app.config.js'],{cwd:root,encoding:'utf8'}).trim().split('\n');
+for(const file of protectedFiles){const current=fs.readFileSync(path.join(root,file)),old=cp.execFileSync('git',['show',baseline+':'+file],{cwd:root});if(/\.(js|json)$/.test(file))assert.equal(current.toString().replace(/\r\n/g,'\n'),old.toString().replace(/\r\n/g,'\n'),file+' changed');else assert.deepEqual(current,old,file+' changed');}
+const oldConfig=JSON.parse(cp.execFileSync('git',['show',baseline+':mobile/app.json'],{cwd:root,encoding:'utf8'})),config=JSON.parse(fs.readFileSync(path.join(root,'mobile/app.json')));assert.deepEqual(config.expo.android,oldConfig.expo.android);assert.deepEqual(config.expo.extra,oldConfig.expo.extra);assert.equal(config.expo.owner,oldConfig.expo.owner);assert.equal(config.expo.icon,oldConfig.expo.icon);assert.equal(config.expo.name,oldConfig.expo.name);
+const source=fs.readFileSync(path.join(root,'mobile/App.js'),'utf8');assert(!/AdminDashboard/.test(source));assert(!fs.existsSync(path.join(root,'mobile/src/screens/AdminDashboardScreen.js')));
+const result={executed_at:new Date().toISOString(),status:'PASS',baseline,existingStyleSheetsChecked:checked,approvedStyleDifferences:approved,protectedAssetsAndSigningConfig:protectedFiles.length,packageIdentity:'com.atyourservice.app',scope:'Existing palettes, typography and StyleSheet definitions preserved except approved emergency action wrapping. Requested forms/navigation/complaints/map content intentionally changed.',physicalScreenshots:'NOT RUN; this is AST/asset verification, not pixel equivalence'};
+fs.writeFileSync(path.join(root,'docs/test-results/android-physical-fixes-visual.json'),JSON.stringify(result,null,2)+'\n');console.log('PASS '+checked+' existing screen/component styles; '+protectedFiles.length+' asset/signing configuration files; Android identity and no-admin guard. Native pixels NOT RUN.');

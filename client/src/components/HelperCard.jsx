@@ -29,7 +29,6 @@ export default function HelperCard({ helper }) {
           ) : (
             <div className="avatar avatar-lg avatar-placeholder">{initial}</div>
           )}
-          {helper.is_verified && <span className="verified-badge" title="Verified"><i className="fas fa-check"></i></span>}
         </div>
         <div className="helper-info">
           <h3 className="helper-name">

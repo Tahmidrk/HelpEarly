@@ -29,6 +29,16 @@ export default function Profile() {
     confirm_password: '',
   });
   const [message, setMessage] = useState('');
+  const [mapCandidate,setMapCandidate]=useState(null),[locating,setLocating]=useState(false);
+  const chooseCurrentArea=()=>{
+    if(!navigator.geolocation){setMessage('Error: Location unavailable. Keep your address and confirm from Android.');return;}
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(position=>{
+      setLocating(false);
+      if(position.coords.accuracy>5000){setMessage('Error: Location is too uncertain. Retry outside or confirm from Android.');return;}
+      setMapCandidate({latitude:position.coords.latitude,longitude:position.coords.longitude});
+    },()=>{setLocating(false);setMessage('Error: Location permission denied or unavailable. Address remains unchanged.');},{enableHighAccuracy:true,timeout:15000});
+  };
 
   useEffect(() => {
     let disposed = false;
@@ -54,13 +64,14 @@ export default function Profile() {
     setLoading(true);
     setMessage('');
     try {
-      const updatedUser = await authAPI.updateProfile(form);
+      const updatedUser = await authAPI.updateProfile({...form,...(mapCandidate?.location_confirmed?mapCandidate:{})});
       if (role === 'helper') {
         await helpersAPI.update(helperForm);
       }
       updateUser(updatedUser);
       setMessage('Profile updated successfully!');
       setEditing(false);
+      setMapCandidate(null);
     } catch (err) {
       setMessage('Error: ' + err.message);
     } finally {
@@ -159,10 +170,15 @@ export default function Profile() {
               <div className="form-group">
                 <label>Address / Location</label>
                 <input type="text" className="form-input" value={form.location} placeholder={addressPlaceholder()}
-                  onChange={(e) => setForm({ ...form, location: e.target.value })} />
+                  onChange={(e) => {setForm({ ...form, location: e.target.value });setMapCandidate(null);}} />
                 <small className="field-help">Add house/flat number, road, block, area, and city.</small>
               </div>
-              <AddressMap address={form.location} label="Profile map preview" />
+              {role==='helper' && <div className="form-group">
+                <button type="button" className="btn btn-secondary" onClick={chooseCurrentArea} disabled={locating || !form.location.trim()}>{locating?'Finding area...':'Select current area for map review'}</button>
+                <small className="field-help">Use only while in your intended service area. Public maps show approximate coordinates. Nothing is saved until you confirm and save.</small>
+                {mapCandidate && <><AddressMap address={form.location} coordinates={{...mapCandidate,location_confirmed:true}} label="Selected service area — review before confirmation"/><label><input type="checkbox" checked={!!mapCandidate.location_confirmed} onChange={e=>setMapCandidate({...mapCandidate,location_confirmed:e.target.checked})}/> I reviewed the map and confirm this service area.</label></>}
+              </div>}
+              <AddressMap address={form.location} coordinates={mapCandidate?.location_confirmed?mapCandidate:form.location===user.location?user:null} label="Profile map preview" />
 
               {role === 'helper' && (
                 <>
@@ -246,7 +262,7 @@ export default function Profile() {
                 <span className="profile-label">Address / Location</span>
                 <span>{user.location || 'Not set'}</span>
               </div>
-              <AddressMap address={user.location} label="Saved map" />
+              <AddressMap address={user.location} coordinates={user} label="Saved map" />
               <div className="profile-field">
                 <span className="profile-label">Member Since</span>
                 <span>{new Date(user.created_at).toLocaleDateString()}</span>

@@ -1,9 +1,10 @@
 const ACTIVE_BOOKING_STATUSES = ['pending', 'confirmed', 'in_progress'];
+const {validCalendarDate}=require('./calendarDate');
 
 async function assertBookingSlot(db, helperId, start, end, excludeBookingId) {
   const startsAt = new Date(start);
   const endsAt = end ? new Date(end) : new Date(startsAt.getTime() + 60 * 60 * 1000);
-  if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime()) || endsAt <= startsAt) {
+  if ((typeof start==='string' && !validCalendarDate(start)) || (typeof end==='string' && !validCalendarDate(end)) || Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime()) || endsAt <= startsAt) {
     const error = new Error('Enter a valid booking time range');
     error.status = 400;
     throw error;

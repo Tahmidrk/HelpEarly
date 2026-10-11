@@ -1,0 +1,9 @@
+{
+  "executed_at": "2026-10-11T15:23:06.402Z",
+  "status": "PASS",
+  "results": [
+    "Actual Web AI component rejects late previous-role replies and clears old history/input",
+    "Actual map component omits unverified pins and rounds confirmed coordinates"
+  ],
+  "boundaries": "API/auth contexts simulated; component code real; no browser pixel/device claim"
+}

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { Alert } from '../components/Feedback';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,8 +11,7 @@ import {
   Platform,
   ActivityIndicator,
   BackHandler,
-  Alert,
-} from 'react-native';
+  } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { helpersAPI, messagesAPI } from '../api/client';
 import { useAuth } from '../context/AuthContext';
@@ -24,6 +24,10 @@ export default function ChatScreen({ route, navigation }) {
   const isWorker = activeRole === 'helper';
   const { helperName, helperId, helperUserId, helperProfileId, conversationId } = route.params || {};
 
+  const generation=useRef(0),mounted=useRef(true);
+  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;generation.current++;};},[]);
+  const [contacts,setContacts]=useState([]);
+  const closeChat=()=>{generation.current++;setActiveChat(null);setInput('');navigation.setParams({helperName:null,helperId:null,helperUserId:null,helperProfileId:null,conversationId:null});};
   const [helpers, setHelpers] = useState([]);
   const [loadingHelpers, setLoadingHelpers] = useState(true);
   const [activeChat, setActiveChat] = useState(null);
@@ -46,7 +50,7 @@ export default function ChatScreen({ route, navigation }) {
     };
     refresh(); const timer=setInterval(refresh,5000);
     return ()=>{disposed=true;clearInterval(timer);};
-  },[activeChat?.id,user?.id,revision]));
+  },[activeChat?.id,user?.id,activeRole,revision]));
 
   const formatMessage = (message) => ({
     ...message,
@@ -57,20 +61,20 @@ export default function ChatScreen({ route, navigation }) {
   });
 
   const openChat = async (chat) => {
+    const request=++generation.current;
     try {
       setActiveChat(chat);
       const rows = await messagesAPI.messages(chat.id);
-      setMessagesMap((prev) => ({ ...prev, [chat.id]: rows.map(formatMessage) }));
+      if(mounted.current && request===generation.current) setMessagesMap((prev) => ({ ...prev, [chat.id]: rows.map(formatMessage) }));
     } catch (error) {
-      Alert.alert('Chat Error', error.message);
-      setActiveChat(null);
+      if(mounted.current && request===generation.current){setChatError(error.message);setActiveChat(null);}
     }
   };
 
-  useEffect(() => {
+  useFocusEffect(React.useCallback(() => {
     const onBackPress = () => {
       if (activeChat) {
-        setActiveChat(null);
+        closeChat();
         return true;
       }
       return false;
@@ -78,7 +82,7 @@ export default function ChatScreen({ route, navigation }) {
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
     return () => backHandler.remove();
-  }, [activeChat]);
+  }, [activeChat,navigation]));
 
   useEffect(() => {
     fetchConversations();
@@ -103,34 +107,32 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   useEffect(() => {
-    if (loadingHelpers) return;
-    const requestedProfileId = helperProfileId || (!isWorker ? helperId : null);
-    const requestedUserId = helperUserId || (isWorker ? helperId : null);
-    if (conversationId || requestedUserId || requestedProfileId) {
-      const found = helpers.find((item) =>
-        Number(item.id) === Number(conversationId)
-        || Number(item.user_id) === Number(requestedUserId)
-        || Number(item.helper_profile_id) === Number(requestedProfileId)
-      );
-      if (found) {
-        if (Number(activeChat?.id) !== Number(found.id)) openChat(found);
-      } else {
-        (async () => {
-          try {
-            const target = requestedUserId
-              ? { user_id: requestedUserId, name: helperName }
-              : await helpersAPI.getById(requestedProfileId);
-            if (Number(target.user_id) === Number(user?.id)) throw new Error('You cannot message yourself');
-            const conversation = await messagesAPI.getOrCreate(target.user_id);
-            await openChat({ ...conversation, id: conversation.id, name: conversation.other_name || target.name, user_id: target.user_id, helper_profile_id: requestedProfileId });
-            await fetchConversations();
-          } catch (error) {
-            Alert.alert('Chat Error', error.message);
-          }
-        })();
-      }
-    }
-  }, [conversationId, helperId, helperUserId, helperProfileId, helperName, helpers, loadingHelpers]);
+    const profile=helperProfileId || (!isWorker ? helperId : null),targetUser=helperUserId || (isWorker ? helperId : null);
+    if(!conversationId && !profile && !targetUser) return;
+    navigation.setParams({helperName:null,helperId:null,helperUserId:null,helperProfileId:null,conversationId:null});
+    const request=++generation.current;
+    (async()=>{
+      try {
+        let conversation;
+        if(conversationId) {
+          const rows=await messagesAPI.conversations();
+          conversation=rows.find(row=>Number(row.id)===Number(conversationId));
+          if(!conversation) throw new Error('Conversation unavailable for this role');
+        }else{
+          const target=targetUser ? {user_id:targetUser} : await helpersAPI.getById(profile);
+          conversation=await messagesAPI.getOrCreate(target.user_id);
+        }
+        if(!mounted.current || request!==generation.current)return;
+        await openChat({...conversation,name:conversation.other_name,user_id:conversation.other_id,helper_profile_id:conversation.other_helper_profile_id});
+        await fetchConversations();
+      }catch(error){if(mounted.current && request===generation.current)setChatError(error.message);}
+    })();
+  }, [conversationId,helperId,helperUserId,helperProfileId,activeRole]);
+  useFocusEffect(React.useCallback(()=>{
+    let disposed=false;
+    if(isWorker) messagesAPI.contacts(searchQuery).then(rows=>{if(!disposed)setContacts(rows);}).catch(error=>{if(!disposed)setChatError(error.message);});
+    return()=>{disposed=true;};
+  },[isWorker,searchQuery,revision]));
 
   const handleSendMessage = async () => {
     if (!input.trim() || !activeChat) return;
@@ -155,6 +157,7 @@ export default function ChatScreen({ route, navigation }) {
     return isSearchMatch;
   });
 
+  const inboxRows=[...activeConversations,...(isWorker?contacts.filter(c=>!helpers.some(h=>Number(h.user_id)===Number(c.id))).map(c=>({...c,id:'contact-'+c.id,user_id:c.id,isContact:true,primary_category:'Eligible household'})):[])];
   // ACTIVE CHAT VIEW
   if (activeChat) {
     const activeMsgs = messagesMap[activeChat.id] || [];
@@ -166,25 +169,7 @@ export default function ChatScreen({ route, navigation }) {
         {/* Top Header */}
         <View style={styles.chatHeader}>
           <TouchableOpacity
-            onPress={() => {
-              const msgs = messagesMap[activeChat.id] || [];
-              const hasUserText = msgs.some((m) => m.sender === 'user');
-
-              setActiveChat(null);
-              if (hasUserText) {
-                navigation.setParams({ helperName: null, helperId: null, helperUserId: null, helperProfileId: null, conversationId: null });
-              } else {
-                navigation.setParams({
-                  openSubTab: 'helpers',
-                  highlightHelperId: activeChat.id,
-                  helperName: null,
-                  helperId: null,
-                  helperUserId: null,
-                  helperProfileId: null,
-                  conversationId: null,
-                });
-              }
-            }}
+            onPress={closeChat}
             style={styles.backBtn}
           >
             <Ionicons name="arrow-back" size={24} color="#ffffff" />
@@ -196,7 +181,7 @@ export default function ChatScreen({ route, navigation }) {
 
           <View style={{ flex: 1, marginLeft: 10 }}>
             <Text style={styles.chatHeaderName}>{activeChat.name}</Text>
-            <Text style={styles.chatHeaderStatus}>📍 {activeChat.location || 'Dhaka'} · {activeCat}</Text>
+            <Text style={styles.chatHeaderStatus}>📍 {activeChat.location || 'Location not shared'} · {activeCat}</Text>
           </View>
 
           {!isWorker && <TouchableOpacity
@@ -209,13 +194,13 @@ export default function ChatScreen({ route, navigation }) {
 
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 160}
+          enabled={Platform.OS === 'ios'} behavior="padding"
+          keyboardVerticalOffset={0}
         >
           {/* Messages List */}
           <FlatList
             data={activeMsgs}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             contentContainerStyle={{ padding: 16 }}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
@@ -263,6 +248,7 @@ export default function ChatScreen({ route, navigation }) {
   // INBOX CONVERSATIONS LIST (Clean interface without extra headers)
   return (
     <View style={styles.container}>
+      {chatError ? <Text accessibilityRole="alert" style={{color:'#b91c1c',padding:12}} onPress={fetchConversations}>{chatError} — Tap to retry</Text> : null}
       {/* Search Bar starting cleanly */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBox}>
@@ -281,7 +267,7 @@ export default function ChatScreen({ route, navigation }) {
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#0d9488" />
         </View>
-      ) : activeConversations.length === 0 ? (
+      ) : inboxRows.length === 0 ? (
         <View style={styles.emptyInbox}>
           <Ionicons name="chatbubbles-outline" size={54} color="#cbd5e1" />
           <Text style={styles.emptyTitle}>No Active Messages</Text>
@@ -293,7 +279,7 @@ export default function ChatScreen({ route, navigation }) {
         </View>
       ) : (
         <FlatList
-          data={activeConversations}
+          data={inboxRows}
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => {
@@ -305,7 +291,7 @@ export default function ChatScreen({ route, navigation }) {
               <TouchableOpacity
                 style={styles.chatRow}
                 activeOpacity={0.7}
-                onPress={() => openChat(item)}
+                onPress={async()=>{if(!item.isContact)return openChat(item);try{const c=await messagesAPI.getOrCreate(item.user_id);await openChat({...c,name:c.other_name,user_id:c.other_id});fetchConversations();}catch(error){setChatError(error.message);}}}
               >
                 <View style={styles.listAvatar}>
                   <Text style={styles.listAvatarText}>{item.name?.charAt(0) || 'H'}</Text>

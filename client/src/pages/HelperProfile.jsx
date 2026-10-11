@@ -95,7 +95,7 @@ export default function HelperProfile() {
               {canChat && <button className="btn btn-secondary btn-lg" onClick={handleChat} id="chat-btn"><i className="fas fa-comments"></i> Chat</button>}
             </div>
           </div>
-          <AddressMap address={helper.location} label="Helper location map" />
+          <AddressMap address={helper.location} coordinates={helper} label="Helper location map" />
           {helper.bio && <p className="profile-bio">{helper.bio}</p>}
         </div>
 

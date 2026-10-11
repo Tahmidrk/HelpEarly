@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { File } from 'expo-file-system';
+import {parseDate} from '../utils/dateOnly';
 
 // Dynamically determine backend host IP for physical phone (Expo Go), web, or emulator
 const getApiBase = () => {
@@ -133,6 +134,7 @@ export const chatbotAPI = {
 };
 
 export const notificationsAPI = {
+  audience: id => apiRequest(`/notifications/devices/${id}/audience`, {method:'PUT'}),
   list: () => apiRequest('/notifications'),
   read: (id) => apiRequest(`/notifications/${id}/read`, { method: 'PUT' }),
   register: (data) => apiRequest('/notifications/devices', { method: 'POST', body: JSON.stringify(data) }),
@@ -147,9 +149,11 @@ export const reviewsAPI = {
 export const complaintsAPI = {
   create: (data) => apiRequest('/complaints', { method: 'POST', body: JSON.stringify(data) }),
   getMine: () => apiRequest('/complaints/mine'),
+  contacts: () => apiRequest('/complaints/contacts'),
 };
 
 export const messagesAPI = {
+  contacts: q => apiRequest('/messages/contacts?q='+encodeURIComponent(q || '')),
   conversations: () => apiRequest('/messages/conversations'),
   messages: (id) => apiRequest(`/messages/${id}?limit=1000`),
   getOrCreate: (userId) => apiRequest(`/messages/conversation/${userId}`),
@@ -172,6 +176,7 @@ export async function withPhoto(data, selectedAsset) {
 }
 
 export function bookingDate(date, time) {
+  parseDate(date);
   const match = time.trim().match(/^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$/i);
   if (!match) throw new Error('Use HH:MM or HH:MM AM/PM for time');
   let hour = Number(match[1]);

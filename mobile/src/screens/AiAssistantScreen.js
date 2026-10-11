@@ -12,11 +12,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../context/AuthContext';
 import { chatbotAPI } from '../api/client';
 import { useNotifications } from '../context/NotificationContext';
 
 export default function AiAssistantScreen() {
   const { revision } = useNotifications();
+  const { activeRole,user } = useAuth();
   const [messages, setMessages] = useState([
     {
       id: '1',
@@ -27,6 +29,7 @@ export default function AiAssistantScreen() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error,setError]=useState('');
 
   useEffect(() => {
     if (loading) return;
@@ -40,9 +43,9 @@ export default function AiAssistantScreen() {
           time: new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         })));
       })
-      .catch(() => {});
+      .catch(err => {if(!disposed)setError(err.message);});
     return () => { disposed = true; };
-  }, [revision, loading]);
+  }, [revision, loading,activeRole,user?.id]);
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
@@ -58,16 +61,11 @@ export default function AiAssistantScreen() {
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     setLoading(true);
+    setError('');
 
     try {
-      let replyText = '';
-      try {
-        const res = await chatbotAPI.sendMessage(userText);
-        replyText = res.message || res.reply;
-      } catch (err) {
-        console.log('Chatbot error:', err);
-        replyText = err.message || 'I could not connect to the live server right now. Please try again.';
-      }
+      const res = await chatbotAPI.sendMessage(userText);
+      const replyText = res.message || res.reply;
 
       setMessages((prev) => [
         ...prev,
@@ -79,7 +77,8 @@ export default function AiAssistantScreen() {
         },
       ]);
     } catch (e) {
-      console.log(e);
+      setError(e.message || 'AI unavailable. Please retry.');
+      setInput(userText);
     } finally {
       setLoading(false);
     }
@@ -89,8 +88,8 @@ export default function AiAssistantScreen() {
     <View style={styles.container}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 110}
+        enabled={Platform.OS === 'ios'} behavior="padding"
+        keyboardVerticalOffset={0}
       >
         {/* Messages List */}
         <FlatList
@@ -118,6 +117,7 @@ export default function AiAssistantScreen() {
         )}
 
         {/* Input Bar */}
+        {error ? <Text accessibilityRole="alert" style={{color:'#b91c1c',padding:12}}>{error}</Text> : null}
         <View style={styles.inputBar}>
           <TextInput
             style={styles.input}

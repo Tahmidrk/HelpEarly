@@ -23,7 +23,10 @@ const auth = async (req, res, next) => {
     if (!currentPasswordSession(decoded, password_hash)) return res.status(401).json({ message: 'Session expired; sign in again' });
     req.user = { ...decoded, ...user };
     const mode = req.header('X-Active-Role');
-    req.activeRole = req.user.role === 'both' && ['helper', 'household'].includes(mode) ? mode : req.user.role;
+    if (mode && !['helper','household','admin'].includes(mode)) return res.status(400).json({message:'Invalid active role'});
+    if (mode && req.user.role !== 'both' && mode !== req.user.role) return res.status(403).json({message:'Role is not available to this account'});
+    if (mode === 'admin' && req.user.role === 'both') return res.status(403).json({message:'Role is not available to this account'});
+    req.activeRole = req.user.role === 'both' ? (mode || 'household') : req.user.role;
     next();
   } catch (error) {
     const invalid=['JsonWebTokenError','TokenExpiredError','NotBeforeError'].includes(error.name);
@@ -52,7 +55,10 @@ const optionalAuth = async (req, res, next) => {
     if (!currentPasswordSession(decoded, password_hash)) return res.status(401).json({ message: 'Session expired; sign in again' });
     req.user = { ...decoded, ...user };
     const mode = req.header('X-Active-Role');
-    req.activeRole = req.user.role === 'both' && ['helper', 'household'].includes(mode) ? mode : req.user.role;
+    if (mode && !['helper','household','admin'].includes(mode)) return res.status(400).json({message:'Invalid active role'});
+    if (mode && req.user.role !== 'both' && mode !== req.user.role) return res.status(403).json({message:'Role is not available to this account'});
+    if (mode === 'admin' && req.user.role === 'both') return res.status(403).json({message:'Role is not available to this account'});
+    req.activeRole = req.user.role === 'both' ? (mode || 'household') : req.user.role;
     next();
   } catch (error) {
     const invalid=['JsonWebTokenError','TokenExpiredError','NotBeforeError'].includes(error.name);
@@ -66,7 +72,7 @@ const requireRole = (...roles) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Authentication required' });
     }
-    if (!roles.includes(req.activeRole || req.user.role) && !(req.user.role === 'both' && !req.header('X-Active-Role') && roles.some(r => ['helper', 'household'].includes(r)))) {
+    if (!roles.includes(req.activeRole || req.user.role)) {
       return res.status(403).json({ message: 'Access denied. Insufficient permissions.' });
     }
     next();

@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-11T12:10:29.694Z",
+  "executed_at": "2026-10-11T15:09:32.283Z",
   "database": "isolated local replica of Supabase schema; synthetic records only",
   "results": {
     "Production startup refuses unmigrated database without changing schema": "PASS",
@@ -12,6 +12,7 @@
     "Next-phase two-way client workflows and isolated AI provider failures": "PASS",
     "Central web administration, audit, authorization and cross-platform integration": "PASS",
     "Password rotation revokes HTTP and Socket.IO sessions without schema changes": "PASS",
+    "Android physical-test fixes: isolated role, privacy, chat, AI, location and notification regressions": "PASS",
     "Actual web and Android API modules share persisted profiles and worker services": "PASS",
     "AI history and inbox read state synchronize across real APIs; unrelated user denied private history": "PASS",
     "Socket.IO browser origin allowlist": "PASS",

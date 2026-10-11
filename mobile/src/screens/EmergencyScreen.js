@@ -1,5 +1,6 @@
+import { Alert } from '../components/Feedback';
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, Linking } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { emergencyAPI } from '../api/client';
@@ -33,7 +34,7 @@ export default function EmergencyScreen({ navigation }) {
       if (action === 'accept') {
         await fetchUserBookings();
         Alert.alert('Accepted', 'Confirmed booking created. Manage work from Home.', [
-          { text: 'View booking', onPress: () => navigation.navigate('Main', { screen: 'Home' }) },
+          { text: 'View booking', onPress: () => navigation.navigate('Main', { screen: 'Home',params:{section:'main'} }) },
           { text: 'Stay here' },
         ]);
       }
@@ -50,10 +51,13 @@ export default function EmergencyScreen({ navigation }) {
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.title}>{item.category_name || 'Emergency service'} · {item.effective_status}</Text>
-              <Text style={styles.text}>{item.location}</Text>
+              <Text style={styles.text}>Requested by: {item.household_name}</Text>
+              <Text style={styles.text}>Location: {item.location}</Text>
+              <Text style={styles.text}>Contact: {item.contact_phone}</Text>
               <Text style={styles.text}>{item.description}</Text>
               <Text style={styles.text}>{activeRole === 'helper' ? item.household_name : item.helper_name || 'Waiting for a worker'}</Text>
-              {item.booking_id ? <Text style={styles.text}>Booking #{item.booking_id} · {item.booking_status}</Text> : <Text style={styles.text}>Expires: {new Date(item.expires_at).toLocaleString()}</Text>}
+              {item.booking_id ? <Text style={styles.text}>Booking #{item.booking_id} · {item.booking_status}</Text> : null}
+              {activeRole==='helper' && item.effective_status==='pending' && <><Text style={styles.text}>If you want to accept this emergency work, contact the client at the number above.</Text><TouchableOpacity accessibilityLabel="Call household" style={styles.secondary} onPress={()=>Linking.openURL('tel:'+item.contact_phone.replace(/[^+\d]/g,'')).catch(()=>Alert.alert('Dialer unavailable','No calling app is available on this device.'))}><Text style={{color:'#0f766e',fontWeight:'700'}}>Call client</Text></TouchableOpacity></>}
               {item.effective_status === 'pending' && (
                 <View style={styles.row}>
                   {activeRole === 'helper' ? <>
@@ -73,7 +77,7 @@ const styles = StyleSheet.create({
   card: { padding: 16, backgroundColor: '#fff', borderRadius: 14, borderWidth: 1, borderColor: '#e2e8f0', marginBottom: 12 },
   title: { fontSize: 16, fontWeight: '800', color: '#991b1b', marginBottom: 8 },
   text: { color: '#334155', marginBottom: 6 },
-  row: { flexDirection: 'row', gap: 12, marginTop: 8 },
+  row: { flexDirection: 'row', flexWrap:'wrap', gap: 12, marginTop: 8 },
   button: { backgroundColor: '#0d9488', borderRadius: 8, padding: 12 },
   buttonText: { color: '#fff', fontWeight: '700' },
   secondary: { backgroundColor: '#f1f5f9', borderRadius: 8, padding: 12 },

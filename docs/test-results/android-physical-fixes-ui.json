@@ -1,0 +1,13 @@
+{
+  "executed_at": "2026-10-11T15:23:04.971Z",
+  "results": {
+    "Actual App renders six ordered tabs in both dual modes; household Inbox only inside Helpers; safe inset and keyboard-hide configured; no Android admin route": "PASS",
+    "Actual Chat hardware/header Back stays in list after refreshed data; first-time profile chat opens without delay workaround": "PASS",
+    "Actual form scroll computes focused-input overflow; Android has single keyboard owner; modal bottom safe inset present (simulated measurements)": "PASS",
+    "Manual date rejects rollover, malformed and past dates; valid leap date round-trips": "PASS",
+    "Actual role sections render correct subtabs, complaint tap, emergency notification intent and dashboard/posts return": "PASS",
+    "Actual notification router sends role-specific emergency/chat/proposal intents to correct tab and section": "PASS"
+  },
+  "native_boundaries": "Simulated RN/navigation host components and measurements; actual App/Chat/Form/date modules",
+  "physical_pixels_keyboard_push": "NOT RUN"
+}

@@ -1,4 +1,10 @@
+import ServiceLocationInput from '../components/ServiceLocationInput';
+import { FormScrollView as ScrollView } from '../components/FormLayout';
+import { FormModal as Modal } from '../components/FormLayout';
+import { Alert } from '../components/Feedback';
 import useMarketplaceCategories from '../utils/useMarketplaceCategories';
+import DateInput from '../components/DateInput';
+import {parseDate} from '../utils/dateOnly';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -8,9 +14,6 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
-  Modal,
-  Alert,
-  ScrollView,
   Image,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -38,6 +41,7 @@ export default function JobsScreen({ navigation, route }) {
   const [workerSetupModal, setWorkerSetupModal] = useState(false);
   const [workerSubWorks, setWorkerSubWorks] = useState('');
   const [workerRate, setWorkerRate] = useState('');
+  const [mappedWorkerArea,setMappedWorkerArea]=useState(null);
   const [workerLocation, setWorkerLocation] = useState('');
   const [savingWorkerSetup, setSavingWorkerSetup] = useState(false);
 
@@ -107,7 +111,7 @@ export default function JobsScreen({ navigation, route }) {
       const locToSave = workerLocation.trim() || user?.location;
       const rate = Number(workerRate.trim());
       if (!Number.isFinite(rate) || rate < 0) throw new Error('Enter a valid service rate');
-      await updateUserProfile({ location: locToSave });
+      await updateUserProfile({ location: locToSave,...(mappedWorkerArea || {}) });
       await saveWorkerSettings({
         category: user.primary_category || user.category,
         hourly_rate: rate,
@@ -182,6 +186,7 @@ export default function JobsScreen({ navigation, route }) {
     }
     try {
       setPosting(true);
+      parseDate(preferredDate.trim());
       const newJobPayload = {
         title: title.trim(),
         category,
@@ -551,7 +556,7 @@ export default function JobsScreen({ navigation, route }) {
               </View>
 
               <Text style={styles.label}>Preferred Date (YYYY-MM-DD)</Text>
-              <TextInput
+              <DateInput
                 style={styles.input}
                 placeholder="e.g. 2026-09-15"
                 value={preferredDate}
@@ -929,13 +934,13 @@ export default function JobsScreen({ navigation, route }) {
             </Text>
             <View style={[styles.inputIconRow, { marginBottom: 16 }]}>
               <Ionicons name="location-outline" size={18} color="#0d9488" />
-              <TextInput
+              <ServiceLocationInput
                 style={styles.inputInner}
                 placeholder="e.g. Dhanmondi, Dhaka"
                 placeholderTextColor="#94a3b8"
                 value={workerLocation}
                 onChangeText={setWorkerLocation}
-              />
+               onSelection={setMappedWorkerArea}/>
             </View>
 
             <TouchableOpacity

@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-11T12:10:26.795Z",
+  "executed_at": "2026-10-11T15:09:28.924Z",
   "database": "suite-owned isolated PostgreSQL; synthetic records",
   "results": {
     "Every admin resource/mutation rejects non-admins; DB role overrides forged JWT; registration/profile cannot promote": "PASS",

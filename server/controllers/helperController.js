@@ -7,7 +7,7 @@ exports.getHelpers = async (req, res) => {
     const offset = (page - 1) * limit;
 
     let query = `
-      SELECT h.*, u.name, u.location, u.avatar_url, u.latitude, u.longitude,
+      SELECT h.*, u.name, u.location, u.avatar_url, CASE WHEN u.location_confirmed THEN ROUND(u.latitude::numeric,2) END AS latitude, CASE WHEN u.location_confirmed THEN ROUND(u.longitude::numeric,2) END AS longitude,u.location_confirmed,
              COALESCE(
                (SELECT c2.name FROM helper_categories hc2 JOIN categories c2 ON hc2.category_id = c2.id WHERE hc2.helper_id = h.id AND c2.is_visible LIMIT 1),
                (SELECT c3.name FROM helper_services hs3 JOIN categories c3 ON hs3.category_id = c3.id WHERE hs3.helper_id = h.id AND c3.is_visible AND NOT hs3.is_hidden LIMIT 1)
@@ -122,7 +122,7 @@ exports.getHelper = async (req, res) => {
     const { id } = req.params;
 
     const helperResult = await pool.query(`
-      SELECT h.*, u.name, u.location, u.avatar_url, u.latitude, u.longitude
+      SELECT h.*, u.name, u.location, u.avatar_url, CASE WHEN u.location_confirmed THEN ROUND(u.latitude::numeric,2) END AS latitude, CASE WHEN u.location_confirmed THEN ROUND(u.longitude::numeric,2) END AS longitude,u.location_confirmed
       FROM helpers h
       JOIN users u ON h.user_id = u.id
       WHERE h.id = $1 AND u.is_active = true

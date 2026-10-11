@@ -1,0 +1,76 @@
+{
+  "executed_at": "2026-10-11T16:11:27.881Z",
+  "status": "PASS",
+  "productionMode": "Read-only snapshot, aggregate diagnostics and private Storage backup; no live changes",
+  "backupDirectory": "H:\\apps\\HelpEarly-backups\\android-role-2026-10-11T16-10-52-017Z",
+  "dumpSHA256": "d693885a5608cb28bac96ae7629acdfefacc28cd2d93afdcdb50a2435a21660e",
+  "migrationSHA256": "c51486f2b9865480c4cbf417b44b582532eca87e3af7802839b4a71ae65b7d46",
+  "originalTableCount": 23,
+  "resultTableCount": 23,
+  "originalCounts": {
+    "admin_audit_logs": 41,
+    "ai_messages": 16,
+    "bookings": 16,
+    "categories": 11,
+    "complaints": 4,
+    "conversations": 9,
+    "emergency_declines": 0,
+    "emergency_requests": 3,
+    "helpearly_schema": 2,
+    "helper_categories": 34,
+    "helper_services": 43,
+    "helpers": 25,
+    "job_applications": 5,
+    "jobs": 15,
+    "media_uploads": 5,
+    "messages": 38,
+    "notifications": 73,
+    "payments": 6,
+    "push_deliveries": 2,
+    "push_devices": 1,
+    "reviews": 6,
+    "sync_revisions": 69,
+    "users": 37
+  },
+  "originalRowsAndContentPreserved": true,
+  "syncMetadata": "Existing resource entries retained; revisions monotonically advance via existing triggers during role backfill",
+  "isolatedRollback": "PASS: transaction restores schema 3 and original fingerprints",
+  "guardedCommittedSchemaRollback": "PASS on restored production copy: schema 3 compatibility restored without deleting business rows; refuses rollback once opposite-role threads exist",
+  "repeatability": "PASS",
+  "notificationAudienceChange": "Known legacy message/complaint metadata gains audience only; preexisting audiences unchanged",
+  "legacyAssignment": {
+    "conversations": {
+      "total": 9,
+      "unassigned": 0
+    },
+    "ai_messages": {
+      "total": 16,
+      "unassigned": 4
+    },
+    "complaints": {
+      "total": 4,
+      "unassigned": 0
+    },
+    "push_devices": {
+      "total": 1,
+      "unassigned": 0
+    }
+  },
+  "pushDiagnostics": {
+    "deviceCounts": {
+      "total": 1,
+      "active": 1
+    },
+    "deliveryStatuses": [
+      {
+        "status": "delivered",
+        "count": 2
+      }
+    ],
+    "phoneDelivery": "UNVERIFIED; provider receipt is not physical evidence"
+  },
+  "mediaObjects": 5,
+  "mediaHashesVerified": true,
+  "productionBeforeAfterHashesUnchanged": true,
+  "backupConsistency": "Exported PostgreSQL snapshot; media copied separately and key inventory checked. Repeat immediately before approved migration."
+}

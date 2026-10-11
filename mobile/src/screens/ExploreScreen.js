@@ -1,3 +1,6 @@
+import { FormScrollView as ScrollView } from '../components/FormLayout';
+import { FormModal as Modal } from '../components/FormLayout';
+import { Alert } from '../components/Feedback';
 import useMarketplaceCategories from '../utils/useMarketplaceCategories';
 import React, { useState, useEffect } from 'react';
 import {
@@ -8,17 +11,15 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
-  Modal,
-  Alert,
   BackHandler,
   Image,
-  ScrollView,
-} from 'react-native';
+  } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { helpersAPI, reviewsAPI, complaintsAPI } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import ChatScreen from './ChatScreen';
 import MapViewModal from '../components/MapViewModal';
+import DateInput from '../components/DateInput';
 import { useNotifications } from '../context/NotificationContext';
 
 export default function ExploreScreen({ route, navigation }) {
@@ -130,6 +131,7 @@ export default function ExploreScreen({ route, navigation }) {
     try {
       setSubmittingComplaint(true);
       await complaintsAPI.create({
+        booking_id:complaintBooking.rawId || complaintBooking.id,
         accused_id: complaintBooking.helper_user_id,
         subject: complaintSubject.trim(),
         description: complaintDescription.trim(),
@@ -150,9 +152,11 @@ export default function ExploreScreen({ route, navigation }) {
   const [highlightId, setHighlightId] = useState(paramHighlightId || null);
   const [search, setSearch] = useState('');
   const [mapModal, setMapModal] = useState(false);
+  const [mapCoordinates,setMapCoordinates]=useState(null);
   const [mapLocation, setMapLocation] = useState('Dhaka, Bangladesh');
 
-  const openMapForLocation = (loc) => {
+  const openMapForLocation = (loc,coordinates) => {
+    setMapCoordinates(coordinates || null);
     setMapLocation(loc || 'Dhaka, Bangladesh');
     setMapModal(true);
   };
@@ -176,30 +180,6 @@ export default function ExploreScreen({ route, navigation }) {
     }
   }, [route.params]);
 
-  // Intercept Android hardware back button when inside Inbox sub-tab
-  useEffect(() => {
-    const onBackPress = () => {
-      if (activeSubTab === 'chats') {
-        setActiveSubTab('helpers');
-        navigation.setParams({ openSubTab: 'helpers', helperName: null, helperId: null });
-        return true; // prevent default back navigation to Home
-      }
-      return false;
-    };
-
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-    return () => backHandler.remove();
-  }, [activeSubTab, navigation]);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
-      setActiveSubTab('helpers');
-      setSelectedCategory('All');
-      setHighlightId(null);
-      navigation.setParams({ openSubTab: null, helperName: null, helperId: null, selectedCategory: 'All', highlightHelperId: null });
-    });
-    return unsubscribe;
-  }, [navigation]);
 
   useEffect(() => {
     loadHelpers();
@@ -524,7 +504,7 @@ export default function ExploreScreen({ route, navigation }) {
                       <View style={{ flex: 1 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                           <Text style={styles.name}>{item.name}</Text>
-                          {item.is_verified && <Ionicons name="checkmark-circle" size={16} color="#0d9488" />}
+
                         </View>
                         <Text style={styles.category}>
                           {catName} · 📍 {item.location || 'Dhaka'}
@@ -593,11 +573,10 @@ export default function ExploreScreen({ route, navigation }) {
             </View>
 
             <Text style={styles.label}>Scheduled Date (YYYY-MM-DD)</Text>
-            <TextInput
+            <DateInput
               style={styles.input}
               value={editDate}
               onChangeText={setEditDate}
-              placeholder="2026-09-10"
             />
 
             <Text style={styles.label}>Scheduled Time</Text>
@@ -806,7 +785,7 @@ export default function ExploreScreen({ route, navigation }) {
       </Modal>
 
       {/* Interactive Map Modal */}
-      <MapViewModal
+      <MapViewModal coordinates={mapCoordinates}
         visible={mapModal}
         onClose={() => setMapModal(false)}
         locationName={mapLocation}

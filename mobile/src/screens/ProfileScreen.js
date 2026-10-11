@@ -1,13 +1,14 @@
+import ServiceLocationInput from '../components/ServiceLocationInput';
+import { FormScrollView as ScrollView } from '../components/FormLayout';
+import { FormModal as Modal } from '../components/FormLayout';
+import { Alert } from '../components/Feedback';
 import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
-  Modal,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -29,6 +30,7 @@ export default function ProfileScreen({ navigation }) {
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [email, setEmail] = useState(user?.email || '');
+  const [mappedArea,setMappedArea]=useState(null);
   const [location, setLocation] = useState(user?.location || '');
 
   // Map Modal
@@ -73,7 +75,7 @@ export default function ProfileScreen({ navigation }) {
       return;
     }
     try {
-      await updateUserProfile({ name: name.trim(), phone: phone.trim(), location: location.trim() });
+      await updateUserProfile({ name: name.trim(), phone: phone.trim(), location: location.trim(),...(mappedArea || {}) });
       Alert.alert('Success', 'Profile information updated successfully!');
       return true;
     } catch (error) {
@@ -121,13 +123,91 @@ export default function ProfileScreen({ navigation }) {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: '#f8fafc' }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 80}
+      enabled={Platform.OS === 'ios'} behavior="padding"
+      keyboardVerticalOffset={0}
     >
       <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <TouchableOpacity style={styles.profileCard} onPress={() => navigation.navigate('Notifications')}><Text style={{ color: '#0d9488', fontWeight: '800' }}>Notifications</Text></TouchableOpacity>
-        {user?.role!=='admin' && <TouchableOpacity style={styles.profileCard} onPress={()=>navigation.navigate('Complaints')}><Text style={{color:'#0d9488',fontWeight:'800'}}>My complaints</Text></TouchableOpacity>}
-        {user?.role !== 'admin' && <TouchableOpacity style={styles.profileCard} onPress={() => navigation.navigate('Emergency')}><Text style={{ color: '#991b1b', fontWeight: '800' }}>Emergency requests</Text></TouchableOpacity>}
+
+      {/* Account Personal Details (Username, Phone, Email, Address) */}
+      <View style={styles.sectionCard}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Text style={styles.sectionTitleNoMargin}>Personal Details & Address</Text>
+          <TouchableOpacity
+            style={styles.editToggleBtn}
+            onPress={() => {
+              if (isEditingPersonal) {
+                handleSaveProfile().then(saved=>{if(saved)setIsEditingPersonal(false);});
+              } else {
+                setIsEditingPersonal(true);
+              }
+            }}
+          >
+            <Ionicons name={isEditingPersonal ? 'checkmark-circle' : 'create-outline'} size={16} color="#0d9488" />
+            <Text style={styles.editToggleBtnText}>{isEditingPersonal ? 'Save' : 'Edit'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Username */}
+        <View style={styles.infoRow}>
+          <Ionicons name="person-outline" size={18} color="#0d9488" />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.infoLabel}>Full Name</Text>
+            {isEditingPersonal ? (
+              <TextInput style={styles.infoInput} value={name} onChangeText={setName} />
+            ) : (
+              <Text style={styles.infoVal}>{user?.name || 'Customer'}</Text>
+            )}
+          </View>
+        </View>
+
+        {/* Phone Number */}
+        <View style={styles.infoRow}>
+          <Ionicons name="call-outline" size={18} color="#0d9488" />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.infoLabel}>Phone Number</Text>
+            {isEditingPersonal ? (
+              <TextInput style={styles.infoInput} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+            ) : (
+              <Text style={styles.infoVal}>{phone}</Text>
+            )}
+          </View>
+        </View>
+
+        {/* Email */}
+        <View style={styles.infoRow}>
+          <Ionicons name="mail-outline" size={18} color="#0d9488" />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.infoLabel}>Email Address</Text>
+            {isEditingPersonal ? (
+              <TextInput style={styles.infoInput} value={email} editable={false} accessibilityLabel="Account email, read only" keyboardType="email-address" />
+            ) : (
+              <Text style={styles.infoVal}>{user?.email || 'N/A'}</Text>
+            )}
+          </View>
+        </View>
+
+        {/* Address Location with View in Map */}
+        <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
+          <Ionicons name="location-outline" size={18} color="#0d9488" />
+          <View style={{ flex: 1 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.infoLabel}>Primary Service Location</Text>
+              <TouchableOpacity
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}
+                onPress={() => setMapModal(true)}
+              >
+                <Ionicons name="map-outline" size={14} color="#0d9488" />
+                <Text style={{ fontSize: 11.5, fontWeight: '700', color: '#0d9488' }}>View in Map</Text>
+              </TouchableOpacity>
+            </View>
+            {isEditingPersonal ? (
+              <ServiceLocationInput style={styles.infoInput} value={location} onChangeText={setLocation}  onSelection={setMappedArea}/>
+            ) : (
+              <Text style={styles.infoVal}>{user?.location || location}</Text>
+            )}
+          </View>
+        </View>
+      </View>
 
         {/* If activeRole is 'helper', render exact Helper Detail profile view from household mode */}
         {activeRole === 'helper' ? (
@@ -266,7 +346,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.modeRow}>
             <TouchableOpacity
               style={[styles.modeChip, activeRole === 'household' && styles.modeChipActive]}
-              onPress={() => switchMode('household')}
+              onPress={() => switchMode('household').catch(()=>{})}
             >
               <Ionicons name="home-outline" size={16} color={activeRole === 'household' ? '#ffffff' : '#0f766e'} />
               <Text style={[styles.modeChipText, activeRole === 'household' && styles.modeChipTextActive]}>
@@ -276,7 +356,7 @@ export default function ProfileScreen({ navigation }) {
 
             <TouchableOpacity
               style={[styles.modeChip, activeRole === 'helper' && styles.modeChipActive]}
-              onPress={() => switchMode('helper')}
+              onPress={() => switchMode('helper').catch(()=>{})}
             >
               <Ionicons name="construct-outline" size={16} color={activeRole === 'helper' ? '#ffffff' : '#0f766e'} />
               <Text style={[styles.modeChipText, activeRole === 'helper' && styles.modeChipTextActive]}>
@@ -345,7 +425,7 @@ export default function ProfileScreen({ navigation }) {
                     <Text style={{ fontSize: 13, fontWeight: '800', color: '#0d9488' }}>৳</Text>
                     <TextInput
                       style={[styles.infoInput, { width: 65, marginTop: 0, paddingVertical: 4, fontWeight: '800', color: '#0d9488' }]}
-                      value={svc.price}
+                      value={String(svc.price ?? '')}
                       keyboardType="numeric"
                       onChangeText={(val) => {
                         const updated = [...workerServicesList];
@@ -363,7 +443,6 @@ export default function ProfileScreen({ navigation }) {
                 ) : (
                   <>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>
-                      <Ionicons name="checkmark-circle-outline" size={15} color="#0d9488" />
                       <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }}>{svc.service_name}</Text>
                     </View>
                     <Text style={{ fontSize: 13.5, fontWeight: '800', color: '#0d9488' }}>৳{svc.price}</Text>
@@ -409,88 +488,6 @@ export default function ProfileScreen({ navigation }) {
         </View>
       )}
 
-      {/* Account Personal Details (Username, Phone, Email, Address) */}
-      <View style={styles.sectionCard}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={styles.sectionTitleNoMargin}>Personal Details & Address</Text>
-          <TouchableOpacity
-            style={styles.editToggleBtn}
-            onPress={() => {
-              if (isEditingPersonal) {
-                handleSaveProfile();
-                setIsEditingPersonal(false);
-              } else {
-                setIsEditingPersonal(true);
-              }
-            }}
-          >
-            <Ionicons name={isEditingPersonal ? 'checkmark-circle' : 'create-outline'} size={16} color="#0d9488" />
-            <Text style={styles.editToggleBtnText}>{isEditingPersonal ? 'Save' : 'Edit'}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Username */}
-        <View style={styles.infoRow}>
-          <Ionicons name="person-outline" size={18} color="#0d9488" />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.infoLabel}>Full Name</Text>
-            {isEditingPersonal ? (
-              <TextInput style={styles.infoInput} value={name} onChangeText={setName} />
-            ) : (
-              <Text style={styles.infoVal}>{user?.name || 'Customer'}</Text>
-            )}
-          </View>
-        </View>
-
-        {/* Phone Number */}
-        <View style={styles.infoRow}>
-          <Ionicons name="call-outline" size={18} color="#0d9488" />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.infoLabel}>Phone Number</Text>
-            {isEditingPersonal ? (
-              <TextInput style={styles.infoInput} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
-            ) : (
-              <Text style={styles.infoVal}>{phone}</Text>
-            )}
-          </View>
-        </View>
-
-        {/* Email */}
-        <View style={styles.infoRow}>
-          <Ionicons name="mail-outline" size={18} color="#0d9488" />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.infoLabel}>Email Address</Text>
-            {isEditingPersonal ? (
-              <TextInput style={styles.infoInput} value={email} onChangeText={setEmail} keyboardType="email-address" />
-            ) : (
-              <Text style={styles.infoVal}>{user?.email || 'N/A'}</Text>
-            )}
-          </View>
-        </View>
-
-        {/* Address Location with View in Map */}
-        <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
-          <Ionicons name="location-outline" size={18} color="#0d9488" />
-          <View style={{ flex: 1 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={styles.infoLabel}>Primary Service Location</Text>
-              <TouchableOpacity
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}
-                onPress={() => setMapModal(true)}
-              >
-                <Ionicons name="map-outline" size={14} color="#0d9488" />
-                <Text style={{ fontSize: 11.5, fontWeight: '700', color: '#0d9488' }}>View in Map</Text>
-              </TouchableOpacity>
-            </View>
-            {isEditingPersonal ? (
-              <TextInput style={styles.infoInput} value={location} onChangeText={setLocation} />
-            ) : (
-              <Text style={styles.infoVal}>{user?.location || location}</Text>
-            )}
-          </View>
-        </View>
-      </View>
-
       {/* Mandatory Location Setup Modal for Fresh Registrations */}
       <Modal visible={mandatoryLocModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
@@ -518,7 +515,7 @@ export default function ProfileScreen({ navigation }) {
       </Modal>
 
       {/* Map View Modal */}
-      <MapViewModal
+      <MapViewModal coordinates={user}
         visible={mapModal}
         onClose={() => setMapModal(false)}
         locationName={user?.location || location}

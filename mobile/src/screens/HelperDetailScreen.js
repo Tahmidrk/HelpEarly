@@ -1,13 +1,15 @@
+import DateInput from '../components/DateInput';
+import BookingInput from '../components/BookingInput';
+import { FormScrollView as ScrollView } from '../components/FormLayout';
+import { FormModal as Modal } from '../components/FormLayout';
+import { Alert } from '../components/Feedback';
 import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Modal,
-  Alert,
   TextInput,
   Image,
 } from 'react-native';
@@ -46,6 +48,7 @@ export default function HelperDetailScreen({ route, navigation }) {
   const [mapModal, setMapModal] = useState(false);
   const [reviewsModal, setReviewsModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [bookingErrors,setBookingErrors]=useState({});
 
   const pickJobPhoto = async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -97,6 +100,11 @@ export default function HelperDetailScreen({ route, navigation }) {
   };
 
   const handleBook = async () => {
+    const errors={};
+    if(!serviceDescription.trim())errors.service='Describe the services you need.';
+    if(!Number.isFinite(Number(offeredFee)) || Number(offeredFee)<=0)errors.fee='Enter a positive offered fee.';
+    setBookingErrors(errors);
+    if(Object.keys(errors).length)return;
     if (!user) {
       Alert.alert('Authentication Required', 'Please log in to book a helper.');
       return;
@@ -124,7 +132,7 @@ export default function HelperDetailScreen({ route, navigation }) {
       setSelectedSubService('');
       setNotes('');
     } catch (err) {
-      Alert.alert('Booking Notice', err.message || 'Unable to place booking.');
+      Alert.alert('Booking Failed', err.message || 'Unable to place booking.');
     } finally {
       setSubmitting(false);
     }
@@ -415,9 +423,9 @@ export default function HelperDetailScreen({ route, navigation }) {
                     )}
 
                     <Text style={styles.inputLabel}>Services you need *</Text>
-                    <TextInput accessibilityLabel="Services you need" style={styles.input} multiline value={serviceDescription} onChangeText={setServiceDescription} placeholder="Describe exactly what needs doing" />
+                    <BookingInput accessibilityLabel="Services you need" error={bookingErrors.service} style={styles.input} multiline value={serviceDescription} onChangeText={setServiceDescription} placeholder="Describe exactly what needs doing" />
                     <Text style={styles.inputLabel}>Your offered fee (৳) *</Text>
-                    <TextInput accessibilityLabel="Your offered fee" style={styles.input} keyboardType="decimal-pad" value={offeredFee} onChangeText={setOfferedFee} placeholder="Enter your offer" />
+                    <BookingInput accessibilityLabel="Your offered fee" error={bookingErrors.fee} style={styles.input} keyboardType="decimal-pad" value={offeredFee} onChangeText={setOfferedFee} placeholder="Enter your offer" />
                     {/* Selected Work Total Bill Display */}
                     <View style={styles.receiptCard}>
                       <View style={styles.receiptHeaderRow}>
@@ -630,43 +638,14 @@ export default function HelperDetailScreen({ route, navigation }) {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.calendarGridContainer}>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', textAlign: 'center', marginBottom: 12 }}>
-                September 2026
-              </Text>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 8 }}>
-                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d, i) => (
-                  <Text key={i} style={{ width: 36, textAlign: 'center', fontWeight: '700', color: '#94a3b8', fontSize: 12 }}>{d}</Text>
-                ))}
-              </View>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-                {Array.from({ length: 30 }, (_, i) => {
-                  const dayNum = i + 1;
-                  const dateStr = `2026-09-${dayNum < 10 ? '0' + dayNum : dayNum}`;
-                  const isSelected = serviceDate === dateStr;
-                  return (
-                    <TouchableOpacity
-                      key={i}
-                      style={[styles.calendarDayBtn, isSelected && styles.calendarDayBtnActive]}
-                      onPress={() => {
-                        setServiceDate(dateStr);
-                        setCalendarPickerModal(false);
-                      }}
-                    >
-                      <Text style={[styles.calendarDayText, isSelected && styles.calendarDayTextActive]}>
-                        {dayNum}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
+            <DateInput value={serviceDate} onChangeText={setServiceDate} style={styles.input}/>
+            <TouchableOpacity onPress={()=>setCalendarPickerModal(false)}><Text style={{color:"#0d9488",fontWeight:"700",textAlign:"center",padding:14}}>Done</Text></TouchableOpacity>
           </View>
         </View>
       </Modal>
 
       {/* Map View Modal */}
-      <MapViewModal
+      <MapViewModal coordinates={helper}
         visible={mapModal}
         onClose={() => setMapModal(false)}
         locationName={helper?.location || 'Dhaka, Bangladesh'}

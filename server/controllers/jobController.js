@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const { assertBookingSlot } = require('../utils/bookingAvailability');
+const {validCalendarDate}=require('../utils/calendarDate');
 
 async function getHelperProfile(userId) {
   const helperResult = await pool.query('SELECT id FROM helpers WHERE user_id = $1', [userId]);
@@ -30,7 +31,8 @@ exports.createJob = async (req, res) => {
     }
 
     const preferredDate = new Date(preferred_date);
-    if (!category_id || !title?.trim() || !description?.trim() || !Number.isFinite(Number(budget)) || Number(budget) <= 0 || Number.isNaN(preferredDate.getTime())) {
+    const today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'});
+    if (!category_id || !title?.trim() || !description?.trim() || !Number.isFinite(Number(budget)) || Number(budget) <= 0 || !validCalendarDate(preferred_date) || preferred_date.slice(0,10)<today) {
       return res.status(400).json({ message: 'Category, title, description, a positive budget, and preferred date are required' });
     }
 

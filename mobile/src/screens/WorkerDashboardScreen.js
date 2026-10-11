@@ -1,15 +1,15 @@
+import { FormScrollView as ScrollView } from '../components/FormLayout';
+import { FormModal as Modal } from '../components/FormLayout';
+import { Alert } from '../components/Feedback';
 import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  Alert,
   Switch,
-  Modal,
   TextInput,
   Image,
 } from 'react-native';
@@ -106,6 +106,7 @@ export default function WorkerDashboardScreen({ navigation }) {
     try {
       setSubmittingComplaint(true);
       await complaintsAPI.create({
+        booking_id:complaintBooking.rawId || complaintBooking.id,
         accused_id: complaintBooking.user_id || complaintBooking.client_id,
         subject: complaintSubject.trim(),
         description: complaintDescription.trim(),

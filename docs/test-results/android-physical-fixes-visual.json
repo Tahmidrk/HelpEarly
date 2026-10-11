@@ -1,0 +1,13 @@
+{
+  "executed_at": "2026-10-11T15:23:06.250Z",
+  "status": "PASS",
+  "baseline": "d0737dde2662a25ff5679975c3ae319a55e7374f",
+  "existingStyleSheetsChecked": 14,
+  "approvedStyleDifferences": [
+    "mobile/src/screens/EmergencyScreen.js: action row wraps for font scaling"
+  ],
+  "protectedAssetsAndSigningConfig": 9,
+  "packageIdentity": "com.atyourservice.app",
+  "scope": "Existing palettes, typography and StyleSheet definitions preserved except approved emergency action wrapping. Requested forms/navigation/complaints/map content intentionally changed.",
+  "physicalScreenshots": "NOT RUN; this is AST/asset verification, not pixel equivalence"
+}

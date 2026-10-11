@@ -1,3 +1,5 @@
+import { FormScrollView as ScrollView } from '../components/FormLayout';
+import { Alert } from '../components/Feedback';
 import React, { useState } from 'react';
 import {
   View,
@@ -6,11 +8,9 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
-} from 'react-native';
+  } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
@@ -42,8 +42,8 @@ export default function LoginScreen({ navigation }) {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      enabled={Platform.OS === 'ios'} behavior="padding"
+      keyboardVerticalOffset={0}
     >
       <ScrollView
         contentContainerStyle={styles.content}

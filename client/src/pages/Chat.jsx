@@ -10,8 +10,8 @@ import { useSync } from '../context/SyncContext';
 
 export default function Chat() {
   const revision = useSync('messages');
-  const { user } = useAuth();
-  const [searchParams] = useSearchParams();
+  const { user,activeRole } = useAuth();
+  const [searchParams,setSearchParams] = useSearchParams();
   const targetUserId = searchParams.get('userId');
 
   const [conversations, setConversations] = useState([]);
@@ -23,12 +23,16 @@ export default function Chat() {
   const [error, setError] = useState(''), [sending, setSending] = useState(false);
   const messagesEndRef = useRef(null);
   const activeConvRef = useRef(null);
+  const scope=useRef(''),intent=useRef(0);
+  const currentScope=`${user?.id}:${activeRole}`;
+  if(scope.current!==currentScope){scope.current=currentScope;intent.current++;}
   activeConvRef.current = activeConv;
 
   // Initialize socket
   useEffect(() => {
+    let disposed=false;
     const token = localStorage.getItem('token');
-    const s = io(SOCKET_URL, { auth: { token }, withCredentials: true });
+    const s = io(SOCKET_URL, { auth: { token,activeRole }, withCredentials: true });
     setSocket(s);
     s.on('connect', () => { if (activeConvRef.current?.id) s.emit('join_conversation', activeConvRef.current.id); });
 
@@ -37,19 +41,22 @@ export default function Chat() {
       if (msg.sender_id !== user.id && msg.conversation_id === activeConvRef.current?.id) {
         setMessages(prev => prev.some(item=>item.id===msg.id) ? prev : [...prev, msg]);
       }
-      messagesAPI.getConversations().then(setConversations).catch(err => setError(err.message));
+      messagesAPI.getConversations().then(rows=>{if(!disposed)setConversations(rows);}).catch(err => {if(!disposed)setError(err.message);});
     });
 
-    return () => s.disconnect();
-  }, []);
+    return () => {disposed=true;s.disconnect();};
+  }, [user?.id,activeRole]);
 
+  useEffect(()=>{setActiveConv(null);setConversations([]);setMessages([]);setNewMessage('');setSending(false);setError('');setLoading(true);},[user?.id,activeRole]);
   // Load conversations
   useEffect(() => {
+    let disposed=false;
     messagesAPI.getConversations()
-      .then(setConversations)
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [revision]);
+      .then(rows=>{if(!disposed)setConversations(rows);})
+      .catch(err => {if(!disposed)setError(err.message);})
+      .finally(() => {if(!disposed)setLoading(false);});
+    return()=>{disposed=true;};
+  }, [revision,activeRole]);
 
   useEffect(() => {
     if (activeConv?.id) loadMessages(activeConv.id);
@@ -58,22 +65,27 @@ export default function Chat() {
   // Auto-open conversation when navigated with userId
   useEffect(() => {
     if (targetUserId && !loading) {
+      const request=++intent.current,requestedScope=scope.current;
+      setSearchParams({}, {replace:true});
       messagesAPI.getOrCreateConversation(targetUserId).then((conv) => {
+        if(request!==intent.current || requestedScope!==scope.current)return;
         setActiveConv(conv);
         loadMessages(conv.id);
         if (socket) socket.emit('join_conversation', conv.id);
         // Refresh conversations
-        messagesAPI.getConversations().then(setConversations).catch(err => setError(err.message));
-      }).catch(err => setError(err.message));
+        messagesAPI.getConversations().then(rows=>{if(requestedScope===scope.current)setConversations(rows);}).catch(err => {if(requestedScope===scope.current)setError(err.message);});
+      }).catch(err => {if(requestedScope===scope.current)setError(err.message);});
     }
   }, [targetUserId, loading]);
 
   const loadMessages = async (convId) => {
+    const requestedScope=scope.current;
     try {
       const msgs = await messagesAPI.getMessages(convId);
+      if(requestedScope!==scope.current)return;
       if (Number(activeConvRef.current?.id) === Number(convId)) setMessages(msgs);
       setError('');
-    } catch (err) { setError(err.message); }
+    } catch (err) { if(requestedScope===scope.current)setError(err.message); }
   };
 
   const selectConversation = (conv) => {
@@ -83,6 +95,7 @@ export default function Chat() {
   };
 
   const sendMessage = async (e) => {
+    const requestedScope=scope.current;
     e.preventDefault();
     if (sending || !newMessage.trim() || !activeConv || activeConv.is_other_active === false) return;
     setSending(true);
@@ -93,6 +106,7 @@ export default function Chat() {
         recipient_id: recipientId,
         content,
       });
+      if(requestedScope!==scope.current)return;
 
       if (Number(activeConvRef.current?.id) === Number(conversationId)) {
         setMessages(prev => prev.some(item => item.id === result.message.id) ? prev : [...prev, result.message]);
@@ -100,9 +114,9 @@ export default function Chat() {
       }
       setError('');
     } catch (err) {
-      setError(err.message);
+      if(requestedScope===scope.current)setError(err.message);
     }
-    finally { setSending(false); }
+    finally { if(requestedScope===scope.current)setSending(false); }
   };
 
   // Auto-scroll to bottom

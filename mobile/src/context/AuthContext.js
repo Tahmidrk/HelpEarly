@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authAPI, bookingsAPI, helpersAPI, bookingDate, notificationsAPI } from '../api/client';
-import { Alert } from 'react-native';
+import { Alert } from '../components/Feedback';
 
 const AuthContext = createContext(null);
 
@@ -9,6 +9,9 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [activeRole, setActiveRole] = useState('household');
   const [loading, setLoading] = useState(true);
+  const scope = useRef('');
+  scope.current = `${user?.id || ''}:${activeRole}`;
+  const bookingRequest = useRef(0);
 
   useEffect(() => {
     loadUser();
@@ -82,6 +85,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
+    bookingRequest.current++;
     try {
       if (await AsyncStorage.getItem('pushEnabled') === 'true') {
         const deviceId = await AsyncStorage.getItem('pushDeviceId');
@@ -97,15 +101,24 @@ export function AuthProvider({ children }) {
 
   const switchMode = async (mode) => {
     if (user?.role !== 'both' || !['household','helper'].includes(mode)) return;
-    setActiveRole(mode);
-    await AsyncStorage.setItem('activeRole', mode);
+    const previous=activeRole;
+    bookingRequest.current++;
+    try {
+      await AsyncStorage.setItem('activeRole',mode);
+      const id=await AsyncStorage.getItem('pushDeviceId');
+      if(id) await notificationsAPI.audience(id);
+      setUserBookings([]);
+      setActiveRole(mode);
+    }catch(error){await AsyncStorage.setItem('activeRole',previous);Alert.alert('Role switch failed','Reconnect and retry: '+error.message);throw error;}
   };
 
   const [userBookings, setUserBookings] = useState([]);
   const [bookingsError, setBookingsError] = useState('');
   const fetchUserBookings = async () => {
+    const requestedScope=scope.current, request=++bookingRequest.current;
     try {
       const rows = await bookingsAPI.getMyBookings();
+      if(requestedScope!==scope.current || request!==bookingRequest.current)return;
       setUserBookings(rows.map(b => ({
         ...b, rawId:b.id, id:`B-${b.id}`, service:b.service_description || b.service_name || 'Custom service',
         category:b.category_name || '', status:b.status.charAt(0).toUpperCase()+b.status.slice(1),
@@ -115,7 +128,7 @@ export function AuthProvider({ children }) {
         photoUri:b.photo_urls?.[0] || null,
       })));
       setBookingsError('');
-    } catch (error) { setBookingsError(error.message); }
+    } catch (error) { if(requestedScope===scope.current && request===bookingRequest.current)setBookingsError(error.message); }
   };
   useEffect(() => {
     setUserBookings([]);

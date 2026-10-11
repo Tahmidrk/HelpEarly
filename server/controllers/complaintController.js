@@ -2,42 +2,12 @@ const pool = require('../config/db');
 
 exports.getComplaintContacts = async (req, res) => {
   try {
-    const result = await pool.query(`
-      WITH contacts AS (
-        SELECT hu.id, hu.name, hu.role
-        FROM bookings b
-        JOIN helpers h ON b.helper_id = h.id
-        JOIN users hu ON h.user_id = hu.id
-        WHERE b.user_id = $1 AND hu.is_active = true
-
-        UNION
-
-        SELECT u.id, u.name, u.role
-        FROM bookings b
-        JOIN users u ON b.user_id = u.id
-        JOIN helpers h ON b.helper_id = h.id
-        WHERE h.user_id = $1 AND u.is_active = true
-
-        UNION
-
-        SELECT u.id, u.name, u.role
-        FROM job_applications ja
-        JOIN helpers h ON ja.helper_id = h.id
-        JOIN jobs j ON ja.job_id = j.id
-        JOIN users u ON j.user_id = u.id
-        WHERE h.user_id = $1 AND ja.status = 'accepted' AND u.is_active = true
-
-        UNION
-
-        SELECT hu.id, hu.name, hu.role
-        FROM job_applications ja
-        JOIN helpers h ON ja.helper_id = h.id
-        JOIN users hu ON h.user_id = hu.id
-        JOIN jobs j ON ja.job_id = j.id
-        WHERE j.user_id = $1 AND ja.status = 'accepted' AND hu.is_active = true
-      )
-      SELECT DISTINCT id, name, role FROM contacts WHERE id != $1 ORDER BY name
-    `, [req.user.id]);
+    const result=await pool.query(`SELECT DISTINCT u.id,u.name,u.role FROM users u JOIN (
+      SELECT CASE WHEN $2='household' THEN h.user_id ELSE b.user_id END AS id FROM bookings b JOIN helpers h ON h.id=b.helper_id
+      WHERE ($2='household' AND b.user_id=$1) OR ($2='helper' AND h.user_id=$1)
+      UNION SELECT CASE WHEN $2='household' THEN h.user_id ELSE j.user_id END FROM job_applications a JOIN jobs j ON j.id=a.job_id JOIN helpers h ON h.id=a.helper_id
+      WHERE a.status='accepted' AND (($2='household' AND j.user_id=$1) OR ($2='helper' AND h.user_id=$1))
+    ) contacts ON contacts.id=u.id WHERE u.id<>$1 AND u.is_active ORDER BY u.name`,[req.user.id,req.activeRole]);
 
     res.json(result.rows);
   } catch (error) {
@@ -50,7 +20,7 @@ exports.createComplaint = async (req, res) => {
   try {
     const { accused_id, subject, description } = req.body;
 
-    if (!accused_id || !subject?.trim() || !description?.trim()) {
+    if (!Number.isInteger(Number(accused_id)) || typeof subject!=='string' || typeof description!=='string' || !subject.trim() || subject.length>200 || !description.trim() || description.length>5000) {
       return res.status(400).json({ message: 'Accused user, subject, and details are required' });
     }
 
@@ -70,25 +40,26 @@ exports.createComplaint = async (req, res) => {
       SELECT 1
       FROM bookings b
       JOIN helpers h ON h.id = b.helper_id
-      WHERE (b.user_id = $1 AND h.user_id = $2)
-         OR (b.user_id = $2 AND h.user_id = $1)
+      WHERE ($3='household' AND b.user_id = $1 AND h.user_id = $2)
+         OR ($3='helper' AND b.user_id = $2 AND h.user_id = $1)
       UNION ALL
       SELECT 1
       FROM job_applications ja
       JOIN jobs j ON j.id = ja.job_id
       JOIN helpers h ON h.id = ja.helper_id
       WHERE ja.status = 'accepted'
-        AND ((j.user_id = $1 AND h.user_id = $2) OR (j.user_id = $2 AND h.user_id = $1))
+        AND (($3='household' AND j.user_id = $1 AND h.user_id = $2) OR ($3='helper' AND j.user_id = $2 AND h.user_id = $1))
       LIMIT 1
-    `, [req.user.id, accused_id]);
+    `, [req.user.id, accused_id,req.activeRole]);
     if (relationship.rows.length === 0) {
       return res.status(403).json({ message: 'Complaints can only be filed about someone you booked or worked with' });
     }
 
+    if(req.body.booking_id && !(await pool.query(`SELECT 1 FROM bookings b JOIN helpers h ON h.id=b.helper_id WHERE b.id=$1 AND (($4='household' AND b.user_id=$2 AND h.user_id=$3) OR ($4='helper' AND b.user_id=$3 AND h.user_id=$2))`,[req.body.booking_id,req.user.id,accused_id,req.activeRole])).rows.length)return res.status(403).json({message:'Related booking is unavailable'});
     const result = await pool.query(
-      `INSERT INTO complaints (complainant_id, accused_id, subject, description)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
-      [req.user.id, accused_id, subject.trim(), description.trim()]
+      `INSERT INTO complaints (complainant_id, accused_id, subject, description,audience,booking_id)
+       VALUES ($1, $2, $3, $4,$5,$6) RETURNING *`,
+      [req.user.id, accused_id, subject.trim(), description.trim(),req.activeRole,req.body.booking_id || null]
     );
 
     res.status(201).json(result.rows[0]);
@@ -106,9 +77,9 @@ exports.getMyComplaints = async (req, res) => {
       FROM complaints c
       JOIN users au ON c.accused_id = au.id
       LEFT JOIN helpers ah ON ah.user_id = au.id
-      WHERE c.complainant_id = $1
+      WHERE c.complainant_id = $1 AND c.audience=$2
       ORDER BY c.created_at DESC
-    `, [req.user.id]);
+    `, [req.user.id,req.activeRole]);
 
     res.json(result.rows);
   } catch (error) {

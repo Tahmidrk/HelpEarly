@@ -37,7 +37,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#0d9488"
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "extra": {
       "eas": {

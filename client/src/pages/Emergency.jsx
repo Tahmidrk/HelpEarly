@@ -32,8 +32,9 @@ export default function Emergency() {
     {actionError && <p className="alert alert-error" role="alert">{actionError}</p>}
     {loading ? <LoadingSpinner /> : items.length ? items.map(item => <article key={item.id} className="glass-card-static parity-card">
       <div className="parity-row"><h3>{item.category_name || 'Emergency service'}</h3><span className="badge badge-info">{item.effective_status}</span></div>
-      <p>{item.description}</p><p>{item.location}</p><p>{activeRole === 'helper' ? item.household_name : item.helper_name || 'Waiting for a worker'}</p>
-      {item.booking_id ? <Link className="btn btn-secondary btn-sm" to={activeRole === 'helper' ? '/helper/dashboard' : '/dashboard'}>Booking #{item.booking_id} · {item.booking_status}</Link> : <p className="text-secondary">Expires: {new Date(item.expires_at).toLocaleString()}</p>}
+      <p>{item.description}</p><p>Requested by: {item.household_name}</p><p>Location: {item.location}</p><p>Contact: {item.contact_phone}</p><p>{activeRole === 'helper' ? item.household_name : item.helper_name || 'Waiting for a worker'}</p>
+      {item.booking_id ? <Link className="btn btn-secondary btn-sm" to={activeRole === 'helper' ? '/helper/dashboard' : '/dashboard'}>Booking #{item.booking_id} · {item.booking_status}</Link> : null}
+      {activeRole==='helper' && item.effective_status==='pending' && <p>If you want to accept this emergency work, contact the client at the number above. <a className="btn btn-secondary btn-sm" href={'tel:'+item.contact_phone.replace(/[^+\d]/g,'')}>Call client</a></p>}
       {item.effective_status === 'pending' && <div className="parity-row parity-actions">{activeRole === 'helper' ? <>
         <button className="btn btn-success btn-sm" disabled={busy !== null} onClick={() => act(item, 'accept')}>Accept</button>
         <button className="btn btn-secondary btn-sm" disabled={busy !== null} onClick={() => act(item, 'decline')}>Decline</button>

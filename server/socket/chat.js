@@ -5,9 +5,12 @@ const { currentPasswordSession } = require('../utils/passwordSession');
 let io;
 async function authenticate(socket) {
   const decoded = jwt.verify(socket.handshake.auth?.token,process.env.JWT_SECRET);
-  const result = await pool.query('SELECT id,password_hash FROM users WHERE id=$1 AND is_active=true',[decoded.id]);
+  const result = await pool.query('SELECT id,role,password_hash FROM users WHERE id=$1 AND is_active=true',[decoded.id]);
   if (!result.rows.length || !currentPasswordSession(decoded,result.rows[0].password_hash)) throw new Error('Account unavailable');
-  socket.user = decoded;
+  const role=result.rows[0].role,requested=socket.handshake.auth?.activeRole;
+  if(requested && (role==='both' ? !['household','helper'].includes(requested) : requested!==role)) throw new Error('Invalid active role');
+  socket.user = {...decoded,role};
+  socket.activeRole=role==='both' ? (requested || 'household') : role;
 }
 function initializeChat(server) {
   const origins = (process.env.CLIENT_URL || 'http://localhost:5173,http://localhost:8081').split(',').map(s=>s.trim());
@@ -17,12 +20,13 @@ function initializeChat(server) {
   io.on('connection',socket=>{
     const userId = socket.user.id;
     socket.join(`user_${userId}`);
+    socket.join(`user_${userId}_${socket.activeRole}`);
     const expiry=setTimeout(()=>socket.disconnect(true),Math.max(0,socket.user.exp*1000-Date.now()));expiry.unref();
     socket.on('disconnect',()=>clearTimeout(expiry));
     socket.use((packet,next)=>authenticate(socket).then(()=>next()).catch(()=>{ next(new Error('Authentication required')); socket.disconnect(true); }));
     const conversation = async id => {
       if (!Number.isInteger(Number(id))) return null;
-      const result = await pool.query('SELECT * FROM conversations WHERE id=$1 AND (user1_id=$2 OR user2_id=$2)',[id,userId]);
+      const result = await pool.query('SELECT * FROM conversations WHERE id=$1 AND (user1_id=$2 AND user1_role=$3 OR user2_id=$2 AND user2_role=$3)',[id,userId,socket.activeRole]);
       return result.rows[0];
     };
     const handle = (event,fn) => socket.on(event,async(data,ack)=>{

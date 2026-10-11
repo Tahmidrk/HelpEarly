@@ -9,16 +9,17 @@ exports.triggerEmergencyAlert = async (req,res) => {
   try {
     const profile = (await pool.query('SELECT name,phone,location FROM users WHERE id=$1',[req.user.id])).rows[0];
     const location = typeof req.body.location==='string' ? req.body.location.trim() : profile.location;
-    const phone = typeof req.body.contact_phone==='string' ? req.body.contact_phone.trim() : profile.phone;
+    const phone = (typeof req.body.contact_phone==='string' && req.body.contact_phone.trim()) || profile.phone;
     if (!location || !phone) throw fail(400,'Location and contact phone are required');
+    if (!/^\+?[\d ()-]{7,25}$/.test(phone) || phone.replace(/\D/g,'').length<7) throw fail(400,'Enter a valid contact phone number');
     const category = (await pool.query('SELECT id,name FROM categories WHERE is_visible AND (id=$1 OR lower(name)=lower($2)) LIMIT 1',[req.body.category_id || null,req.body.category_name || null])).rows[0];
     if (!category) throw fail(400,'Select a valid emergency category');
     const description = typeof req.body.description==='string' && req.body.description.trim() ? req.body.description.trim() : 'Immediate assistance required';
     if (description.length>5000 || location.length>500 || phone.length>50) throw fail(400,'Emergency details are too long');
     const emergency = (await pool.query('INSERT INTO emergency_requests(household_id,category_id,description,location,contact_phone) VALUES($1,$2,$3,$4,$5) RETURNING *',[req.user.id,category.id,description,location,phone])).rows[0];
-    const helpers = await pool.query(`SELECT h.user_id FROM helpers h JOIN users u ON u.id=h.user_id JOIN emergency_requests e ON e.id=$1 WHERE u.is_active AND h.is_available AND h.user_id<>$2 AND ${eligibility}`,[emergency.id,req.user.id]);
+    const helpers = await pool.query(`SELECT h.user_id FROM helpers h JOIN users u ON u.id=h.user_id JOIN emergency_requests e ON e.id=$1 WHERE u.is_active AND u.role IN('helper','both') AND h.is_available AND h.user_id<>$2 AND ${eligibility}`,[emergency.id,req.user.id]);
     const alertDetails = {...emergency,household_name:profile.name,household_phone:phone,category_name:category.name};
-    for (const helper of helpers.rows) getIO()?.to(`user_${helper.user_id}`).emit('emergency_alert',alertDetails);
+    for (const helper of helpers.rows) getIO()?.to(`user_${helper.user_id}_helper`).emit('emergency_alert',{request_id:emergency.id});
     res.json({message:'Emergency request created',helpersNotified:helpers.rows.length,alertDetails});
   } catch (error) { publicError(res,error); }
 };

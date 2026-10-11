@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { AppState, Platform, Alert } from 'react-native';
+import { AppState, Platform } from 'react-native';
+import { Alert } from '../components/Feedback';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
@@ -22,7 +23,15 @@ export function NotificationProvider({ children, navigationRef }) {
   const seen=useRef(new Set());
   const [revision, setRevision] = useState(0);
   const [pushStatus, setPushStatus] = useState('Not enabled');
+  const [unreadCount,setUnreadCount]=useState(0);
+  useEffect(()=>{
+    let disposed=false;
+    setUnreadCount(0);
+    if(user)notificationsAPI.list().then(rows=>{if(!disposed)setUnreadCount(rows.filter(row=>!row.read_at).length);}).catch(()=>{});
+    return()=>{disposed=true;};
+  },[user?.id,activeRole,revision]);
 
+  useEffect(()=>{seen.current.clear();},[user?.id,activeRole]);
   const openNotification = useCallback(async (data) => {
     if (!user || !data?.notification_id) return;
     if(!navigationRef.isReady()) {await AsyncStorage.setItem('pendingNotification',JSON.stringify(data));return;}
@@ -59,9 +68,9 @@ export function NotificationProvider({ children, navigationRef }) {
       }
       await notificationsAPI.register({ device_id: deviceId, token, platform: Platform.OS });
       await AsyncStorage.setItem('pushEnabled', 'true');
-      setPushStatus('Device registered. Delivery still requires configured FCM credentials.');
+      setPushStatus('Device registered. System delivery must be checked on this phone.');
     } catch (err) { setPushStatus(err.message); if (askPermission) Alert.alert('Push setup', err.message); }
-  }, [user?.id]);
+  }, [user?.id,activeRole]);
 
   const disablePush = async () => {
     try {
@@ -86,11 +95,12 @@ export function NotificationProvider({ children, navigationRef }) {
     refresh();
     AsyncStorage.getItem('token').then(token => {
       if (disposed || !token) return;
-      socket = io(API_BASE.replace(/\/api\/?$/, ''), { auth: { token }, transports: ['websocket','polling'] });
+      socket = io(API_BASE.replace(/\/api\/?$/, ''), { auth: { token,activeRole }, transports: ['websocket','polling'] });
       socket.on('connect', refresh);
       socket.on('sync_hint', () => sync.check());
       socket.on('new_message', () => setRevision(value=>value+1));
       socket.on('notification', item => {
+        if(item.data?.audience && item.data.audience!==activeRole) return;
         const duplicate=seen.current.has(item.id);
         seen.current.add(item.id);
         if(seen.current.size>500) seen.current.delete(seen.current.values().next().value);
@@ -108,6 +118,7 @@ export function NotificationProvider({ children, navigationRef }) {
     const subscriptions = [];
     const refresh = async () => {
       if (await AsyncStorage.getItem('pushEnabled') === 'true') await registerPush();
+      else if(await AsyncStorage.getItem('pushPrompted')!=='true') {await AsyncStorage.setItem('pushPrompted','true');await registerPush(true);}
       setRevision(value => value + 1);
     };
     refresh();
@@ -115,6 +126,7 @@ export function NotificationProvider({ children, navigationRef }) {
     getNativeNotifications().then(async Notifications => {
       if (disposed) return;
       Notifications.setNotificationHandler({ handleNotification: async notification => {
+        if(notification.request.content.data?.audience && notification.request.content.data.audience!==activeRole)return {shouldShowBanner:false,shouldShowList:false,shouldPlaySound:false,shouldSetBadge:false};
         const id=notification.request.content.data?.notification_id,duplicate=seen.current.has(id);
         if(id) seen.current.add(id);
         return {shouldShowBanner:!duplicate,shouldShowList:!duplicate,shouldPlaySound:!duplicate,shouldSetBadge:false};
@@ -131,6 +143,6 @@ export function NotificationProvider({ children, navigationRef }) {
     return () => { disposed = true; subscriptions.forEach(subscription => subscription.remove()); };
   }, [user?.id, registerPush, openNotification]);
 
-  return <NotificationContext.Provider value={{ revision, pushStatus, navigationReady, enablePush: () => registerPush(true), disablePush }}>{children}</NotificationContext.Provider>;
+  return <NotificationContext.Provider value={{ revision, unreadCount, pushStatus, navigationReady, enablePush: () => registerPush(true), disablePush }}>{children}</NotificationContext.Provider>;
 }
 export const useNotifications = () => useContext(NotificationContext);

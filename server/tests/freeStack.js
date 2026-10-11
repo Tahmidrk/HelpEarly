@@ -108,6 +108,7 @@ async function main() {
   console.log((await run('tests/nextPhase.js',env)).trim()); pass('Next-phase two-way client workflows and isolated AI provider failures');
   console.log((await run('tests/adminFlows.js',env)).trim()); pass('Central web administration, audit, authorization and cross-platform integration');
   console.log((await run('tests/passwordSessions.js',env)).trim()); pass('Password rotation revokes HTTP and Socket.IO sessions without schema changes');
+  console.log((await run('tests/androidPhysicalFixes.js',env)).trim());pass('Android physical-test fixes: isolated role, privacy, chat, AI, location and notification regressions');
   const home=await request('/auth/login',null,'POST',{email:'home@fixture.test',password:'fixture-password'});
   const worker=await request('/auth/login',null,'POST',{email:'worker@fixture.test',password:'fixture-password'});
   const third=await request('/auth/register',null,'POST',{name:'Unrelated',email:'third@fixture.test',password:'fixture-password',role:'household',nid_number:'fixture-third'},201);
@@ -138,7 +139,7 @@ async function main() {
   assert.equal((await clientApi.helpersAPI.getOne(helper)).services[0].service_name,'Parity wiring');
   pass('Actual web and Android API modules share persisted profiles and worker services');
   const aiBefore=await clientApi.syncAPI.revisions();
-  await db.query("INSERT INTO ai_messages(user_id,role,content) VALUES($1,'user','Private cross-platform question'),($1,'model','Private cross-platform answer')",[home.user.id]);
+  await db.query("INSERT INTO ai_messages(user_id,role,content,audience) VALUES($1,'user','Private cross-platform question','household'),($1,'model','Private cross-platform answer','household')",[home.user.id]);
   await web.check();assert(changedWeb.includes('ai'));assert.notEqual((await clientApi.syncAPI.revisions()).ai,aiBefore.ai);
   global.__parityMobileSession={token:home.token,activeRole:'household'};
   assert((await androidApi.chatbotAPI.history()).some(row=>row.content==='Private cross-platform answer'));

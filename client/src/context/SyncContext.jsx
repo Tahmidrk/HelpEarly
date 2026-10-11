@@ -16,7 +16,7 @@ export function SyncProvider({ children }) {
         const next = { ...previous }; for (const key of changed) next[key] = (next[key] || 0) + 1; return next;
       });
     });
-    const socket = io(SOCKET_URL, { auth: { token: localStorage.getItem('token') }, withCredentials: true });
+    const socket = io(SOCKET_URL, { auth: { token: localStorage.getItem('token'),activeRole }, withCredentials: true });
     const refresh = () => sync.check(true);
     socket.on('connect', refresh); socket.on('sync_hint', () => sync.check());
     socket.on('notification', () => sync.check()); socket.on('new_message', () => sync.check());

@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
       }
     }
     await db.query('DELETE FROM helper_services WHERE helper_id=$1 AND NOT is_hidden AND NOT (id=ANY($2::int[]))', [id,keep]);
-    const user = await db.query('SELECT id,name,email,phone,role,location FROM users WHERE id=$1', [req.user.id]);
+    const user = await db.query('SELECT id,name,email,phone,role,location,latitude,longitude,location_confirmed FROM users WHERE id=$1', [req.user.id]);
     const result = await attachHelper(user.rows[0],db);
     await db.query('COMMIT');
     res.json(result);
