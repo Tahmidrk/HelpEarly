@@ -1,0 +1,37 @@
+{
+  "executed_at": "2026-10-11T07:31:47.870Z",
+  "buildId": "dcf6a4bd-1d56-447b-b131-6c8d6b471d3c",
+  "status": "FINISHED",
+  "profile": "preview",
+  "projectId": "af6f6973-68c9-4e56-af9f-1e8896877b9d",
+  "package": "com.atyourservice.app",
+  "sdk": "57.0.0",
+  "version": "1.0.0",
+  "versionCode": "1",
+  "createdAt": "2026-10-11T07:14:24.394Z",
+  "completedAt": "2026-10-11T07:25:34.750Z",
+  "apk": "H:/apps/HelpEarly-artifacts/HelpEarly-preview-FCM-20261011.apk",
+  "bytes": 82325365,
+  "sha256": "8019e0da86bb4902f7695acae4173e7e18be34f43c71c68dc2e6e0593efb4903",
+  "source": {
+    "baseCommit": "dc61d0681ee4555643b98fcf035372d3afc2565f",
+    "workingTree": "Documentation/evidence updates only; actual Firebase Android file provided through EAS secret environment variable",
+    "fingerprint": "442af21a32a55f2846aafa228c41e30e8837230a"
+  },
+  "signing": {
+    "v2": "PASS",
+    "certificateSHA256": "90cb140d12144596e8287484c2fec5d6d117e0048772350abbda3dcf9699ca33",
+    "matchesExistingEASKeystore": "PASS"
+  },
+  "firebaseNativeResources": "PASS: real Firebase app ID, sender ID and project compiled into APK",
+  "displayName": "At Your Service (preserved)",
+  "debuggable": false,
+  "artifactChecks": {
+    "zipCRC": "PASS",
+    "allEntriesKnownSecretScan": "PASS",
+    "actualRenderAPI": "PASS",
+    "hermesSHA256": "1375d20dc73515fd0b3634c38050be739059382e105ad0f82c7c0b5693057f5c"
+  },
+  "physicalAndroid": "NOT RUN",
+  "expoPushTicketsReceipts": "NOT RUN: no registered phone"
+}

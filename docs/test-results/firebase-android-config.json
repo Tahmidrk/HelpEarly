@@ -1,0 +1,54 @@
+{
+  "executed_at": "2026-10-11T07:32:56.086Z",
+  "firebase_project": "atyourservice-24d4c",
+  "android_package": "com.atyourservice.app",
+  "eas_project": "af6f6973-68c9-4e56-af9f-1e8896877b9d",
+  "local_file": "mobile/google-services.json",
+  "file_ignored": true,
+  "package_match": true,
+  "source_destination_backup_match": true,
+  "preflight": {
+    "previewAPK": true,
+    "verifiedAPI": true,
+    "easProject": true,
+    "firebaseAndroid": true
+  },
+  "eas_variable": {
+    "name": "GOOGLE_SERVICES_JSON",
+    "type": "file",
+    "visibility": "SECRET",
+    "scope": "PROJECT",
+    "environments": [
+      "preview",
+      "production"
+    ],
+    "metadata_verified": true
+  },
+  "fcm_service_account": "PASS: project matched, RSA signing verified, uploaded and assigned to com.atyourservice.app in existing EAS project",
+  "new_build": {
+    "id": "dcf6a4bd-1d56-447b-b131-6c8d6b471d3c",
+    "profile": "preview",
+    "status": "FINISHED",
+    "physical_delivery": "NOT RUN",
+    "artifact_checks": "PASS: same signature, real Firebase resources, integrity, Render API and all-entry known-secret exclusion"
+  },
+  "physical_delivery": "NOT RUN",
+  "production_push_enablement": {
+    "status": "PASS: approved flag saved true, same-code deployment LIVE",
+    "setting": "PUSH_ENABLED=true",
+    "service": "helpearly-api",
+    "deployId": "dep-db5jh2l9fdbs73d3sad0",
+    "commit": "9671e4862820df85bce27a1a91f53c278186e7b1",
+    "healthHTTP": 200,
+    "schema": 2,
+    "unauthenticatedNotificationsHTTP": 401,
+    "delivery": "NOT RUN: no registered phone"
+  },
+  "native_config_introspection": "PASS: correct package, Google services file, expo-notifications plugin and linked EAS project",
+  "preview_config_fixtures": "PASS",
+  "firebase_console_access": "VERIFIED: existing project service-account settings visible",
+  "fcm_http_v1": "VERIFIED: enabled in existing Firebase project",
+  "firebase_verified_at": "2026-10-11T07:07:22.021Z",
+  "fcm_real_provider_validation": "PASS: Google OAuth HTTP 200; FCM validate_only HTTP 200; no delivery",
+  "archive_secret_scan": "PASS: private FCM/backend/signing credentials absent from uploaded source archive"
+}

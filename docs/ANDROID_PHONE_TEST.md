@@ -1,10 +1,10 @@
 # HelpEarly preview installation and real Android test
 
-**Status: physical tests NOT RUN.** First preview APK has no verified native FCM configuration. Use it for functional testing now; use a rebuilt FCM-configured preview for push tests. Both use the existing backend and Supabase records. Preserve existing user records; use explicitly labeled test accounts and ordinary supervised actions.
+**Status: physical tests NOT RUN.** Use the latest FCM-configured preview below for functionality and push tests. Its native configuration and signing passed artifact checks; actual delivery still requires a phone. It uses the existing backend and Supabase records. Preserve existing user records; use explicitly labeled test accounts and ordinary supervised actions. The web-only admin requirement is planned: this preview still contains the existing mobile admin dashboard.
 
 ## Install
 
-1. Copy `H:/apps/HelpEarly-artifacts/HelpEarly-preview-20261011.apk` to the phone, or open the [existing EAS build](https://expo.dev/accounts/tahmid_041/projects/at-your-service/builds/1d3a2f1e-35fa-4ae6-a126-4924211fabc1) and select Install.
+1. Copy `H:/apps/HelpEarly-artifacts/HelpEarly-preview-FCM-20261011.apk` to the phone, or open the [FCM preview EAS build](https://expo.dev/accounts/tahmid_041/projects/at-your-service/builds/dcf6a4bd-1d56-447b-b131-6c8d6b471d3c) and select Install. SHA-256: `8019e0da86bb4902f7695acae4173e7e18be34f43c71c68dc2e6e0593efb4903`.
 2. Open the APK in Android Files and allow installation from that source when prompted. Turn that permission off afterward. Keep Play Protect enabled. Do not bypass a malware warning.
 3. Launch the app named **At Your Service**, its existing approved name. If Android reports a signature/install conflict, stop and record the error; do not uninstall an existing application automatically. App data must not be deleted to conceal a failure.
 4. Before presentation open https://helpearly-api.onrender.com/api/ready once. Render Free may need 50 seconds or more after sleep. Wait for readiness, then log in on phone and https://atyour-service.vercel.app/.
@@ -22,7 +22,7 @@
 9. Turn phone network off. Change a test booking/chat from web. Restore network and return app to foreground. Confirm missed updates recover without duplicate records. Repeat with app in background for 1–2 minutes and after ordinary close/reopen.
 10. Log out/in on both clients. Verify all saved jobs, bookings, chats, photos, complaints and AI history persist. Record any failed action/error verbatim; do not mark a row PASS merely because its API test passed.
 
-## FCM checklist after configured rebuild
+## FCM checklist for the configured preview
 
 1. Install the new preview signed with the same keystore. Profile → Notifications → Enable push; grant Android notification permission. Confirm authenticated device registration privately; never publish its push token.
 2. From another test account, create/update a booking or send a message. Test foreground, background and normal closed-app delivery; tap notification and verify the correct authenticated screen and current record.

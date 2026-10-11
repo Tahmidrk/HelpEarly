@@ -2,13 +2,21 @@
 
 ## Current result
 
-Signed **preview** APK is available at `H:/apps/HelpEarly-artifacts/HelpEarly-preview-20261011.apk` (82,322,593 bytes). This is a testing build, not the final branded release. It uses the existing HTTPS Render backend and preserves the approved Android screens, navigation, assets, app name and styling. **This first APK does not include Firebase Android configuration; native FCM delivery is not ready.** In-app notifications and foreground synchronization remain available.
+Latest signed **FCM-configured preview** APK is available at `H:/apps/HelpEarly-artifacts/HelpEarly-preview-FCM-20261011.apk` (82,325,365 bytes). This is a testing build, not the final branded release. It uses the existing HTTPS Render backend and preserves the approved Android screens, navigation, assets, app name and styling. The earlier APK at `HelpEarly-preview-20261011.apk` is retained for comparison but lacks Firebase Android configuration; use the new FCM APK for testing.
+
+Second functional preview build `dcf6a4bd-1d56-447b-b131-6c8d6b471d3c` succeeded with the actual Firebase Android file supplied through EAS. Official APK signature verification passed with the existing signing identity; compiled Firebase app/project/sender resources match the real local file. ZIP integrity, packaged Render URL, private backup hash and all-entry known-secret checks passed. The owner-supplied FCM V1 service-account key is stored outside Git, assigned to `com.atyourservice.app` in EAS, and passed real Google authentication plus FCM validation-only requests (both HTTP 200). No notification was delivered by that validation. Physical notification and Android/Web tests remain NOT RUN.
+
+Latest APK SHA-256: `8019e0da86bb4902f7695acae4173e7e18be34f43c71c68dc2e6e0593efb4903`. Build completed October 11 at 13:25 Dhaka. Source base `dc61d0681ee4555643b98fcf035372d3afc2565f` had documentation/evidence changes; Firebase file was injected through the EAS secret file variable. Fingerprint `442af21a32a55f2846aafa228c41e30e8837230a`. Evidence: [actual APK checks](test-results/android-fcm-preview-build.json), [EAS success](test-results/expo-fcm-preview-succeeded-20261011.png).
+
+New [web-only admin roadmap](WEB_ADMIN_ROADMAP.md) is planned before branding. This preview still contains the existing Android admin dashboard; its removal and expanded web administration have not been implemented or tested.
+
+Approved Render `PUSH_ENABLED=true` configuration-only deployment `dep-db5jh2l9fdbs73d3sad0` is LIVE on unchanged backend commit `9671e4862820df85bce27a1a91f53c278186e7b1`. The saved flag was verified through the dashboard; `/api/ready` returned HTTP 200/schema 2 and unauthenticated notification access returned 401. No FCM private key is stored in Render: the existing durable dispatcher uses Expo, whose FCM credential is held in EAS. No production records, schema or website deployment changed. Proof: [live deployment](test-results/render-push-deployed-20261011.png), [saved push flag](test-results/render-push-enabled-20261011.png).
 
 - Existing website: https://atyour-service.vercel.app/ (Vercel project `client`, unchanged during this phase).
 - Existing API: https://helpearly-api.onrender.com (Render Free service `helpearly-api`).
 - Existing database/private media: Supabase `at-your-service`, unchanged schema and existing records.
 - Expo: `@tahmid_041/at-your-service`, UUID `af6f6973-68c9-4e56-af9f-1e8896877b9d`; Free plan, no billing upgrade.
-- Firebase project created by owner: `AtYourService` / `atyourservice-24d4c`; Spark verified when accessed. Existing package `com.atyourservice.app` registered as `HelpEarly Android`. Latest console access fails, so configuration download and FCM key upload remain pending.
+- Firebase project created by owner: `AtYourService` / `atyourservice-24d4c`; Spark verified when accessed. Existing package `com.atyourservice.app` registered as `HelpEarly Android`. Owner-supplied `google-services.json` is installed locally, package-checked and uploaded as an EAS secret file variable for preview and production. Console access is restored, and Firebase Cloud Messaging API (V1) is verified enabled. FCM V1 service-account key is uploaded and assigned in EAS; it is absent from application source/build archive.
 
 ## Real AI
 
@@ -20,7 +28,7 @@ An initial live probe returned 503; the next probe passed. Its initial cause was
 
 Evidence: [live AI](test-results/ai-production-next.json), [direct provider](test-results/gemini-provider-next.json), [AI deployment proof](test-results/render-ai-deployed-20261011.jpg).
 
-## Native APK evidence
+## Earlier preview APK evidence
 
 Build `1d3a2f1e-35fa-4ae6-a126-4924211fabc1` succeeded in EAS on October 11, 03:38 Dhaka time. Profile `preview`, internal distribution, Expo SDK 57, Android package `com.atyourservice.app`, app version `1.0.0`, versionCode `1`. Native Gradle build, remote Expo doctor, credential preparation and artifact upload ran successfully.
 
@@ -50,7 +58,8 @@ Evidence: [build/signature/package checks](test-results/android-preview-build.js
 | Live shared Supabase AI | PASS through actual Web/Android API modules with simulated native session bindings |
 | Real Android/Website physical synchronization | NOT RUN; phone required |
 | Live emergency broadcast | NOT RUN on production: avoids alerting existing workers with fake emergencies; isolated lifecycle/concurrency tests PASS |
-| Real FCM tickets/receipts and phone presentation | NOT RUN; credentials and phone required |
+| Real FCM credential/API validation | PASS: Google OAuth 200 and FCM HTTP v1 200 with `validate_only`; no message delivered |
+| Real Expo push tickets/receipts and phone presentation | NOT RUN; installed/registered phone required |
 
 Details: [free stack](test-results/free-stack.json), [two-way tests](test-results/next-phase-protocol.json), [visual source baseline](test-results/android-parity.json). Protocol tests do not establish that phone UI renders or that Android delivers background notifications.
 
@@ -62,14 +71,16 @@ Keep these as release limitations, not a claim of complete commercial security. 
 
 ## Remaining FCM actions
 
+Android configuration update: local preflight passed all four checks; app configuration resolves `./google-services.json`; Git ignores the file. EAS lists `GOOGLE_SERVICES_JSON` as project-scoped, type file, visibility SECRET, environments preview and production. After FCM credentials became ready, exactly one additional preview build was submitted. No UI, dependency or business-logic changes were needed. Evidence: [Firebase configuration checks](test-results/firebase-android-config.json), [real FCM credential validation](test-results/fcm-credential-validation.json). Firebase's documented `validate_only` mode tests permission/request acceptance without delivering a message: [official REST reference](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages/send).
+
 1. Owner opens the existing `AtYourService` Firebase project. Confirm actual ID `atyourservice-24d4c` and Spark. No second project, Firestore, Firebase Auth, Storage, Functions or billing setup is needed.
-2. Project settings → General → Your apps → `com.atyourservice.app`: download `google-services.json` to ignored `H:/apps/HelpEarly/mobile/google-services.json`. Browser download did not complete here; no file was fabricated.
-3. Project settings → Cloud Messaging: confirm Firebase Cloud Messaging API (V1) is enabled. Legacy FCM is unnecessary.
-4. Project settings → Service accounts: owner generates/downloads a private key and saves it outside Git as `H:/apps/HelpEarly-test-tools/fcm-service-account.json`. Never paste it into chat or mobile source. This requires owner interaction for credential creation; do not rotate existing keys or expand unrelated services.
-5. Validate both files reference the same real Firebase project/package. Prefer a dedicated account restricted to Firebase Cloud Messaging API Admin for commercial operation; the broad Firebase Admin SDK account must be restricted/reviewed before commercial use.
-6. In `mobile`, upload `GOOGLE_SERVICES_JSON` as a **file** variable in EAS preview/production, then upload the real FCM V1 service account through `npx eas-cli credentials --platform android` → Google Service Account → Push Notifications (FCM V1). Never put private service keys in `EXPO_PUBLIC_*` variables or the app archive. Run `node scripts/checkPreview.cjs`.
-7. Generate a new preview APK with the Firebase Android file included, reusing the same signing key and API. First APK's missing native Firebase config cannot be fixed merely by changing server settings.
-8. Obtain approval for the production Render push configuration/redeploy when credentials are ready. Do not enable live delivery prematurely. Optional enhanced Expo push security needs a private backend token and a separate deliberate credential setup.
+2. DONE: owner supplied the downloaded Android file; it is placed at ignored `H:/apps/HelpEarly/mobile/google-services.json`, with matching source/destination hash and package `com.atyourservice.app`.
+3. DONE: Project settings → Cloud Messaging reports Firebase Cloud Messaging API (V1) enabled. Legacy FCM remains disabled and is unnecessary. Evidence: [FCM API status](test-results/firebase-fcm-v1-enabled-20261011.png).
+4. DONE: owner generated/downloaded the key; its verified exact copy is outside Git at `H:/apps/HelpEarly-test-tools/fcm-service-account.json`, with a matching private backup. No key contents were printed or committed.
+5. DONE: Firebase project matches both files; private RSA signing/verification passed. Prefer a dedicated account restricted to Firebase Cloud Messaging API Admin for commercial operation; the broad Firebase Admin SDK account must be restricted/reviewed before commercial use. Its existing FCM permission passed a real validation-only request without changing IAM grants.
+6. DONE: Android file uploaded to preview/production; FCM V1 key assigned to the same app identifier in EAS. Private FCM key, signing keys and backend secrets were excluded from the source archive. Local preflight passed; native device registration/delivery remains a separate test.
+7. DONE: one new preview build `dcf6a4bd-1d56-447b-b131-6c8d6b471d3c` succeeded, reusing the existing signing key and API. Real Firebase resources, release package, APK signature, integrity and known-secret exclusion passed. First APK's missing native Firebase config cannot be fixed merely by changing server settings.
+8. DONE: owner-approved `PUSH_ENABLED=true` is saved and deployed LIVE on the same backend commit. Read-only Supabase preflight found zero push devices and zero eligible queued deliveries; no database records changed. See [preflight](test-results/push-enable-preflight.json). Optional enhanced Expo push security remains a separate deliberate credential setup.
 9. Install/test on a physical phone. Confirm authenticated device registration, live push ticket/receipt, foreground/background handling and correct tap destination. Provider receipt `delivered` is not proof that a phone displayed the notification.
 
 See [official FCM setup](https://docs.expo.dev/push-notifications/fcm-credentials/) and [official Expo pricing](https://expo.dev/pricing). Use Free allowance only; stop if a paid plan/card is requested.

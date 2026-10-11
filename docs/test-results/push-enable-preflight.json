@@ -1,0 +1,9 @@
+{
+  "executed_at": "2026-10-11T07:15:24.811Z",
+  "mode": "production read-only aggregate; no records changed",
+  "devices": {
+    "total": 0,
+    "active": 0
+  },
+  "eligible_pending_deliveries": 0
+}

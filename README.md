@@ -2,9 +2,11 @@
 
 > **Connecting households with trusted local service workers in Bangladesh — quickly, safely, and transparently.**
 
-Current zero-budget implementation/deployment strategy and approval gates: [docs/FREE_STACK_STRATEGY.md](docs/FREE_STACK_STRATEGY.md). Existing Vercel project `client` now serves [atyour-service.vercel.app](https://atyour-service.vercel.app/) and retains [client-sigma-dun-96.vercel.app](https://client-sigma-dun-96.vercel.app/) as a secondary domain. Both use the live Render backend and existing Supabase database/private media. [Release verification and rollback](docs/VERCEL_DEPLOYMENT.md). Real Gemini responses/history and a signed Android preview APK are verified. Native FCM configuration and physical device delivery/synchronization remain pending; [actual evidence and remaining setup](docs/ANDROID_NEXT_PHASE.md), [phone installation/checklist](docs/ANDROID_PHONE_TEST.md).
+Current zero-budget implementation/deployment strategy and approval gates: [docs/FREE_STACK_STRATEGY.md](docs/FREE_STACK_STRATEGY.md). Existing Vercel project `client` now serves [atyour-service.vercel.app](https://atyour-service.vercel.app/) and retains [client-sigma-dun-96.vercel.app](https://client-sigma-dun-96.vercel.app/) as a secondary domain. Both use the live Render backend and existing Supabase database/private media. [Release verification and rollback](docs/VERCEL_DEPLOYMENT.md). Real Gemini responses/history and a signed Android preview APK are verified. Firebase Android configuration and FCM V1 credentials are secured in EAS; real FCM validation passed and the approved Render push flag is enabled. Physical device delivery/synchronization remain pending; [actual APK evidence and status](docs/ANDROID_NEXT_PHASE.md), [phone installation/checklist](docs/ANDROID_PHONE_TEST.md).
 
 Project roadmap: [operational completion, separate branding approvals, regression/device testing and signed APK/AAB release](docs/FREE_STACK_STRATEGY.md#project-roadmap-and-final-branding-approval-gates). Android visuals remain unchanged until the future branding phase is explicitly approved.
+
+New functional requirement: [centralized web-only administration](docs/WEB_ADMIN_ROADMAP.md) before branding. Planned, not yet implemented: the current Android preview still includes its existing admin dashboard. Ordinary Android household/worker/dual screens must remain unchanged during that implementation.
 
 Render deployment: [actual service/build/runtime report](docs/RENDER_DEPLOYMENT.md). Production database/security/media changes were [approved and completed after verified production backup and isolated restore](docs/SUPABASE_RELEASE_APPROVAL.md).
 
@@ -73,7 +75,7 @@ An academic software project (SDP II) — a web-based platform that enables hous
 | Authentication | JWT + bcrypt |
 | Authorization | Role-Based Access Control (RBAC) |
 | Styling | Vanilla CSS (Light + Dark Theme) |
-| Push Notifications | Expo/FCM integration implemented; real credentials and delivery pending |
+| Push Notifications | Expo/FCM credentials configured and API validation passed; physical delivery pending |
 | Maps *(planned)* | Google Maps API + Expo Location |
 | Media Storage | Private Supabase Storage behind the backend storage abstraction |
 
@@ -166,7 +168,7 @@ at-your-service/
 
 ## API Endpoints (Summary)
 
-Current live status: [Render/Supabase release report](docs/RENDER_DEPLOYMENT.md). Render Free, PostgreSQL preservation, private media and actual HTTP/WSS MVP checks passed. Existing Vercel still uses its unavailable Railway API until the approved redeployment completes; access to the Vercel account owning atyour-service.vercel.app is pending. Signed Android builds, physical-device testing, AI provider credentials and real push delivery remain pending. Earlier [production audit](docs/PRODUCTION_AUDIT.md), [deployment guide](docs/DEPLOYMENT.md) and [local completion report](docs/COMPLETION_REPORT.md) describe earlier states; use the current report for release status. [Physical Android checklist](docs/ANDROID_CHECKLIST.md).
+Current live status: [Render/Supabase release report](docs/RENDER_DEPLOYMENT.md), [Vercel deployment](docs/VERCEL_DEPLOYMENT.md) and [latest Android/AI/FCM checkpoint](docs/ANDROID_NEXT_PHASE.md). Existing Vercel uses the verified Render API and preserved Supabase records/private media. Real Gemini responses/history, HTTP/WSS workflows and a signed FCM-configured preview APK passed their documented checks. Physical-device rendering, delivery and paired synchronization remain pending. Earlier [production audit](docs/PRODUCTION_AUDIT.md), [deployment guide](docs/DEPLOYMENT.md) and [local completion report](docs/COMPLETION_REPORT.md) describe earlier states. Use the [current phone checklist](docs/ANDROID_PHONE_TEST.md).
 
 | Method | Endpoint | Description |
 |---|---|---|
