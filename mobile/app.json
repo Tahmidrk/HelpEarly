@@ -22,7 +22,12 @@
     },
     "plugins": [
       "expo-notifications",
-      ["expo-image-picker", {"microphonePermission": false}],
+      [
+        "expo-image-picker",
+        {
+          "microphonePermission": false
+        }
+      ],
       "expo-status-bar",
       "expo-font",
       [
@@ -33,6 +38,12 @@
           "backgroundColor": "#0d9488"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "af6f6973-68c9-4e56-af9f-1e8896877b9d"
+      }
+    },
+    "owner": "tahmid_041"
   }
 }

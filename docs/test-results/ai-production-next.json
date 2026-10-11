@@ -1,0 +1,15 @@
+{
+  "executedAt": "2026-10-10T21:22:04.516Z",
+  "backend": "https://helpearly-api.onrender.com/api",
+  "provider": "Real Gemini; approved free-tier key configured on existing Render service",
+  "physicalAndroid": "NOT RUN; actual API module with native session bindings simulated",
+  "Authentication and input validation": "PASS",
+  "Real AI response names existing database worker": "PASS",
+  "Web and Android share authenticated Supabase AI history": "PASS",
+  "Household and worker account history isolation": "PASS",
+  "History persistence after logout and login": "PASS",
+  "Read-only AI did not modify marketplace records": "PASS",
+  "providerErrorHandling": "PASS in isolated controller suite; real provider error/quota intentionally not induced",
+  "dualRoleHistory": "History belongs to authenticated account; both active modes share that account history",
+  "Fixture cleanup and existing record fingerprints preserved": "PASS"
+}

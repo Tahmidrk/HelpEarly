@@ -1,0 +1,42 @@
+{
+  "executedAt": "2026-10-11T06:37:00.563Z",
+  "buildId": "1d3a2f1e-35fa-4ae6-a126-4924211fabc1",
+  "status": "FINISHED",
+  "projectId": "af6f6973-68c9-4e56-af9f-1e8896877b9d",
+  "profile": "preview",
+  "package": "com.atyourservice.app",
+  "sdk": "57.0.0",
+  "version": "1.0.0",
+  "versionCode": "1",
+  "createdAt": "2026-10-10T21:25:17.823Z",
+  "completedAt": "2026-10-10T21:38:06.403Z",
+  "apk": "H:/apps/HelpEarly-artifacts/HelpEarly-preview-20261011.apk",
+  "bytes": 82322593,
+  "sha256": "82ed0ab5f2b45ef38b980646cf8c7b99b350fe12733aa57dcc3bef07b81dc504",
+  "source": {
+    "baseCommit": "32a7e2bf4ecb5403aeee0efc63de104e98317c9d",
+    "workingTree": "Included uncommitted EAS linkage/API config; recorded archive/fingerprint",
+    "fingerprint": "309ff1615cea10a3b0567a8bc669bd2aa7c582d8"
+  },
+  "signing": {
+    "status": "PASS",
+    "tool": "Official Android SDK Build Tools 37.0.0 apksigner verify",
+    "scheme": "v2",
+    "certificateSHA256": "90cb140d12144596e8287484c2fec5d6d117e0048772350abbda3dcf9699ca33",
+    "matchedEASKeystore": "PASS"
+  },
+  "firebase": "This build preceded Firebase Android config and does not support verified FCM",
+  "physicalAndroid": "NOT RUN",
+  "artifactChecks": {
+    "zipCRC": "PASS",
+    "package": "com.atyourservice.app",
+    "displayName": "At Your Service (preserved)",
+    "debuggable": false,
+    "minSDK": 24,
+    "targetSDK": 36,
+    "actualAPKRenderAPI": "PASS",
+    "knownBackendSecretsAbsentFromPackagedJS": "PASS",
+    "packagedHermesSHA256": "1375d20dc73515fd0b3634c38050be739059382e105ad0f82c7c0b5693057f5c"
+  },
+  "verifiedAt": "2026-10-11T06:41:03.021Z"
+}

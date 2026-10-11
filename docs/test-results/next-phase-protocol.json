@@ -1,0 +1,18 @@
+{
+  "executedAt": "2026-10-10T21:26:11.475Z",
+  "scope": "Disposable local PostgreSQL + real Web/Android API modules; native Platform/AsyncStorage bindings simulated",
+  "results": {
+    "Two-way profiles through actual Web and Android API modules": "PASS",
+    "Web job → Android proposal → Web acceptance → Android completion/review → Web state": "PASS",
+    "Android booking → Web lifecycle → Android state; Web review → Android": "PASS",
+    "Two-way saved chat through actual client modules": "PASS",
+    "Two-way complaint records": "PASS",
+    "Two-way emergency state in isolation; no alerts sent to real users": "PASS",
+    "Two-way durable notification read state; not real FCM delivery": "PASS",
+    "AI authenticated owner/role history isolation, real SQL persistence and sanitized provider failures with mocked provider": "PASS",
+    "Android protocol relogin retains records": "PASS"
+  },
+  "liveGemini": "NOT RUN: free-tier/production approval pending",
+  "realDevice": "NOT RUN",
+  "nativeFCM": "NOT RUN"
+}

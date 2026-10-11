@@ -1,7 +1,7 @@
 {
   "cli": { "appVersionSource": "remote" },
   "build": {
-    "preview": { "distribution": "internal", "environment": "preview", "android": { "buildType": "apk" }, "node": "22.14.0" },
-    "production": { "autoIncrement": true, "environment": "production", "android": { "buildType": "app-bundle" }, "node": "22.14.0" }
+    "preview": { "distribution": "internal", "environment": "preview", "android": { "buildType": "apk" }, "node": "22.14.0", "env": { "EXPO_PUBLIC_API_URL": "https://helpearly-api.onrender.com" } },
+    "production": { "autoIncrement": true, "environment": "production", "android": { "buildType": "app-bundle" }, "node": "22.14.0", "env": { "EXPO_PUBLIC_API_URL": "https://helpearly-api.onrender.com" } }
   }
 }

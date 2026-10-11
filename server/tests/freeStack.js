@@ -18,7 +18,10 @@ function run(file, env, args = []) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [file, ...args], { cwd: root, env, windowsHide: true, stdio: ['ignore','pipe','pipe'] });
     let output = ''; child.stdout.on('data', value => output += value); child.stderr.resume();
-    child.on('error', reject); child.on('close', code => code === 0 ? resolve(output) : reject(new Error(`${path.basename(file)} failed (${code})`)));
+    child.on('error', reject); child.on('close', code => {
+      if (code !== 0 && file === 'tests/nextPhase.js') console.error(output.trim());
+      code === 0 ? resolve(output) : reject(new Error(`${path.basename(file)} failed (${code})`));
+    });
   });
 }
 async function stopApi() { if (!api) return; const child=api; api=null; await new Promise(resolve => { child.once('exit',resolve); child.kill(); }); }
@@ -102,6 +105,7 @@ async function main() {
   const corsDenied=await fetch(base+'/health',{headers:{Origin:'https://untrusted.fixture.test'}});assert.equal(corsDenied.headers.get('access-control-allow-origin'),null);pass('HTTP CORS allowlist');
   console.log((await run('tests/mvpFlows.js',env)).trim()); pass('14 database-backed MVP groups');
   console.log((await run('tests/productionFlows.js',env)).trim()); pass('20 authorization/concurrency/outbox groups');
+  console.log((await run('tests/nextPhase.js',env)).trim()); pass('Next-phase two-way client workflows and isolated AI provider failures');
   const home=await request('/auth/login',null,'POST',{email:'home@fixture.test',password:'fixture-password'});
   const worker=await request('/auth/login',null,'POST',{email:'worker@fixture.test',password:'fixture-password'});
   const third=await request('/auth/register',null,'POST',{name:'Unrelated',email:'third@fixture.test',password:'fixture-password',role:'household',nid_number:'fixture-third'},201);

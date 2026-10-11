@@ -1,0 +1,7 @@
+{
+  "executedAt": "2026-10-10T21:16:27.898Z",
+  "model": "gemini-3.6-flash",
+  "httpStatus": 200,
+  "realAnswer": "HelpEarly provider connection verified.",
+  "freeTier": "Owner confirmed free tier/no billing before request; no billing changes performed"
+}

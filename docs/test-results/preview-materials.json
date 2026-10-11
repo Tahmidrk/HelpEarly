@@ -1,0 +1,13 @@
+{
+  "executedAt": "2026-10-10T21:25:32.604Z",
+  "archiveFileCount": 230,
+  "privateEnvironmentAndSigningFilesExcluded": "PASS",
+  "knownBackendSecretsAbsent": "PASS",
+  "androidHermesExport": {
+    "path": "H:\\apps\\HelpEarly-test-tools\\android-preview-next-export\\_expo\\static\\js\\android\\index-b18cafc124f476fa2a1c80bde15c2d7b.hbc",
+    "sha256": "c1967f50a23446212374ae38bba7224c266b217ddee31ebd054727a9659e184b",
+    "verifiedRenderAPI": "PASS",
+    "privateBackendSecretsAbsent": "PASS"
+  },
+  "apk": "Separate native build required; Hermes export is not an APK"
+}
