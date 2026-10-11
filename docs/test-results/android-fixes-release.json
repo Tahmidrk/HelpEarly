@@ -1,7 +1,7 @@
 {
-  "recorded_at": "2026-10-11T15:25:12.874Z",
+  "recorded_at": "2026-10-11T17:09:17.977Z",
   "baseline": "d0737dde2662a25ff5679975c3ae319a55e7374f",
-  "status": "LOCAL_CHECKS_PASS_PRODUCTION_APPROVAL_PENDING",
+  "status": "DEPLOYED_VERIFIED_SIGNED_PREVIEW_READY_PHONE_PENDING",
   "files": [
     {
       "path": "client/src/components/AIChatbot.jsx",
@@ -41,11 +41,11 @@
     },
     {
       "path": "docs/ANDROID_PHYSICAL_FIXES.md",
-      "sha256": "5135fcb62ad27ecf67e76c43a763423c8cfc02eda93c8b8724c690cabd02329b"
+      "sha256": "80e7bd6cc5b3b6120cb713989a69f0a994a3d3eca069ba06e6d65466d610a226"
     },
     {
       "path": "docs/test-results/admin-local.json",
-      "sha256": "c1a9fc75514d601f6a4649228214a01acfdce00d5c73411c4b96f4597c1355a3"
+      "sha256": "0f9a61cc1636dd298777465d04943cb4fb1b1b3718bc93160e7a0fe1fa09e39b"
     },
     {
       "path": "docs/test-results/android-fixes-web-components.json",
@@ -53,7 +53,7 @@
     },
     {
       "path": "docs/test-results/android-physical-fixes-backend.json",
-      "sha256": "8a81d3b016f0c8b2c1cea3bde5905104bb2a21c34cde8774442bf0b7300e8174"
+      "sha256": "af19fd3c2d07c41978ac3136371499c7df93d89c498eb8ef632eb7cd42df418f"
     },
     {
       "path": "docs/test-results/android-physical-fixes-ui.json",
@@ -65,19 +65,19 @@
     },
     {
       "path": "docs/test-results/android-role-backup-restore.json",
-      "sha256": "22a3056201e5075d12b1d35472c299aaf2213284893c5aef13cb21f8a1045b30"
+      "sha256": "e6cd6a1dad266844f56b8d739956f4d5098415de46d6750a595690a14b8d7c4f"
     },
     {
       "path": "docs/test-results/free-stack.json",
-      "sha256": "4cd4243a60ec29b9e2e3ec6ab785aca1257c0bf95835effc1fabc485d18391ad"
+      "sha256": "4c9d0de07a54b4952b944b3561fc6215ac4ce53459d11fd90fa6abdb7f1ef7e1"
     },
     {
       "path": "docs/test-results/next-phase-protocol.json",
-      "sha256": "ba779e9cfdb6a20994dfdd1cc5f9a68f36c424bf448ed85d55793669c172f4af"
+      "sha256": "3bb64fffca8b31be93fe7216aef971445c0be678021f840b0ab073d22e671570"
     },
     {
       "path": "docs/test-results/password-sessions.json",
-      "sha256": "2d6d2a0765d856fbb75268af800f700462433fa72777e552d05c9b1d8bb7c982"
+      "sha256": "dc5d1092de1f17d6188a569a03508c80fcd269cc1731f553ff4e83e774dd6078"
     },
     {
       "path": "mobile/App.js",
@@ -233,7 +233,7 @@
     },
     {
       "path": "server/db/startup.js",
-      "sha256": "7a52727439164ded700a6a3c09a35066118f3b2cf8af41220edee6894a26dad2"
+      "sha256": "ad7c15b1df71e6ecd022624b56d0d7006c14ab90b2ad6a1a220fb255945fac74"
     },
     {
       "path": "server/middleware/auth.js",
@@ -269,7 +269,7 @@
     },
     {
       "path": "server/tests/freeStack.js",
-      "sha256": "11e9bf5faacaa32f72babe6d6d6867f05c3b5710719b84cec1e7f41a896fde59"
+      "sha256": "c2c1751a387e3873378222cfd83df512b41a6a81b172f7b99558f57266e2e264"
     },
     {
       "path": "server/tests/webRoleComponents.js",
@@ -302,6 +302,38 @@
     {
       "path": "supabase/rollback/20261011143253_android_role_isolation.sql",
       "sha256": "74b2cad5b3a681cde4adedb71ce42ca37eba4a0e5cf3fa215cf7dd21a91e90a8"
+    },
+    {
+      "path": "server/app.js",
+      "sha256": "6e62d6878ef0192cdf598ae66b7e8f221beeb51b6fe7e0465aac249723c4bbbc"
+    },
+    {
+      "path": "docs/ANDROID_SCHEMA4_RELEASE.md",
+      "sha256": "0c4e76665d42615e3197b98bd65035b34a3755ce80ecba1c240206416ce3194d"
+    },
+    {
+      "path": "docs/test-results/android-production-migration.json",
+      "sha256": "8bc2e3da4b654a519e130a3c0e419a1b72ef03ac94df578af869320df5031189"
+    },
+    {
+      "path": "docs/test-results/android-fixes-live.json",
+      "sha256": "860424052d4dafd6278b7db7b6ca908290094c62cafeafee5b01521fa71f5d5e"
+    },
+    {
+      "path": "docs/test-results/android-fixes-preservation.json",
+      "sha256": "76ddf6f7372aa5f8574b04e52193ffd542710b303165cdd55736e519e5912f1a"
+    },
+    {
+      "path": "docs/test-results/android-fixes-render-live.png",
+      "sha256": "96e4129b38ada522e08076d4dd55132aa5589cde8d52204d71f8511d9b6edd3f"
+    },
+    {
+      "path": "docs/test-results/android-fixes-admin-restored.png",
+      "sha256": "b61cfa3e39fe4de8558cecdb1293edfa0c84e007738df3791a8f55ebc11d3d5b"
+    },
+    {
+      "path": "docs/test-results/android-physical-fixes-preview-build.json",
+      "sha256": "4610d5eb1fc419d596cd747f6421c46fc7768d6caf2ed288688145024b5d54a6"
     }
   ],
   "checks": {
@@ -315,7 +347,13 @@
     "expoDoctor": "PASS 21/21",
     "gitDiffCheck": "PASS",
     "sensitivePatternReview": "PASS; not a comprehensive security audit",
-    "productionBackupIsolatedRestoreMigrationRollback": "PASS; android-role-backup-restore.json"
+    "productionBackupIsolatedRestoreMigrationRollback": "PASS; android-role-backup-restore.json",
+    "productionMigration": "PASS",
+    "productionLiveHttpsWssGeminiMediaRoleIsolation": "PASS",
+    "postreleasePreservation": "PASS",
+    "webByteComparisonWithProductionViteSettings": "PASS",
+    "cleanEasArchive": "PASS: isolated committed snapshot; no private settings/signing/service-account key or unrelated files",
+    "signedApkArtifact": "PASS"
   },
   "androidExport": {
     "directory": "H:/apps/HelpEarly-artifacts/android-physical-fixes-export",
@@ -328,13 +366,38 @@
   },
   "webJavaScript": [
     {
-      "file": "index-BDXgEIeS.js",
-      "sha256": "a63898c105288630290126bacf7cce8a3614a1843c16a00d49d5246558a81388"
+      "file": "index-CxquVejz.js",
+      "sha256": "bae0ea1001f0fb64f1ccf4d6f5dbfddae7d63d552e22ef9e40149af6cc39e7cf"
     }
   ],
-  "backupDirectory": "H:\\apps\\HelpEarly-backups\\android-role-2026-10-11T15-22-42-744Z",
-  "newApk": "NOT BUILT; preserve free allowance until schema 4 and existing-service deployments approved/verified",
-  "productionChanges": "NONE",
+  "backupDirectory": "H:\\apps\\HelpEarly-backups\\android-role-2026-10-11T16-10-52-017Z",
+  "newApk": {
+    "buildId": "33b26760-f472-404d-be17-0be745ce7144",
+    "status": "FINISHED",
+    "apk": "H:/apps/HelpEarly-artifacts/HelpEarly-preview-physical-fixes-20261011.apk",
+    "bytes": 83785090,
+    "sha256": "dda2074d10edd8d14fed01c1dff7ef9e7059d59c270b4ec59b4397df90c07385",
+    "projectId": "af6f6973-68c9-4e56-af9f-1e8896877b9d",
+    "package": "com.atyourservice.app",
+    "sourceCommit": "7d7b3bb7cf9584bc3987e0add3e5e7a2e04abe77",
+    "signature": "PASS: existing signing certificate",
+    "nativeFirebase": "PASS",
+    "nativeFixes": {
+      "approvedFixStrings": "PASS: date picker, confirmed service area and role sections in actual APK bytecode",
+      "nativeDatePicker": "PASS: RNDatePicker native module in compiled DEX",
+      "nativeResizeAndPermissions": "PASS: adjustResize, notification and location permissions in actual manifest"
+    },
+    "privateCredentialScan": "PASS",
+    "physicalAndroid": "NOT RUN"
+  },
+  "productionChanges": {
+    "schema": 4,
+    "renderService": "helpearly-api",
+    "renderDeployment": "dep-db5rrctckfvc73b7v670",
+    "vercelProject": "client",
+    "vercelDeployment": "dpl_2HjaCaJcU8J1VABFEcqpiZhbC5Bk",
+    "existingRecordsMedia": "PASS: verified preserved"
+  },
   "physicalDevice": "NOT RUN; user will test APK manually",
   "audit": {
     "server": {
@@ -352,5 +415,11 @@
       "high": 16,
       "moderate": 8
     }
+  },
+  "sourceCommit": "7d7b3bb7cf9584bc3987e0add3e5e7a2e04abe77",
+  "sourceBackup": {
+    "path": "H:\\apps\\HelpEarly-backups\\android-role-2026-10-11T16-10-52-017Z/source-release.bundle",
+    "verified": "PASS",
+    "sha256": "c72475596623312b4469706cd8c87b23e0b250143ce61c42b9fc17c50f666b9a"
   }
 }

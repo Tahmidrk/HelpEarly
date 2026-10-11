@@ -1,0 +1,226 @@
+{
+  "executed_at": "2026-10-11T16:55:11.215Z",
+  "status": "PASS",
+  "scope": "Fresh pre-release backup restored into disposable local PostgreSQL; production reads only",
+  "schema": 4,
+  "originalRowsDeleted": 0,
+  "ordinaryOriginalBusinessFieldsChanged": 0,
+  "permittedChanges": [
+    {
+      "table": "conversations",
+      "id": "[6]",
+      "fields": [
+        "last_message_at"
+      ]
+    },
+    {
+      "table": "messages",
+      "id": "[30]",
+      "fields": [
+        "is_read"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[39]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[40]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[41]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[52]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[53]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[54]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[65]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[64]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[63]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[72]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[75]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "notifications",
+      "id": "[82]",
+      "fields": [
+        "data"
+      ]
+    },
+    {
+      "table": "users",
+      "id": "[53]",
+      "fields": [
+        "updated_at"
+      ]
+    },
+    {
+      "table": "users",
+      "id": "[54]",
+      "fields": [
+        "updated_at"
+      ]
+    }
+  ],
+  "fixtureAccountsRestoredInactive": true,
+  "fixtureWorkerUnavailable": true,
+  "liveAdminActivationDeactivationAudit": "PASS: four durable successful actions, authenticated actor 1, targets 53/54 only",
+  "rlsTables": 23,
+  "directConsumerGrants": 0,
+  "newTriggerConsumerExecuteDenied": true,
+  "legacyDualAiUnassignedPreserved": 4,
+  "existingMediaHashesPreserved": 5,
+  "tableCounts": {
+    "admin_audit_logs": {
+      "before": 41,
+      "after": 46
+    },
+    "ai_messages": {
+      "before": 16,
+      "after": 18
+    },
+    "bookings": {
+      "before": 16,
+      "after": 16
+    },
+    "categories": {
+      "before": 11,
+      "after": 11
+    },
+    "complaints": {
+      "before": 4,
+      "after": 4
+    },
+    "conversations": {
+      "before": 9,
+      "after": 9
+    },
+    "emergency_declines": {
+      "before": 0,
+      "after": 0
+    },
+    "emergency_requests": {
+      "before": 3,
+      "after": 3
+    },
+    "helpearly_schema": {
+      "before": 2,
+      "after": 3
+    },
+    "helper_categories": {
+      "before": 34,
+      "after": 34
+    },
+    "helper_services": {
+      "before": 43,
+      "after": 43
+    },
+    "helpers": {
+      "before": 25,
+      "after": 25
+    },
+    "job_applications": {
+      "before": 5,
+      "after": 5
+    },
+    "jobs": {
+      "before": 15,
+      "after": 15
+    },
+    "media_uploads": {
+      "before": 5,
+      "after": 5
+    },
+    "messages": {
+      "before": 38,
+      "after": 40
+    },
+    "notifications": {
+      "before": 73,
+      "after": 75
+    },
+    "payments": {
+      "before": 6,
+      "after": 6
+    },
+    "push_deliveries": {
+      "before": 2,
+      "after": 2
+    },
+    "push_devices": {
+      "before": 1,
+      "after": 1
+    },
+    "reviews": {
+      "before": 6,
+      "after": 6
+    },
+    "sync_revisions": {
+      "before": 69,
+      "after": 75
+    },
+    "users": {
+      "before": 37,
+      "after": 37
+    }
+  },
+  "baseline": "H:\\apps\\HelpEarly-backups\\android-role-2026-10-11T16-10-52-017Z",
+  "physicalAndroid": "NOT RUN"
+}

@@ -1,0 +1,18 @@
+{
+  "executed_at": "2026-10-11T16:51:09.045Z",
+  "status": "PASS",
+  "scope": "Existing labeled release accounts 53/54 only; no ordinary account or real emergency changed",
+  "results": {
+    "ready": "PASS: real schema 4 readiness",
+    "authorization": "PASS: authenticated WSS, wrong role handshake/REST/optional auth denied, non-admin denied",
+    "persistenceMedia": "PASS: shared booking IDs persist after fresh login; live signed private Storage photos resolve",
+    "contacts": "PASS: real relationship contacts; no private email/phone/address fields",
+    "chatSync": "PASS: two-way persisted labeled chat, authenticated live event, disconnect/reconnect and durable missed-update revision",
+    "validation": "PASS: impossible date and invalid coordinates rejected without writes",
+    "gemini": "PASS: real provider answer, authenticated durable history, worker isolation",
+    "webDeployment": "PASS: both production domains match rebuilt reviewed source using exact Vercel production VITE settings; Render URL and CORS verified"
+  },
+  "physicalAndroid": "NOT RUN; manual phone test pending",
+  "probeCorrection": "Initial local build used different VITE settings; rebuilt with private production settings and exact byte comparison passed. No application code changed.",
+  "completed_at": "2026-10-11T16:53:08.789Z"
+}
