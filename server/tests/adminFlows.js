@@ -22,7 +22,7 @@ async function main(){
   const resources=['workers','categories','services','bookings','jobs','proposals','emergencies','reviews','complaints','audit'];
   for(const role of [home,worker])for(const resource of resources)await req('/admin/monitor/'+resource,role.token,'GET',undefined,403);
   for(const route of ['/admin/users/'+home.user.id,'/admin/helpers/'+helper,'/admin/categories/1','/admin/services/1','/admin/jobs/1','/admin/reviews/1','/admin/complaints/1'])await req(route,home.token,'PUT',{is_hidden:true},403);
-  const forged=jwt.sign({id:home.user.id,role:'admin'},process.env.JWT_SECRET);await req('/admin/stats',forged,'GET',undefined,403);
+  const forged=jwt.sign({...jwt.decode(home.token),role:'admin'},process.env.JWT_SECRET);await req('/admin/stats',forged,'GET',undefined,403);
   await req('/auth/register',null,'POST',{name:'Escalate',email:'escalate@fixture.test',password:'fixture-password',nid_number:'test',role:'admin'},400);
   await req('/auth/profile',home.token,'PUT',{role:'admin',name:'Fixture Home'});assert.equal((await pool.query('SELECT role FROM users WHERE id=$1',[home.user.id])).rows[0].role,'household');
   pass('Every admin resource/mutation rejects non-admins; DB role overrides forged JWT; registration/profile cannot promote');

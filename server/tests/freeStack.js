@@ -107,6 +107,7 @@ async function main() {
   console.log((await run('tests/productionFlows.js',env)).trim()); pass('20 authorization/concurrency/outbox groups');
   console.log((await run('tests/nextPhase.js',env)).trim()); pass('Next-phase two-way client workflows and isolated AI provider failures');
   console.log((await run('tests/adminFlows.js',env)).trim()); pass('Central web administration, audit, authorization and cross-platform integration');
+  console.log((await run('tests/passwordSessions.js',env)).trim()); pass('Password rotation revokes HTTP and Socket.IO sessions without schema changes');
   const home=await request('/auth/login',null,'POST',{email:'home@fixture.test',password:'fixture-password'});
   const worker=await request('/auth/login',null,'POST',{email:'worker@fixture.test',password:'fixture-password'});
   const third=await request('/auth/register',null,'POST',{name:'Unrelated',email:'third@fixture.test',password:'fixture-password',role:'household',nid_number:'fixture-third'},201);

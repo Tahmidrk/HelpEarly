@@ -1,11 +1,12 @@
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
+const { currentPasswordSession } = require('../utils/passwordSession');
 let io;
 async function authenticate(socket) {
   const decoded = jwt.verify(socket.handshake.auth?.token,process.env.JWT_SECRET);
-  const result = await pool.query('SELECT id FROM users WHERE id=$1 AND is_active=true',[decoded.id]);
-  if (!result.rows.length) throw new Error('Account unavailable');
+  const result = await pool.query('SELECT id,password_hash FROM users WHERE id=$1 AND is_active=true',[decoded.id]);
+  if (!result.rows.length || !currentPasswordSession(decoded,result.rows[0].password_hash)) throw new Error('Account unavailable');
   socket.user = decoded;
 }
 function initializeChat(server) {

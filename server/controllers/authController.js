@@ -2,6 +2,7 @@ const { attachHelper } = require('../db/profile');
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { passwordVersion } = require('../utils/passwordSession');
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -73,7 +74,7 @@ exports.register = async (req, res) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email, role: user.role, pv: passwordVersion(password_hash) },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -122,7 +123,7 @@ exports.login = async (req, res) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email, role: user.role, pv: passwordVersion(user.password_hash) },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -208,8 +209,9 @@ exports.changePassword = async (req, res) => {
       return res.status(400).json({ message: 'Current password and new password are required' });
     }
 
-    if (typeof new_password!=='string' || new_password.length < 6 || Buffer.byteLength(new_password)>72) {
-      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    const minimum = req.user.role === 'admin' ? 12 : 6;
+    if (typeof current_password!=='string' || typeof new_password!=='string' || new_password.length < minimum || Buffer.byteLength(new_password)>72) {
+      return res.status(400).json({ message: `New password must be at least ${minimum} characters and at most 72 bytes` });
     }
 
     const result = await pool.query(
@@ -229,10 +231,12 @@ exports.changePassword = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(new_password, salt);
 
-    await pool.query(
-      'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
-      [password_hash, req.user.id]
+    const updated = await pool.query(
+      'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND password_hash = $3 RETURNING id',
+      [password_hash, req.user.id, result.rows[0].password_hash]
     );
+    if (!updated.rows.length) return res.status(409).json({ message: 'Password changed concurrently; sign in again' });
+    require('../socket/chat').getIO()?.in(`user_${req.user.id}`).disconnectSockets(true);
 
     res.json({ message: 'Password updated successfully' });
   } catch (error) {

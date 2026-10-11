@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
+const { currentPasswordSession } = require('../utils/passwordSession');
 
 // Verify JWT token middleware
 const auth = async (req, res, next) => {
@@ -11,14 +12,16 @@ const auth = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const activeUser = await pool.query(
-      'SELECT id, email, role FROM users WHERE id = $1 AND is_active = true',
+      'SELECT id, email, role, password_hash FROM users WHERE id = $1 AND is_active = true',
       [decoded.id]
     );
     if (activeUser.rows.length === 0) {
       return res.status(403).json({ message: 'Account is unavailable' });
     }
 
-    req.user = { ...decoded, ...activeUser.rows[0] };
+    const { password_hash, ...user } = activeUser.rows[0];
+    if (!currentPasswordSession(decoded, password_hash)) return res.status(401).json({ message: 'Session expired; sign in again' });
+    req.user = { ...decoded, ...user };
     const mode = req.header('X-Active-Role');
     req.activeRole = req.user.role === 'both' && ['helper', 'household'].includes(mode) ? mode : req.user.role;
     next();
@@ -38,14 +41,16 @@ const optionalAuth = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const activeUser = await pool.query(
-      'SELECT id, email, role FROM users WHERE id = $1 AND is_active = true',
+      'SELECT id, email, role, password_hash FROM users WHERE id = $1 AND is_active = true',
       [decoded.id]
     );
     if (activeUser.rows.length === 0) {
       return next();
     }
 
-    req.user = { ...decoded, ...activeUser.rows[0] };
+    const { password_hash, ...user } = activeUser.rows[0];
+    if (!currentPasswordSession(decoded, password_hash)) return res.status(401).json({ message: 'Session expired; sign in again' });
+    req.user = { ...decoded, ...user };
     const mode = req.header('X-Active-Role');
     req.activeRole = req.user.role === 'both' && ['helper', 'household'].includes(mode) ? mode : req.user.role;
     next();
