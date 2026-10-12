@@ -40,8 +40,9 @@ exports.getEmergencyRequests = async (req,res) => {
 };
 
 exports.acceptEmergencyAlert = async (req,res) => {
-  const db = await pool.connect();
+  let db;
   try {
+    db = await pool.connect();
     await db.query('BEGIN');
     const helper = (await db.query('SELECT * FROM helpers WHERE user_id=$1 AND is_available=true FOR UPDATE',[req.user.id])).rows[0];
     if (!helper) throw fail(403,'An available worker profile is required');
@@ -56,21 +57,22 @@ exports.acceptEmergencyAlert = async (req,res) => {
     await db.query('COMMIT');
     getIO()?.to(`user_${emergency.household_id}`).emit('emergency_accepted',{request_id:emergency.id,booking});
     res.json({message:'Emergency request accepted',booking});
-  } catch (error) { await db.query('ROLLBACK'); publicError(res,error); }
-  finally { db.release(); }
+  } catch (error) { publicError(res,error); }
+  finally { if (db) { try { await db.query('ROLLBACK'); db.release(); } catch(error) { db.release(error); } } }
 };
 
 exports.declineEmergency = async (req,res) => {
-  const db = await pool.connect();
+  let db;
   try {
+    db = await pool.connect();
     await db.query('BEGIN');
     const result = await db.query(`SELECT h.id AS helper_id FROM emergency_requests e JOIN helpers h ON h.user_id=$2 WHERE e.id=$1 AND e.household_id<>$2 AND e.status='pending' AND e.expires_at>CURRENT_TIMESTAMP AND h.is_available AND ${eligibility} FOR UPDATE OF e`,[req.params.id,req.user.id]);
     if (!result.rows.length) throw fail(409,'Emergency request is no longer available');
     await db.query('INSERT INTO emergency_declines(request_id,helper_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[req.params.id,result.rows[0].helper_id]);
     await db.query('COMMIT');
     res.json({message:'Emergency declined'});
-  } catch (error) { await db.query('ROLLBACK'); publicError(res,error); }
-  finally { db.release(); }
+  } catch (error) { publicError(res,error); }
+  finally { if (db) { try { await db.query('ROLLBACK'); db.release(); } catch(error) { db.release(error); } } }
 };
 
 exports.cancelEmergency = async (req,res) => {

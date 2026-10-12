@@ -25,15 +25,20 @@ export default function ChatScreen({ route, navigation }) {
   const isWorker = activeRole === 'helper';
   const { helperName, helperId, helperUserId, helperProfileId, conversationId } = route.params || {};
 
-  const generation=useRef(0),mounted=useRef(true);
+  const generation=useRef(0),mounted=useRef(true),listRequest=useRef(0),messageRequest=useRef(0);
+  const scope=useRef('');
+  const currentScope=`${user?.id}:${activeRole}`;
+  if(scope.current!==currentScope){scope.current=currentScope;generation.current++;listRequest.current++;messageRequest.current++;}
   useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;generation.current++;};},[]);
   const [contacts,setContacts]=useState([]);
-  const closeChat=()=>{generation.current++;setActiveChat(null);setInput('');navigation.setParams({helperName:null,helperId:null,helperUserId:null,helperProfileId:null,conversationId:null});};
+  const closeChat=()=>{generation.current++;messageRequest.current++;setOpening(false);setActiveChat(null);setInput('');setChatError('');navigation.setParams({helperName:null,helperId:null,helperUserId:null,helperProfileId:null,conversationId:null});};
   const [helpers, setHelpers] = useState([]);
   const [loadingHelpers, setLoadingHelpers] = useState(true);
   const [activeChat, setActiveChat] = useState(null);
+  const [opening,setOpening]=useState(false);
   const [messagesMap, setMessagesMap] = useState({});
   const [input, setInput] = useState('');
+  const messageList=useRef(null),nearBottom=useRef(true);
   const [sending,setSending]=useState(false),sendLock=useRef(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [chatError, setChatError] = useState('');
@@ -41,17 +46,20 @@ export default function ChatScreen({ route, navigation }) {
     let disposed=false;
     const refresh=async()=>{
       try {
+        const requestedScope=scope.current,list=++listRequest.current;
         const rows=await messagesAPI.conversations();
-        if(!disposed) setHelpers(rows.map(c=>({...c,name:c.other_name,user_id:c.other_id,helper_profile_id:c.other_helper_profile_id,primary_category:['helper','both'].includes(c.other_role)?'Service Worker':'Household Client'})));
-        if(activeChat) {
+        if(disposed || requestedScope!==scope.current)return;
+        if(list===listRequest.current) setHelpers(rows.map(c=>({...c,name:c.other_name,user_id:c.other_id,helper_profile_id:c.other_helper_profile_id,primary_category:['helper','both'].includes(c.other_role)?'Service Worker':'Household Client'})));
+        if(activeChat && !sendLock.current) {
+          const request=generation.current,message=++messageRequest.current;
           const messages=await messagesAPI.messages(activeChat.id);
-          if(!disposed) setMessagesMap(prev=>({...prev,[activeChat.id]:messages.map(formatMessage)}));
+          if(!disposed && request===generation.current && message===messageRequest.current) setMessagesMap(prev=>({...prev,[activeChat.id]:messages.map(formatMessage)}));
         }
         if(!disposed) setChatError('');
       } catch(error) { if(!disposed) setChatError(error.message); }
     };
-    refresh(); const timer=setInterval(refresh,5000);
-    return ()=>{disposed=true;clearInterval(timer);};
+    refresh();
+    return ()=>{disposed=true;};
   },[activeChat?.id,user?.id,activeRole,revision]));
 
   const formatMessage = (message) => ({
@@ -64,18 +72,33 @@ export default function ChatScreen({ route, navigation }) {
 
   const openChat = async (chat) => {
     const request=++generation.current;
+    const message=++messageRequest.current;
     try {
+      setChatError('');setInput('');setOpening(false);
+      nearBottom.current=true;
       setActiveChat(chat);
       const rows = await messagesAPI.messages(chat.id);
-      if(mounted.current && request===generation.current) setMessagesMap((prev) => ({ ...prev, [chat.id]: rows.map(formatMessage) }));
+      if(mounted.current && request===generation.current && message===messageRequest.current) setMessagesMap((prev) => ({ ...prev, [chat.id]: rows.map(formatMessage) }));
     } catch (error) {
       if(mounted.current && request===generation.current){setChatError(error.message);setActiveChat(null);}
     }
   };
 
+  const startConversation = async (targetUserId) => {
+    const request=++generation.current;
+    setOpening(true);setChatError('');
+    try {
+      const conversation=await messagesAPI.getOrCreate(targetUserId);
+      if(!mounted.current || request!==generation.current)return;
+      await openChat({...conversation,name:conversation.other_name,user_id:conversation.other_id,helper_profile_id:conversation.other_helper_profile_id});
+      fetchConversations();
+    } catch(error) {if(mounted.current && request===generation.current)setChatError(error.message);}
+    finally {if(mounted.current && request===generation.current)setOpening(false);}
+  };
+
   useFocusEffect(React.useCallback(() => {
     const onBackPress = () => {
-      if (activeChat) {
+      if (activeChat || opening) {
         closeChat();
         return true;
       }
@@ -84,16 +107,18 @@ export default function ChatScreen({ route, navigation }) {
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
     return () => backHandler.remove();
-  }, [activeChat,navigation]));
+  }, [activeChat,opening,navigation]));
 
   useEffect(() => {
     fetchConversations();
   }, [isWorker]);
 
   const fetchConversations = async () => {
+    const requestedScope=scope.current,request=++listRequest.current;
     try {
       setLoadingHelpers(true);
       const rows = await messagesAPI.conversations();
+      if(!mounted.current || requestedScope!==scope.current || request!==listRequest.current)return;
       setHelpers(rows.map((conversation) => ({
         ...conversation,
         name: conversation.other_name,
@@ -101,10 +126,11 @@ export default function ChatScreen({ route, navigation }) {
         helper_profile_id: conversation.other_helper_profile_id,
         primary_category: conversation.other_role === 'helper' || conversation.other_role === 'both' ? 'Service Worker' : 'Household Client',
       })));
+      setChatError('');
     } catch (e) {
-      setChatError(e.message);
+      if(mounted.current && requestedScope===scope.current && request===listRequest.current)setChatError(e.message);
     } finally {
-      setLoadingHelpers(false);
+      if(mounted.current && requestedScope===scope.current)setLoadingHelpers(false);
     }
   };
 
@@ -113,6 +139,7 @@ export default function ChatScreen({ route, navigation }) {
     if(!conversationId && !profile && !targetUser) return;
     navigation.setParams({helperName:null,helperId:null,helperUserId:null,helperProfileId:null,conversationId:null});
     const request=++generation.current;
+    setOpening(true);setChatError('');
     (async()=>{
       try {
         let conversation;
@@ -127,7 +154,7 @@ export default function ChatScreen({ route, navigation }) {
         if(!mounted.current || request!==generation.current)return;
         await openChat({...conversation,name:conversation.other_name,user_id:conversation.other_id,helper_profile_id:conversation.other_helper_profile_id});
         await fetchConversations();
-      }catch(error){if(mounted.current && request===generation.current)setChatError(error.message);}
+      }catch(error){if(mounted.current && request===generation.current){setChatError(error.message);setOpening(false);}}
     })();
   }, [conversationId,helperId,helperUserId,helperProfileId,activeRole]);
   useFocusEffect(React.useCallback(()=>{
@@ -139,16 +166,17 @@ export default function ChatScreen({ route, navigation }) {
   const handleSendMessage = async () => {
     if (!input.trim() || !activeChat || sendLock.current) return;
     sendLock.current=true;setSending(true);
-    const userText = input;
-    setInput('');
+    const userText = input,request=generation.current;
+    messageRequest.current++;
     try {
       const result = await messagesAPI.send(activeChat.user_id || activeChat.other_id, userText.trim());
+      if(!mounted.current || request!==generation.current)return;
       setMessagesMap((prev) => (prev[activeChat.id] || []).some(message=>message.id===result.message.id) ? prev : ({ ...prev, [activeChat.id]: [...(prev[activeChat.id] || []), formatMessage(result.message)] }));
+      setInput(previous=>previous===userText?'':previous);
       fetchConversations();
     } catch (error) {
-      setInput(userText);
-      Alert.alert('Message Not Sent', error.message);
-    } finally {sendLock.current=false;setSending(false);}
+      if(mounted.current && request===generation.current)Alert.alert('Message Not Sent', error.message);
+    } finally {sendLock.current=false;if(mounted.current)setSending(false);}
   };
 
   const activeConversations = helpers.filter((h) => {
@@ -164,7 +192,7 @@ export default function ChatScreen({ route, navigation }) {
   // ACTIVE CHAT VIEW
   if (activeChat) {
     const activeMsgs = messagesMap[activeChat.id] || [];
-    const activeCat = activeChat.primary_category || activeChat.category || activeChat.services?.[0]?.category_name || 'Service Worker';
+    const activeCat = isWorker ? 'Household Client' : activeChat.primary_category || activeChat.category || activeChat.services?.[0]?.category_name || 'Service Worker';
 
     return (
       <View style={styles.container}>
@@ -172,6 +200,7 @@ export default function ChatScreen({ route, navigation }) {
         {/* Top Header */}
         <View style={styles.chatHeader}>
           <TouchableOpacity
+            accessibilityLabel="Back to inbox"
             onPress={closeChat}
             style={styles.backBtn}
           >
@@ -203,10 +232,15 @@ export default function ChatScreen({ route, navigation }) {
 <KeyboardViewport style={{flex:1}}>
           {/* Messages List */}
           <FlatList
+            ref={messageList}
             data={activeMsgs}
             keyExtractor={(item) => String(item.id)}
             contentContainerStyle={{ padding: 16 }}
             showsVerticalScrollIndicator={false}
+            onScroll={({nativeEvent:{layoutMeasurement,contentOffset,contentSize}})=>{nearBottom.current=contentSize.height-layoutMeasurement.height-contentOffset.y<80;}}
+            scrollEventThrottle={16}
+            onContentSizeChange={()=>{if(nearBottom.current)messageList.current?.scrollToEnd({animated:false});}}
+            onLayout={()=>{if(nearBottom.current)messageList.current?.scrollToEnd({animated:false});}}
             renderItem={({ item }) => (
               <View style={[styles.bubble, item.sender === 'user' ? styles.userBubble : styles.partnerBubble]}>
                 <View style={styles.bubbleInnerRow}>
@@ -277,7 +311,7 @@ export default function ChatScreen({ route, navigation }) {
           <Text style={styles.emptyTitle}>No Active Messages</Text>
           <Text style={styles.emptySub}>
             {isWorker
-              ? 'When clients message you regarding bookings or job offers, your conversations will appear here.'
+              ? 'No eligible contacts found. Households become available through your bookings or job interactions.'
               : 'Click "Chat" on any helper in the Available Helpers list to start messaging.'}
           </Text>
         </View>
@@ -295,7 +329,8 @@ export default function ChatScreen({ route, navigation }) {
               <TouchableOpacity
                 style={styles.chatRow}
                 activeOpacity={0.7}
-                onPress={async()=>{if(!item.isContact)return openChat(item);try{const c=await messagesAPI.getOrCreate(item.user_id);await openChat({...c,name:c.other_name,user_id:c.other_id});fetchConversations();}catch(error){setChatError(error.message);}}}
+                disabled={opening}
+                onPress={()=>item.isContact?startConversation(item.user_id):openChat(item)}
               >
                 <View style={styles.listAvatar}>
                   <Text style={styles.listAvatarText}>{item.name?.charAt(0) || 'H'}</Text>
@@ -305,13 +340,13 @@ export default function ChatScreen({ route, navigation }) {
                 <View style={{ flex: 1 }}>
                   <View style={styles.rowTop}>
                     <Text style={styles.partnerName}>{item.name}</Text>
-                    <Text style={styles.msgTime}>{lastMsg?.time || 'Now'}</Text>
+                    <Text style={styles.msgTime}>{lastMsg?.time || (item.last_message_at ? new Date(item.last_message_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '')}</Text>
                   </View>
 
                   <View style={styles.rowBottom}>
                     <Text style={styles.catBadge}>{primaryCat}</Text>
                     <Text style={styles.lastMsgText} numberOfLines={1}>
-                      {lastMsg?.text || 'Tap to continue conversation'}
+                      {lastMsg?.text || item.last_message || (item.isContact?'Tap to start conversation':'Tap to continue conversation')}
                     </Text>
                   </View>
                 </View>
@@ -320,6 +355,7 @@ export default function ChatScreen({ route, navigation }) {
           }}
         />
       )}
+      {opening && <View style={{padding:12,alignItems:'center'}}><ActivityIndicator color="#0d9488"/><TouchableOpacity accessibilityLabel="Cancel opening conversation" onPress={closeChat} style={{padding:12}}><Text style={{color:'#0d9488'}}>Cancel opening conversation</Text></TouchableOpacity></View>}
     </View>
   );
 }

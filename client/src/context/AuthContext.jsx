@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../utils/api';
+import { authAPI, cancelRequests } from '../utils/api';
 
 const AuthContext = createContext(null);
 
@@ -7,12 +7,13 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [activeRole, setActiveRole] = useState(() => localStorage.getItem('activeRole') || null);
   const [loading, setLoading] = useState(true);
+  const [restoreError, setRestoreError] = useState('');
 
   useEffect(() => {
-    let timer,disposed=false;
+    let disposed=false;
     const token = localStorage.getItem('token');
     if (token) {
-      const restore=()=>authAPI.getMe()
+      const restore=()=>authAPI.getMe({timeoutMs:60000})
         .then((data) => {
           if(disposed || localStorage.getItem('token')!==token) return;
           setUser(data);
@@ -28,18 +29,21 @@ export function AuthProvider({ children }) {
           if (error.status===401 || error.status===403) {
             localStorage.removeItem('token');
             localStorage.removeItem('activeRole');
-          } else if(!disposed && localStorage.getItem('token')===token) timer=setTimeout(restore,5000);
+          } else if (error.name !== 'AbortError') {
+            setRestoreError('Session could not be loaded. Check your connection and sign in to retry.');
+          }
         })
-        .finally(() => setLoading(false));
+        .finally(() => { if (!disposed) setLoading(false); });
       restore();
     } else {
       setLoading(false);
     }
-    return ()=>{disposed=true;clearTimeout(timer);};
+    return ()=>{disposed=true;};
   }, []);
 
   const login = async (email, password) => {
     const data = await authAPI.login({ email, password });
+    cancelRequests();
     localStorage.setItem('token', data.token);
     setUser(data.user);
     const initialRole = data.user.role === 'admin' ? 'admin' : (data.user.role === 'helper' ? 'helper' : 'household');
@@ -50,6 +54,7 @@ export function AuthProvider({ children }) {
 
   const register = async (formData) => {
     const data = await authAPI.register(formData);
+    cancelRequests();
     localStorage.setItem('token', data.token);
     setUser(data.user);
     const initialRole = data.user.role === 'admin' ? 'admin' : (data.user.role === 'helper' ? 'helper' : 'household');
@@ -59,6 +64,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    cancelRequests();
     localStorage.removeItem('token');
     localStorage.removeItem('activeRole');
     setUser(null);
@@ -67,6 +73,8 @@ export function AuthProvider({ children }) {
 
   const switchMode = (newMode) => {
     if(user?.role!=='both' || !['household','helper'].includes(newMode)) return;
+    if (newMode === activeRole) return;
+    cancelRequests();
     setActiveRole(newMode);
     localStorage.setItem('activeRole', newMode);
   };
@@ -87,7 +95,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, activeRole, loading, login, register, logout, switchMode, updateUser, refreshUser }}>
+    <AuthContext.Provider value={{ user, activeRole, loading, restoreError, login, register, logout, switchMode, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

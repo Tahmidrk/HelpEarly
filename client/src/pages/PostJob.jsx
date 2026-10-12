@@ -13,6 +13,7 @@ export default function PostJob() {
   const fileInputRef = useRef(null);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const submitting = useRef(false);
   const [photos, setPhotos] = useState([]);       // File objects
   const [previews, setPreviews] = useState([]);
   const previewsRef = useRef([]);
@@ -54,6 +55,8 @@ export default function PostJob() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setLoading(true);
     try {
       // Build FormData so we can attach photos
@@ -63,8 +66,8 @@ export default function PostJob() {
 
       await jobsAPI.create(fd);
       navigate('/dashboard');
-    } catch (err) { alert(err.message); }
-    finally { setLoading(false); }
+    } catch (err) { if (err.name !== 'AbortError') alert(err.message); }
+    finally { submitting.current = false; setLoading(false); }
   };
 
   return (

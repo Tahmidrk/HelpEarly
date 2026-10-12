@@ -21,7 +21,7 @@ export default function NotificationsScreen({ navigation }) {
     catch (err) { if(current===scope.current && id===request.current)setError(err.message); }
     finally { if(current===scope.current && id===request.current)setLoading(false); }
   }, [user?.id,activeRole]);
-  useFocusEffect(useCallback(() => { load(); const timer = setInterval(load, 10000); return () => clearInterval(timer); }, [load, revision]));
+  useFocusEffect(useCallback(() => { load(); return () => { request.current++; }; }, [load, revision]));
   const open = async item => {
     if(openLock.current)return;
     openLock.current=true;setOpening(item.id);
@@ -41,7 +41,7 @@ export default function NotificationsScreen({ navigation }) {
     {loading ? <ActivityIndicator color="#0d9488" /> : <FlatList data={items} keyExtractor={item => String(item.id)} onRefresh={load} refreshing={loading}
       ListEmptyComponent={<Text>No notifications yet.</Text>}
       renderItem={({ item }) => {const emergency=activeRole==='helper' && item.type==='emergency_new' ? emergencies.find(row=>Number(row.id)===Number(item.data?.request_id) && ['pending','accepted'].includes(row.effective_status)):null;return <TouchableOpacity onPress={() => open(item)} disabled={opening!==null} accessibilityState={{busy:opening===item.id}} style={{ backgroundColor: '#fff', padding: 16, borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: item.read_at ? '#e2e8f0' : '#0d9488' }}>
-        <Text style={{ color: '#0f172a', fontWeight: '800' }}>{item.title}</Text>
+        <Text style={{ color: '#0f172a', fontWeight: '800' }}>{emergency ? `Emergency help needed for ${emergency.category_name || 'the requested service'}.` : item.title}</Text>
         {!item.read_at?<Text style={{color:'#0f766e',fontWeight:'700',marginTop:6}}>Unread</Text>:null}
         {opening===item.id?<ActivityIndicator color="#0d9488"/>:null}
         {emergency?<><Text style={{color:'#334155',marginTop:8}}>Requested by: {emergency.household_name}</Text><Text style={{color:'#334155',marginTop:4}}>Location: {emergency.location}</Text><Text style={{color:'#334155',marginTop:4}}>Contact: {emergency.contact_phone}</Text><Text style={{color:'#334155',marginTop:8}}>If you want to accept this emergency work, contact the client at the number above.</Text><TouchableOpacity accessibilityLabel="Call emergency client" style={{paddingVertical:14}} onPress={()=>Linking.openURL('tel:'+emergency.contact_phone.replace(/[^+\d]/g,'')).catch(()=>Alert.alert('Dialer unavailable','Open your phone app and use the contact shown.'))}><Text style={{color:'#0d9488',fontWeight:'800'}}>Call client</Text></TouchableOpacity></>:null}

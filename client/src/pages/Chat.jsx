@@ -44,7 +44,7 @@ export default function Chat() {
       messagesAPI.getConversations().then(rows=>{if(!disposed)setConversations(rows);}).catch(err => {if(!disposed)setError(err.message);});
     });
 
-    return () => {disposed=true;s.disconnect();};
+    return () => {disposed=true;intent.current++;s.disconnect();};
   }, [user?.id,activeRole]);
 
   useEffect(()=>{setActiveConv(null);setConversations([]);setMessages([]);setNewMessage('');setSending(false);setError('');setLoading(true);},[user?.id,activeRole]);
@@ -74,7 +74,7 @@ export default function Chat() {
         if (socket) socket.emit('join_conversation', conv.id);
         // Refresh conversations
         messagesAPI.getConversations().then(rows=>{if(requestedScope===scope.current)setConversations(rows);}).catch(err => {if(requestedScope===scope.current)setError(err.message);});
-      }).catch(err => {if(requestedScope===scope.current)setError(err.message);});
+      }).catch(err => {if(request===intent.current && requestedScope===scope.current)setError(err.message);});
     }
   }, [targetUserId, loading]);
 
@@ -89,6 +89,9 @@ export default function Chat() {
   };
 
   const selectConversation = (conv) => {
+    intent.current++;
+    setMessages([]);
+    setNewMessage('');
     setActiveConv(conv);
     loadMessages(conv.id);
     if (socket) socket.emit('join_conversation', conv.id);

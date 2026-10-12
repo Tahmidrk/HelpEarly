@@ -1,5 +1,5 @@
 import {FormTextInput as TextInput} from '../components/FormLayout';
-import React,{useState,useCallback} from 'react';
+import React,{useState,useCallback,useRef} from 'react';
 import {View,Text,FlatList,ActivityIndicator,TouchableOpacity,} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {Ionicons} from '@expo/vector-icons';
@@ -11,8 +11,9 @@ import {Alert} from '../components/Feedback';
 export default function ComplaintsScreen({historyOnly=false}){
  const [items,setItems]=useState([]),[error,setError]=useState(''),[loading,setLoading]=useState(true),[open,setOpen]=useState(false),[contacts,setContacts]=useState([]),[accused,setAccused]=useState(null),[subject,setSubject]=useState(''),[description,setDescription]=useState(''),[busy,setBusy]=useState(false);
  const {revision}=useNotifications('complaints'),{activeRole}=useAuth();
- const load=useCallback(async()=>{try{setItems(await complaintsAPI.getMine());setError('');}catch(err){setError(err.message);}finally{setLoading(false);}},[activeRole]);
- useFocusEffect(useCallback(()=>{let disposed=false;load();return()=>{disposed=true;};},[load,revision]));
+ const request=useRef(0);
+ const load=useCallback(async()=>{const id=++request.current;try{const rows=await complaintsAPI.getMine();if(id===request.current){setItems(rows);setError('');}}catch(err){if(id===request.current && err.name!=='AbortError')setError(err.message);}finally{if(id===request.current)setLoading(false);}},[activeRole]);
+ useFocusEffect(useCallback(()=>{load();return()=>{request.current++;};},[load,revision]));
  const start=async()=>{try{setContacts(await complaintsAPI.contacts());setOpen(true);}catch(e){setError(e.message);}};
  const submit=async()=>{if(busy)return;setBusy(true);try{await complaintsAPI.create({accused_id:accused,subject:subject.trim(),description:description.trim()});setOpen(false);setSubject('');setDescription('');setAccused(null);await load();Alert.alert('Complaint Filed','Submitted for administrator review.');}catch(e){Alert.alert('Complaint Not Saved',e.message);}finally{setBusy(false);}};
  const input={borderWidth:1,borderColor:'#cbd5e1',backgroundColor:'#fff',borderRadius:12,padding:12,color:'#0f172a',marginVertical:8,minHeight:48};

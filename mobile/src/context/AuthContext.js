@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authAPI, bookingsAPI, helpersAPI, bookingDate, notificationsAPI, setApiSession } from '../api/client';
 import { Alert } from '../components/Feedback';
+import { formatBookings } from '../utils/bookings';
 
 const AuthContext = createContext(null);
 
@@ -9,9 +10,11 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [activeRole, setActiveRole] = useState('household');
   const [loading, setLoading] = useState(true);
+  const [restoreError, setRestoreError] = useState('');
   const scope = useRef('');
   scope.current = `${user?.id || ''}:${activeRole}`;
   const bookingRequest = useRef(0);
+  const bookingSnapshot = useRef(null);
   const epoch = useRef(0), credentials = useRef(null);
   const installSession = async (data) => {
     const requested=epoch.current;
@@ -44,7 +47,7 @@ export function AuthProvider({ children }) {
       const token = await AsyncStorage.getItem('token');
       if (token) {
         credentials.current = token;
-        const me = await authAPI.getMe();
+        const me = await authAPI.getMe({timeoutMs:60000});
         if (me.role === 'admin') throw Object.assign(new Error('Administration is available on the website only'),{status:403});
         const savedRole = await AsyncStorage.getItem('activeRole');
         const role = me.role === 'both' && ['household','helper'].includes(savedRole) ? savedRole : (me.role === 'admin' ? 'admin' : me.role === 'helper' ? 'helper' : 'household');
@@ -55,6 +58,7 @@ export function AuthProvider({ children }) {
         setUser(me);
       }
     } catch (e) {
+      if (requested === epoch.current && ![401,403].includes(e.status) && e.name !== 'AbortError') setRestoreError('Session could not be loaded. Check your connection and sign in to retry.');
       if (requested===epoch.current && (e.status === 401 || e.status === 403)) {
         credentials.current=null;setApiSession(null,'household');await AsyncStorage.removeItem('token');
       }
@@ -65,6 +69,7 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (email, password) => {
+    setRestoreError('');
     const requested = ++epoch.current;
     const data = await authAPI.login({ email, password });
     if (requested !== epoch.current) throw new Error('Sign-in cancelled');
@@ -109,10 +114,12 @@ export function AuthProvider({ children }) {
   },[]);
 
   const logout = async () => {
+    setRestoreError('');
     const token=credentials.current, role=activeRole, account=user?.id;
     epoch.current++;
     const requested=epoch.current;
     bookingRequest.current++;
+    bookingSnapshot.current=null;
     credentials.current=null; scope.current='';
     setApiSession(null,'household');
     setUser(null); setUserBookings([]); setBookingsError(''); setActiveRole('household');
@@ -131,6 +138,7 @@ export function AuthProvider({ children }) {
     if(mode===activeRole)return;
     epoch.current++;
     bookingRequest.current++;
+    bookingSnapshot.current=null;
     try {
       scope.current=`${user.id}:${mode}`;
       setApiSession(credentials.current,mode);
@@ -145,22 +153,21 @@ export function AuthProvider({ children }) {
   const [bookingsError, setBookingsError] = useState('');
   const fetchUserBookings = useCallback(async () => {
     const requestedScope=scope.current, request=++bookingRequest.current;
-    if(!credentials.current)return;
+    // Worker Dashboard owns its raw booking list; household formatting is unused there.
+    if(!credentials.current || !requestedScope.endsWith(':household'))return;
     try {
       const rows = await bookingsAPI.getMyBookings();
       if(requestedScope!==scope.current || request!==bookingRequest.current)return;
-      setUserBookings(rows.map(b => ({
-        ...b, rawId:b.id, id:`B-${b.id}`, service:b.service_description || b.service_name || 'Custom service',
-        category:b.category_name || '', status:b.status.charAt(0).toUpperCase()+b.status.slice(1),
-        date:b.booking_date ? new Date(b.booking_date).toLocaleDateString('en-CA') : '',
-        time:b.booking_date ? new Date(b.booking_date).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '',
-        amount:b.total_price, location:b.address,
-        photoUri:b.photo_urls?.[0] || null,
-      })));
+      const snapshot=JSON.stringify(rows);
+      if(snapshot!==bookingSnapshot.current) {
+        bookingSnapshot.current=snapshot;
+        setUserBookings(formatBookings(rows));
+      }
       setBookingsError('');
     } catch (error) { if(requestedScope===scope.current && request===bookingRequest.current)setBookingsError(error.message); }
   },[]);
   useEffect(() => {
+    bookingSnapshot.current=null;
     setUserBookings([]);
     if (user) fetchUserBookings();
   }, [user?.id, activeRole]);
@@ -182,6 +189,7 @@ export function AuthProvider({ children }) {
         user,
         activeRole,
         loading,
+        restoreError,
         userBookings,
         bookingsError,
         saveWorkerSettings,

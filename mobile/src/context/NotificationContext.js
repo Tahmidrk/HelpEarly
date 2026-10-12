@@ -106,13 +106,13 @@ export function NotificationProvider({ children, navigationRef }) {
       if (changed.includes('bookings')) fetchUserBookings();
       if (changed.includes('profile') || changed.includes('helpers')) refreshUser();
     });
-    const refresh = () => sync.check();
+    const refresh = () => { if(socket && !socket.connected && !socket.active) socket.connect(); sync.check(); };
     const timer = setInterval(() => { if (AppState.currentState === 'active') refresh(); }, 30000);
     const foreground = AppState.addEventListener('change', state => { if (state === 'active') sync.check(true); });
     refresh();
     AsyncStorage.getItem('token').then(token => {
       if (disposed || !token) return;
-      socket = io(API_BASE.replace(/\/api\/?$/, ''), { auth: { token,activeRole }, transports: ['websocket','polling'] });
+      socket = io(API_BASE.replace(/\/api\/?$/, ''), { auth: { token,activeRole }, transports: ['websocket','polling'], reconnectionAttempts:5, reconnectionDelayMax:10000, timeout:10000 });
       socket.on('connect', refresh);
       socket.on('sync_hint', () => sync.check());
       socket.on('new_message', () => sync.check());

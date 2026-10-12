@@ -3,7 +3,8 @@ import { FormScrollView as ScrollView } from '../components/FormLayout';
 import { FormModal as Modal } from '../components/FormLayout';
 import { Alert } from '../components/Feedback';
 import useMarketplaceCategories from '../utils/useMarketplaceCategories';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -25,6 +26,7 @@ export default function HomeScreen({ navigation }) {
   const [helpers, setHelpers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError,setLoadError]=useState('');
+  const helpersRequest=useRef(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -38,11 +40,11 @@ export default function HomeScreen({ navigation }) {
   // Map Modal State
   const [mapModal, setMapModal] = useState(false);
   const [mapCoordinates,setMapCoordinates]=useState(null);
-  const [mapLocation, setMapLocation] = useState('Dhaka, Bangladesh');
+  const [mapLocation, setMapLocation] = useState('');
 
   const openMap = (loc,coordinates) => {
     setMapCoordinates(coordinates || null);
-    setMapLocation(loc || 'Dhaka, Bangladesh');
+    setMapLocation(loc || '');
     setMapModal(true);
   };
 
@@ -50,20 +52,23 @@ export default function HomeScreen({ navigation }) {
   const categoryIcons = {Cleaning:'broom',Plumbing:'pipe',Electrical:'flash',Gardening:'flower',Babysitting:'baby-carriage',Moving:'truck-delivery',Cooking:'silverware-fork-knife'};
   const categories = [{name:'All',icon:'apps'}, ...categoryNames.map(name=>({name,icon:categoryIcons[name]||'apps'}))];
 
-  useEffect(() => {
+  useFocusEffect(React.useCallback(() => {
     fetchTopHelpers();
-  }, [revision]);
+    return () => {helpersRequest.current++;};
+  }, [revision]));
 
   const fetchTopHelpers = async () => {
+    const requested=++helpersRequest.current;
     try {
       const data = await helpersAPI.getAll({ limit: 50 });
       const list = Array.isArray(data) ? data : (data?.helpers || []);
-      setHelpers(list);
+      if(requested!==helpersRequest.current)return;
+      setHelpers(previous=>JSON.stringify(previous)===JSON.stringify(list)?previous:list);
       setLoadError('');
     } catch (e) {
-      if(e.name!=='AbortError')setLoadError(e.message);
+      if(requested===helpersRequest.current && e.name!=='AbortError')setLoadError(e.message);
     } finally {
-      setLoading(false);
+      if(requested===helpersRequest.current)setLoading(false);
     }
   };
 
@@ -276,7 +281,7 @@ export default function HomeScreen({ navigation }) {
                       style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 }}
                     >
                       <Ionicons name="location-outline" size={13} color="#0d9488" />
-                      <Text style={styles.helperLocationText}>{h.location || 'Dhaka'}</Text>
+                      <Text style={styles.helperLocationText}>{h.location || 'Location not provided'}</Text>
                     </TouchableOpacity>
 
                     {/* 4. Review star */}

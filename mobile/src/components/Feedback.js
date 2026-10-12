@@ -6,12 +6,14 @@ import { FormModal } from './FormLayout';
 
 let display;
 export const Alert={alert:(title,message,buttons,options)=>display?.({title,message,buttons,options,key:Date.now()})};
+const needsAction=item=>item?.buttons?.length>1 || item?.buttons?.some(button=>typeof button.onPress==='function');
+export const feedbackKind=title=>/fail|error|unavailable|not sent|not saved|could not|unable|rejected/i.test(title||'')?'error':/required|missing|permission|validation|invalid/i.test(title||'')?'warning':/success|saved|complete|sent|accepted|published|filed|selected/i.test(title||'')?'success':'information';
 export function FeedbackProvider({children}) {
   const [item,setItem]=useState(null),insets=useSafeAreaInsets();
-  useEffect(()=>{display=setItem;return()=>{display=null;};},[]);
-  const confirm=item?.buttons?.length>1;
+  useEffect(()=>{display=next=>setItem(current=>needsAction(current)?current:next);return()=>{display=null;};},[]);
+  const confirm=needsAction(item);
   useEffect(()=>{if(!item||confirm)return;const timer=setTimeout(()=>setItem(null),6000);return()=>clearTimeout(timer);},[item,confirm]);
-  const kind=/fail|error|unavailable|not sent|could not/i.test(item?.title||'')?'error':/required|missing|permission|validation/i.test(item?.title||'')?'warning':/success|saved|complete|sent|accepted|published/i.test(item?.title||'')?'success':'information';
+  const kind=feedbackKind(item?.title);
   const color={error:'#b91c1c',warning:'#92400e',success:'#0f766e',information:'#0d9488'}[kind];
   const close=()=>{setItem(null);item?.options?.onDismiss?.();};
   const content=item&&<View style={[styles.card,{borderColor:color}]} accessibilityLiveRegion="polite" accessibilityRole="alert">

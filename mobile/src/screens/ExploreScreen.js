@@ -3,7 +3,8 @@ import { FormScrollView as ScrollView } from '../components/FormLayout';
 import { FormModal as Modal } from '../components/FormLayout';
 import { Alert } from '../components/Feedback';
 import useMarketplaceCategories from '../utils/useMarketplaceCategories';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -23,7 +24,7 @@ import DateInput from '../components/DateInput';
 import { useNotifications } from '../context/NotificationContext';
 
 export default function ExploreScreen({ route, navigation }) {
-  const { revision } = useNotifications('helpers,bookings');
+  const { revision } = useNotifications('helpers');
   const { user, activeRole, userBookings, fetchUserBookings, cancelBooking, updateBookingSchedule } = useAuth();
   const { selectedCategory: paramCat, highlightHelperId: paramHighlightId, openSubTab } = route.params || {};
 
@@ -149,16 +150,17 @@ export default function ExploreScreen({ route, navigation }) {
   const [helpers, setHelpers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError,setLoadError]=useState('');
+  const helpersRequest=useRef(0);
   const [selectedCategory, setSelectedCategory] = useState(paramCat || 'All');
   const [highlightId, setHighlightId] = useState(paramHighlightId || null);
   const [search, setSearch] = useState('');
   const [mapModal, setMapModal] = useState(false);
   const [mapCoordinates,setMapCoordinates]=useState(null);
-  const [mapLocation, setMapLocation] = useState('Dhaka, Bangladesh');
+  const [mapLocation, setMapLocation] = useState('');
 
   const openMapForLocation = (loc,coordinates) => {
     setMapCoordinates(coordinates || null);
-    setMapLocation(loc || 'Dhaka, Bangladesh');
+    setMapLocation(loc || '');
     setMapModal(true);
   };
 
@@ -182,20 +184,23 @@ export default function ExploreScreen({ route, navigation }) {
   }, [route.params]);
 
 
-  useEffect(() => {
+  useFocusEffect(React.useCallback(() => {
     loadHelpers();
-  }, [revision]);
+    return () => {helpersRequest.current++;};
+  }, [revision]));
 
   const loadHelpers = async () => {
+    const requested=++helpersRequest.current;
     try {
       const data = await helpersAPI.getAll({ limit: 50 });
       const list = Array.isArray(data) ? data : (data?.helpers || []);
-      setHelpers(list);
+      if(requested!==helpersRequest.current)return;
+      setHelpers(previous=>JSON.stringify(previous)===JSON.stringify(list)?previous:list);
       setLoadError('');
     } catch (e) {
-      if(e.name!=='AbortError')setLoadError(e.message);
+      if(requested===helpersRequest.current && e.name!=='AbortError')setLoadError(e.message);
     } finally {
-      setLoading(false);
+      if(requested===helpersRequest.current)setLoading(false);
     }
   };
 
@@ -293,7 +298,7 @@ export default function ExploreScreen({ route, navigation }) {
                       const matchedHelper = helpers.find(h => String(h.id) === String(item.helper_id)) || {
                         id: item.helper_id,
                         name: item.helper_name,
-                        location: item.location || 'Dhaka',
+                        location: item.location || '',
                         primary_category: item.category || 'Service Worker',
                       };
                       navigation.navigate('HelperDetail', {
@@ -381,7 +386,7 @@ export default function ExploreScreen({ route, navigation }) {
                           const matchedHelper = helpers.find(h => String(h.id) === String(item.helper_id)) || {
                             id: item.helper_id,
                             name: item.helper_name,
-                            location: item.location || 'Dhaka',
+                            location: item.location || '',
                             primary_category: item.category || 'Service Worker',
                           };
                           navigation.navigate('HelperDetail', {
@@ -508,7 +513,7 @@ export default function ExploreScreen({ route, navigation }) {
 
                         </View>
                         <Text style={styles.category}>
-                          {catName} · 📍 {item.location || 'Dhaka'}
+                          {catName} · 📍 {item.location || 'Location not provided'}
                         </Text>
 
                         <View style={styles.ratingRow}>
@@ -738,7 +743,7 @@ export default function ExploreScreen({ route, navigation }) {
                   <Ionicons name="location" size={16} color="#0d9488" />
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontSize: 11, color: '#64748b', fontWeight: '600' }}>Location / Address</Text>
-                    <Text style={{ fontSize: 13.5, fontWeight: '700', color: '#0f172a' }}>{viewDetailsBooking?.location || 'Dhaka, Bangladesh'}</Text>
+                    <Text style={{ fontSize: 13.5, fontWeight: '700', color: '#0f172a' }}>{viewDetailsBooking?.location || 'Location not provided'}</Text>
                   </View>
                 </View>
 

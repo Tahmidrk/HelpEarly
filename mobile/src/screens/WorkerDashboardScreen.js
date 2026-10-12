@@ -21,9 +21,77 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import MapViewModal from '../components/MapViewModal';
 
+export function WorkerHomeHeader({ navigation }) {
+  const { user, activeRole, switchMode, refreshUser } = useAuth();
+  const [isAvailable, setIsAvailable] = useState(user?.helperProfile?.is_available !== false);
+  useEffect(() => { setIsAvailable(user?.helperProfile?.is_available !== false); }, [user?.id, user?.helperProfile?.is_available]);
+  const handleAvailability = async (value) => {
+    try {
+      await helpersAPI.update({ is_available: value });
+      setIsAvailable(value);
+      refreshUser();
+    } catch (error) {
+      Alert.alert('Availability Not Saved', error.message);
+    }
+  };
+
+
+  return <>
+      {/* Top User Greeting Bar (Identical layout to Household Mode) */}
+      {user?.role !== 'both' && <View style={styles.userGreetingHeader}>
+        <TouchableOpacity
+          style={styles.userInfoTouchable}
+          onPress={() => navigation.navigate('Profile')}
+          activeOpacity={0.8}
+        >
+          <View style={styles.userAvatarCircle}>
+            <Text style={styles.userAvatarText}>{user?.name ? user.name.charAt(0).toUpperCase() : 'W'}</Text>
+          </View>
+          <Text style={styles.userNameText}>{user?.name || 'Helper Account'}</Text>
+        </TouchableOpacity>
+
+        {/* Availability Toggle */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text style={{ color: '#ffffff', fontSize: 11, fontWeight: '800', marginTop: 2 }}>
+            {isAvailable ? 'ONLINE' : 'OFFLINE'}
+          </Text>
+          <Switch
+            value={isAvailable}
+            onValueChange={handleAvailability}
+            trackColor={{ false: '#cbd5e1', true: '#99f6e4' }}
+            thumbColor={isAvailable ? '#ffffff' : '#64748b'}
+          />
+        </View>
+      </View>}
+
+      {/* Dual Role Mode Switcher Bar */}
+      {user?.role === 'both' && (
+        <View style={styles.toggleCard}>
+          <View style={styles.modeWrapper}>
+            <TouchableOpacity
+              style={[styles.modeBtn, activeRole === 'household' && styles.modeBtnActive]}
+              onPress={() => switchMode('household')}
+            >
+              <Ionicons name="home" size={15} color={activeRole === 'household' ? '#0d9488' : '#64748b'} />
+              <Text style={[styles.modeText, activeRole === 'household' && styles.modeTextActive]}>Household Mode</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modeBtn, activeRole === 'helper' && styles.modeBtnActive]}
+              onPress={() => switchMode('helper')}
+            >
+              <Ionicons name="construct" size={14} color={activeRole === 'helper' ? '#0d9488' : '#64748b'} />
+              <Text style={[styles.modeText, activeRole === 'helper' && styles.modeTextActive]}>Worker Mode</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+</>;
+}
+
 export default function WorkerDashboardScreen({ navigation, embeddedSections=false }) {
   const {revision}=useNotifications('bookings,jobs');
-  const { user, activeRole, switchMode } = useAuth();
+  const { user, activeRole } = useAuth();
   const [activeTab, setActiveTab] = useState('bookings');
   const [isAvailable, setIsAvailable] = useState(user?.helperProfile?.is_available !== false);
   const [bookings, setBookings] = useState([]);
@@ -45,10 +113,10 @@ export default function WorkerDashboardScreen({ navigation, embeddedSections=fal
 
   // Map View Modal State
   const [mapModal, setMapModal] = useState(false);
-  const [mapLocation, setMapLocation] = useState('Dhaka, Bangladesh');
+  const [mapLocation, setMapLocation] = useState('');
 
   const openMapForLocation = (loc) => {
-    setMapLocation(loc || 'Dhaka, Bangladesh');
+    setMapLocation(loc || '');
     setMapModal(true);
   };
 
@@ -133,54 +201,11 @@ export default function WorkerDashboardScreen({ navigation, embeddedSections=fal
       {/* Top Header Banner matching status bar height */}
       {!embeddedSections && <View style={styles.topHeaderBanner} />}
 
-      {/* Top User Greeting Bar (Identical layout to Household Mode) */}
-      <View style={styles.userGreetingHeader}>
-        <TouchableOpacity
-          style={styles.userInfoTouchable}
-          onPress={() => navigation.navigate('Profile')}
-          activeOpacity={0.8}
-        >
-          <View style={styles.userAvatarCircle}>
-            <Text style={styles.userAvatarText}>{user?.name ? user.name.charAt(0).toUpperCase() : 'W'}</Text>
-          </View>
-          <Text style={styles.userNameText}>{user?.name || 'Helper Account'}</Text>
-        </TouchableOpacity>
-
-        {/* Availability Toggle */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Text style={{ color: '#ffffff', fontSize: 11, fontWeight: '800', marginTop: 2 }}>
-            {isAvailable ? 'ONLINE' : 'OFFLINE'}
-          </Text>
-          <Switch
-            value={isAvailable}
-            onValueChange={handleAvailability}
-            trackColor={{ false: '#cbd5e1', true: '#99f6e4' }}
-            thumbColor={isAvailable ? '#ffffff' : '#64748b'}
-          />
-        </View>
-      </View>
-
-      {/* Dual Role Mode Switcher Bar */}
-      {user?.role === 'both' && (
-        <View style={styles.toggleCard}>
-          <View style={styles.modeWrapper}>
-            <TouchableOpacity
-              style={[styles.modeBtn, activeRole === 'household' && styles.modeBtnActive]}
-              onPress={() => switchMode('household')}
-            >
-              <Ionicons name="home" size={15} color={activeRole === 'household' ? '#0d9488' : '#64748b'} />
-              <Text style={[styles.modeText, activeRole === 'household' && styles.modeTextActive]}>Household Mode</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modeBtn, activeRole === 'helper' && styles.modeBtnActive]}
-              onPress={() => switchMode('helper')}
-            >
-              <Ionicons name="construct" size={14} color={activeRole === 'helper' ? '#0d9488' : '#64748b'} />
-              <Text style={[styles.modeText, activeRole === 'helper' && styles.modeTextActive]}>Worker Mode</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+      {!embeddedSections && <WorkerHomeHeader navigation={navigation} />}
+      {user?.role === 'both' && <View style={[styles.userGreetingHeader, {justifyContent:'flex-end'}]}>
+        <Text style={{color:'#ffffff',fontWeight:'800'}}>{isAvailable ? 'ONLINE' : 'OFFLINE'}</Text>
+        <Switch accessibilityLabel="Worker availability" value={isAvailable} onValueChange={handleAvailability} trackColor={{false:'#cbd5e1',true:'#99f6e4'}} thumbColor={isAvailable ? '#ffffff' : '#64748b'} />
+      </View>}
 
       {/* Quick Stats Grid */}
       <View style={styles.statsGrid}>
@@ -240,7 +265,7 @@ export default function WorkerDashboardScreen({ navigation, embeddedSections=fal
                     setSelectedClientProfile({
                       id: item.user_id || item.client_id,
                       name: item.booker_name || item.client_name || item.user_name || item.user?.name || 'Customer',
-                      location: item.address || item.booker_location || item.location || 'Gulshan-2, Dhaka, Bangladesh',
+                      location: item.address || item.booker_location || item.location || '',
                       phone: item.booker_phone || item.phone,
                       email: item.booker_email || item.email,
                     })
@@ -306,7 +331,7 @@ export default function WorkerDashboardScreen({ navigation, embeddedSections=fal
                     <Text style={{ fontSize: 11, fontWeight: '800', color: '#0d9488' }}>View</Text>
                   </TouchableOpacity>
                 </View>
-                <Text style={styles.cardMeta}>📅 {new Date(item.service_date || Date.now()).toLocaleDateString()} · 📍 {item.address || item.booker_location || item.location || 'Dhaka'}</Text>
+                <Text style={styles.cardMeta}>📅 {new Date(item.service_date || Date.now()).toLocaleDateString()} · 📍 {item.address || item.booker_location || item.location || 'Location not provided'}</Text>
                 {item.notes && <Text style={styles.notes}>"{item.notes}"</Text>}
               </View>
 
@@ -453,7 +478,7 @@ export default function WorkerDashboardScreen({ navigation, embeddedSections=fal
                   setSelectedClientProfile({
                     id: b?.user_id || b?.client_id,
                     name: b?.booker_name || b?.client_name || b?.user_name || 'Customer',
-                    location: b?.address || b?.booker_location || b?.location || 'Gulshan-2, Dhaka, Bangladesh',
+                    location: b?.address || b?.booker_location || b?.location || '',
                     phone: b?.booker_phone || b?.phone,
                     email: b?.booker_email || b?.email,
                   });
@@ -466,11 +491,11 @@ export default function WorkerDashboardScreen({ navigation, embeddedSections=fal
 
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
                 <Text style={{ fontSize: 12.5, color: '#475569', flex: 1, marginRight: 8 }}>
-                  📍 {viewDetailsBooking?.address || viewDetailsBooking?.booker_location || viewDetailsBooking?.location || 'Dhaka, Bangladesh'}
+                  📍 {viewDetailsBooking?.address || viewDetailsBooking?.booker_location || viewDetailsBooking?.location || 'Location not provided'}
                 </Text>
                 <TouchableOpacity
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#0d9488', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 }}
-                  onPress={() => openMapForLocation(viewDetailsBooking?.address || viewDetailsBooking?.booker_location || viewDetailsBooking?.location || 'Dhaka, Bangladesh')}
+                  onPress={() => openMapForLocation(viewDetailsBooking?.address || viewDetailsBooking?.booker_location || viewDetailsBooking?.location || '')}
                 >
                   <Ionicons name="map" size={14} color="#ffffff" />
                   <Text style={{ fontSize: 11.5, fontWeight: '800', color: '#ffffff' }}>Open Map</Text>
@@ -664,7 +689,7 @@ const styles = StyleSheet.create({
     borderColor: '#99f6e4',
   },
   userAvatarText: { color: '#0d9488', fontWeight: '900', fontSize: 16 },
-  userNameText: { color: '#ffffff', fontSize: 17, fontWeight: '800' },
+  userNameText: { color: '#ffffff', fontSize: 17, fontWeight: '800', flexShrink:1 },
   onlineToggle: { alignItems: 'center' },
   toggleCard: {
     backgroundColor: '#ffffff',

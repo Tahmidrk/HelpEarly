@@ -3,7 +3,7 @@ const parser=require('../../mobile/node_modules/@babel/parser');
 const traverse=require('../../mobile/node_modules/@babel/traverse').default;
 const root=path.resolve(__dirname,'../..');
 const globals=new Set(['require','module','exports','__dirname','__filename','process','Buffer','console','fetch','FormData','File','Blob','FileReader','URL','URLSearchParams','AbortSignal','window','document','navigator','localStorage','Image','alert','requestAnimationFrame','cancelAnimationFrame','setTimeout','clearTimeout','setInterval','clearInterval','global','globalThis','performance','structuredClone','Promise','Array','Object','Set','Map','WeakMap','WeakSet','String','Number','Boolean','Date','Math','JSON','Error','TypeError','RegExp','Symbol','Infinity','NaN','undefined','parseInt','parseFloat','isNaN','encodeURIComponent','decodeURIComponent','encodeURI','decodeURI','Intl','TextEncoder','TextDecoder']);
-globals.add('Audio');globals.add('confirm');
+globals.add('Audio');globals.add('confirm');globals.add('AbortController');
 let checked=0,errors=[];
 function check(file){
   if(!/\.[jt]sx?$/.test(file))return;

@@ -2,12 +2,13 @@ const pool = require('../config/db');
 const { attachHelper } = require('../db/profile');
 
 module.exports = async (req, res) => {
-  const db = await pool.connect();
+  let db;
   try {
     const { category, services, bio, hourly_rate, experience_years } = req.body;
     if (!category || !Array.isArray(services) || services.length > 100 || services.some(s => !s || typeof s.service_name!=='string' || !s.service_name.trim() || s.service_name.length>100 || !Number.isFinite(Number(s.price)) || Number(s.price) < 0) || !Number.isFinite(Number(hourly_rate)) || Number(hourly_rate) < 0 || !Number.isInteger(Number(experience_years)) || Number(experience_years) < 0) {
       return res.status(400).json({ message: 'Valid category, services, prices, and experience are required' });
     }
+    db = await pool.connect();
     await db.query('BEGIN');
     const cats = await db.query('SELECT id FROM categories WHERE LOWER(name) = LOWER($1) AND is_visible', [category]);
     if (!cats.rows[0]) return res.status(400).json({ message: 'Unknown category' });
@@ -36,7 +37,9 @@ module.exports = async (req, res) => {
   } catch (error) {
     res.status(error.status || 500).json({ message: error.status ? error.message : 'Worker settings could not be saved' });
   } finally {
-    await db.query('ROLLBACK');
-    db.release();
+    if (db) {
+      try { await db.query('ROLLBACK'); db.release(); }
+      catch (error) { db.release(error); console.error('Worker settings cleanup failed:', error.code || error.name); }
+    }
   }
 };

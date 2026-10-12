@@ -4,7 +4,7 @@ import BookingInput from '../components/BookingInput';
 import { FormScrollView as ScrollView } from '../components/FormLayout';
 import { FormModal as Modal } from '../components/FormLayout';
 import { Alert } from '../components/Feedback';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -48,6 +48,7 @@ export default function HelperDetailScreen({ route, navigation }) {
   const [mapModal, setMapModal] = useState(false);
   const [reviewsModal, setReviewsModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const bookingLock = useRef(false);
   const [bookingErrors,setBookingErrors]=useState({});
 
   const pickJobPhoto = async () => {
@@ -100,6 +101,7 @@ export default function HelperDetailScreen({ route, navigation }) {
   };
 
   const handleBook = async () => {
+    if (bookingLock.current) return;
     const errors={};
     if(!serviceDescription.trim())errors.service='Describe the services you need.';
     if(!Number.isFinite(Number(offeredFee)) || Number(offeredFee)<=0)errors.fee='Enter a positive offered fee.';
@@ -114,6 +116,7 @@ export default function HelperDetailScreen({ route, navigation }) {
       return;
     }
 
+    bookingLock.current = true;
     try {
       setSubmitting(true);
       const householdLocation = user.location;
@@ -123,17 +126,18 @@ export default function HelperDetailScreen({ route, navigation }) {
         service_description:serviceDescription.trim(), total_price:Number(offeredFee),
         notes:notes.trim(), address:householdLocation,
       },photoAsset));
-      await addBooking();
       setCreatedBooking({...saved,id:`B-${saved.id}`,helper_name:helper.name,service:saved.service_description,amount:saved.total_price,date:serviceDate,time:serviceTime,location:saved.address});
       setBookingModal(false);
       setSuccessModal(true);
+      addBooking().catch(() => {});
       setPhotoUri(null);
       setPhotoAsset(null);
       setSelectedSubService('');
       setNotes('');
     } catch (err) {
-      Alert.alert('Booking Failed', err.message || 'Unable to place booking.');
+      if (err.name !== 'AbortError') Alert.alert('Booking Failed', err.message || 'Unable to place booking.');
     } finally {
+      bookingLock.current = false;
       setSubmitting(false);
     }
   };
@@ -210,7 +214,7 @@ export default function HelperDetailScreen({ route, navigation }) {
 
           <TouchableOpacity style={styles.locationContainer} onPress={() => setMapModal(true)} activeOpacity={0.8}>
             <Ionicons name="location" size={15} color="#0d9488" />
-            <Text style={styles.locationText} numberOfLines={1}>{helper.location || 'Dhaka, Bangladesh'}</Text>
+            <Text style={styles.locationText} numberOfLines={1}>{helper.location || 'Location not provided'}</Text>
             <View style={styles.viewMapChip}>
               <Ionicons name="map" size={12} color="#ffffff" />
               <Text style={styles.viewMapChipText}>View Map</Text>
@@ -513,7 +517,7 @@ export default function HelperDetailScreen({ route, navigation }) {
               <View style={styles.autoLocationBox}>
                 <Ionicons name="navigate-circle" size={16} color="#0d9488" />
                 <Text style={styles.autoLocationText}>
-                  Your home location ({user?.location || 'Dhaka Central'}) will be automatically shared with the worker.
+                  {user?.location ? `Your saved location (${user.location}) will be shared with the worker.` : 'Save your address in Profile before booking.'}
                 </Text>
               </View>
 
@@ -648,7 +652,7 @@ export default function HelperDetailScreen({ route, navigation }) {
       <MapViewModal coordinates={helper}
         visible={mapModal}
         onClose={() => setMapModal(false)}
-        locationName={helper?.location || 'Dhaka, Bangladesh'}
+        locationName={helper?.location || ''}
       />
 
       {/* Customer Reviews Modal */}

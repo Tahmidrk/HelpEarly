@@ -8,7 +8,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, restoreError } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -64,7 +64,7 @@ export default function Login() {
               </button>
             </div>
 
-            {error && <div className="alert alert-error">{error}</div>}
+            {(error || restoreError) && <div className="alert alert-error">{error || restoreError}</div>}
 
             <form onSubmit={handleSubmit} id="login-form">
               <div className="form-group">

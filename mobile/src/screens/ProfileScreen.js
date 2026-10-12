@@ -159,7 +159,7 @@ export default function ProfileScreen({ navigation }) {
       {/* Account Personal Details (Username, Phone, Email, Address) */}
       <View style={styles.sectionCard}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={styles.sectionTitleNoMargin}>Personal Details & Address</Text>
+          <Text style={[styles.sectionTitleNoMargin, { flexShrink: 1 }]}>Personal Details & Address</Text>
           <TouchableOpacity
             style={styles.editToggleBtn}
             onPress={() => {

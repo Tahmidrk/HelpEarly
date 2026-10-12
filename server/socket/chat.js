@@ -15,7 +15,12 @@ async function authenticate(socket) {
 function initializeChat(server) {
   const origins = (process.env.CLIENT_URL || 'http://localhost:5173,http://localhost:8081').split(',').map(s=>s.trim());
   if(process.env.NODE_ENV!=='production') origins.push('http://localhost:8081','http://127.0.0.1:8081');
-  io = new Server(server,{cors:{origin:origins,methods:['GET','POST'],credentials:true},allowRequest:(req,callback)=>callback(null,!req.headers.origin || origins.includes(req.headers.origin))});
+  io = new Server(server,{cors:{origin:origins,methods:['GET','POST'],credentials:true},allowRequest:(req,callback)=>{
+    const origin=req.headers.origin;
+    // Android's WebSocket implementation supplies the API's own origin.
+    // Socket authentication below still validates JWT, account and active role.
+    callback(null,!origin || origins.includes(origin) || origin===`http://${req.headers.host}` || origin===`https://${req.headers.host}`);
+  }});
   io.use((socket,next)=>authenticate(socket).then(()=>next()).catch(()=>next(new Error('Authentication required'))));
   io.on('connection',socket=>{
     const userId = socket.user.id;

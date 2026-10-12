@@ -7,16 +7,35 @@ const apiOrigin = normalizedApiUrl.replace(/\/api$/, '');
 export const SOCKET_URL = (import.meta.env.VITE_SOCKET_URL || apiOrigin).replace(/\/api\/?$/, '').replace(/\/$/, '') || undefined;
 export const getMediaUrl = value => !value || /^(https?:|data:|blob:)/i.test(value) ? value : `${apiOrigin}/${value.replace(/^\/+/, '')}`;
 
-async function request(endpoint, options = {}) {
+let generation = 0;
+const pending = new Set(), reads = new Map();
+export function cancelRequests() {
+  generation++;
+  pending.forEach(controller => controller.abort());
+  reads.clear();
+}
+export function request(endpoint, options = {}) {
   const token = localStorage.getItem('token');
+  const role = localStorage.getItem('activeRole') || '';
+  const requestedGeneration = generation;
+  const { timeoutMs = ['/auth/login','/auth/register'].includes(endpoint) ? 60000 : endpoint === '/chatbot' ? 45000 : 20000, signal, ...fetchOptions } = options;
+  const key = JSON.stringify([endpoint, token, role]);
+  const reusable = !signal && (!fetchOptions.method || fetchOptions.method === 'GET');
+  if (reusable && reads.has(key)) return reads.get(key);
+  const controller = new AbortController();
+  pending.add(controller);
+  const cancel = () => controller.abort();
+  signal?.addEventListener('abort', cancel, { once: true });
+  if (signal?.aborted) cancel();
   const config = {
+    ...fetchOptions,
     headers: {
       'Content-Type': 'application/json',
-      'X-Active-Role': localStorage.getItem('activeRole') || '',
+      'X-Active-Role': role,
       ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
+      ...fetchOptions.headers,
     },
-    ...options,
+    signal: controller.signal,
   };
 
   // Handle FormData (file uploads)
@@ -24,6 +43,8 @@ async function request(endpoint, options = {}) {
     delete config.headers['Content-Type'];
   }
 
+  let timer;
+  const work = (async () => {
   const res = await fetch(`${API_BASE}${endpoint}`, config);
   let data;
   try {data=await res.json();}
@@ -33,7 +54,26 @@ async function request(endpoint, options = {}) {
     throw Object.assign(new Error(data.message || 'Something went wrong'), {status:res.status});
   }
 
+  if (generation !== requestedGeneration) throw Object.assign(new Error('Session changed'), { name: 'AbortError' });
   return data;
+  })();
+  const result = Promise.race([work, new Promise((resolve, reject) => {
+    timer = setTimeout(() => {
+      reject(Object.assign(new Error('Connection timed out. Check your network and retry. The server may be waking up.'), { code: 'TIMEOUT' }));
+      controller.abort();
+    }, timeoutMs);
+  }), new Promise((resolve, reject) => {
+    const abort = () => reject(Object.assign(new Error('Request cancelled'), { name: 'AbortError' }));
+    controller.signal.addEventListener('abort', abort, { once: true });
+    if (controller.signal.aborted) abort();
+  })]).finally(() => {
+    clearTimeout(timer);
+    pending.delete(controller);
+    signal?.removeEventListener('abort', cancel);
+    if (reads.get(key) === result) reads.delete(key);
+  });
+  if (reusable) reads.set(key, result);
+  return result;
 }
 
 export const syncAPI = { revisions: () => request('/sync') };
@@ -41,7 +81,7 @@ export const syncAPI = { revisions: () => request('/sync') };
 export const authAPI = {
   register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   login: (data) => request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
-  getMe: () => request('/auth/me'),
+  getMe: (options = {}) => request('/auth/me', options),
   changePassword: (data) => request('/auth/change-password', { method: 'PUT', body: JSON.stringify(data) }),
   updateProfile: (data) => {
     if (data instanceof FormData) {

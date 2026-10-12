@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen({ navigation }) {
-  const { login } = useAuth();
+  const { login, restoreError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -62,6 +62,7 @@ export default function LoginScreen({ navigation }) {
 
         {/* Card Form */}
         <View style={styles.card}>
+          {restoreError ? <Text accessibilityRole="alert" style={{color:'#b91c1c',marginBottom:12}}>{restoreError}</Text> : null}
           <Text style={styles.label}>Email Address</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="mail-outline" size={20} color="#0d9488" style={{ marginRight: 8 }} />

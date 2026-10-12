@@ -29,11 +29,11 @@ const poolConfig = process.env.DATABASE_URL
       ssl,
     };
 
-const pool = new Pool({ ...poolConfig, max:Number(process.env.DB_POOL_MAX || 5), connectionTimeoutMillis: 10000, idleTimeoutMillis:30000 });
+const pool = new Pool({ ...poolConfig, max:Number(process.env.DB_POOL_MAX || 5), connectionTimeoutMillis: 10000, idleTimeoutMillis:30000,
+  statement_timeout:10000, lock_timeout:5000, idle_in_transaction_session_timeout:15000 });
 
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err.code || err.name);
-  process.exit(-1);
 });
 
 module.exports = pool;

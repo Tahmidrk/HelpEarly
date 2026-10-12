@@ -4,12 +4,12 @@ const {locationInput}=require('../utils/location');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { passwordVersion } = require('../utils/passwordSession');
+const { randomUUID } = require('node:crypto');
 
 // Register a new user
 exports.register = async (req, res) => {
-  const db = await pool.connect();
+  let db;
   try {
-    await db.query('BEGIN');
     const { name, email, password, phone, nid_number, role, location, latitude, longitude } = req.body;
     const cleanEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
     const cleanName = typeof name === 'string' ? name.trim() : '';
@@ -22,15 +22,15 @@ exports.register = async (req, res) => {
     }
 
     const coordinates=locationInput({...req.body,location:location || undefined});
+    // CPU work must not occupy a scarce database connection.
+    const password_hash = await bcrypt.hash(password, 10);
+    db = await pool.connect();
+    await db.query('BEGIN');
     // Check if user exists
     const existingUser = await db.query('SELECT id FROM users WHERE LOWER(TRIM(email)) = $1', [cleanEmail]);
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ message: 'Email already registered' });
     }
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const password_hash = await bcrypt.hash(password, salt);
 
     // Insert user
     const result = await db.query(
@@ -78,7 +78,7 @@ exports.register = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role, pv: passwordVersion(password_hash) },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: '7d', jwtid: randomUUID() }
     );
 
     user = await attachHelper(user, db);
@@ -88,8 +88,10 @@ exports.register = async (req, res) => {
     console.error('Register error:', error.code || error.name);
     res.status(error.status || (error.code==='23505'?400:500)).json({message:error.status?error.message:error.code==='23505'?'Email already registered':'Registration could not be saved'});
   } finally {
-    await db.query('ROLLBACK');
-    db.release();
+    if (db) {
+      try { await db.query('ROLLBACK'); db.release(); }
+      catch (error) { db.release(error); console.error('Registration cleanup failed:', error.code || error.name); }
+    }
   }
 };
 
@@ -127,7 +129,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role, pv: passwordVersion(user.password_hash) },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: '7d', jwtid: randomUUID() }
     );
 
     // Remove password_hash from response

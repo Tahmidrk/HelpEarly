@@ -6,7 +6,7 @@ import { Alert } from '../components/Feedback';
 import useMarketplaceCategories from '../utils/useMarketplaceCategories';
 import DateInput from '../components/DateInput';
 import {parseDate} from '../utils/dateOnly';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -57,10 +57,12 @@ export default function JobsScreen({ navigation, route }) {
   const [photoUri, setPhotoUri] = useState(null);
   const [photoAsset, setPhotoAsset] = useState(null);
   const [posting, setPosting] = useState(false);
+  const postingLock = useRef(false);
+  const jobsRequest = useRef(0);
 
   // Map Modal
   const [mapModal, setMapModal] = useState(false);
-  const [mapLocation, setMapLocation] = useState('Dhaka, Bangladesh');
+  const [mapLocation, setMapLocation] = useState('');
 
   // Apply / Bargain Modal State
   const [applyModalJob, setApplyModalJob] = useState(null);
@@ -80,6 +82,7 @@ export default function JobsScreen({ navigation, route }) {
     React.useCallback(() => {
       loadJobs();
       checkWorkerSetup();
+      return () => { jobsRequest.current++; };
     }, [user?.id, activeRole, revision])
   );
 
@@ -134,26 +137,33 @@ export default function JobsScreen({ navigation, route }) {
     if (user?.location) {
       setLocation(user.location);
     } else {
-      setLocation('Dhaka, Bangladesh');
+      setLocation('');
     }
   }, [user?.id, postModal]);
 
   const loadJobs = async () => {
+    const requested = ++jobsRequest.current;
     try {
       const [data, applicationRows] = await Promise.all([
-        (activeRole === 'household' ? jobsAPI.getMine() : jobsAPI.getAll()).then(rows=>{setJobs(Array.isArray(rows)?rows:[]);setLoading(false);return rows;}),
+        (activeRole === 'household' ? jobsAPI.getMine() : jobsAPI.getAll()).then(rows=>{
+          if (requested === jobsRequest.current) {
+            setJobs(Array.isArray(rows)?rows:[]);
+            setLoading(false);
+          }
+          return rows;
+        }),
         activeRole === 'helper' ? jobsAPI.getApplications() : Promise.resolve([]),
       ]);
-      setJobs(Array.isArray(data) ? data : []);
+      if (requested !== jobsRequest.current) return;
       setAppliedJobIds(Object.fromEntries(applicationRows.map((application) => [application.job_id, {
         status: application.status,
         offeredRate: application.proposed_price,
       }])));
       setLoadError('');
     } catch (err) {
-      if(err.name!=='AbortError')setLoadError(err.message);
+      if(requested === jobsRequest.current && err.name!=='AbortError')setLoadError(err.message);
     } finally {
-      setLoading(false);
+      if (requested === jobsRequest.current) setLoading(false);
     }
   };
 
@@ -181,10 +191,12 @@ export default function JobsScreen({ navigation, route }) {
   };
 
   const handleCreateJob = async () => {
-    if (!title.trim() || !budget.trim() || !description.trim() || !preferredDate.trim()) {
-      Alert.alert('Required Fields', 'Please enter a job title, budget, preferred date, and description.');
+    if (postingLock.current) return;
+    if (!title.trim() || !budget.trim() || !description.trim() || !preferredDate.trim() || !location.trim()) {
+      Alert.alert('Required Fields', 'Please enter a job title, budget, preferred date, address, and description.');
       return;
     }
+    postingLock.current = true;
     try {
       setPosting(true);
       parseDate(preferredDate.trim());
@@ -193,7 +205,7 @@ export default function JobsScreen({ navigation, route }) {
         category,
         budget: parseFloat(budget),
         preferred_date: preferredDate.trim(),
-        location: location.trim() || user?.location || 'Dhaka, Bangladesh',
+        location: location.trim(),
         description: description.trim(),
       };
 
@@ -206,7 +218,7 @@ export default function JobsScreen({ navigation, route }) {
         poster_name: user?.name || 'Household User',
       };
 
-      setJobs((prev) => [formattedCreatedJob, ...prev]);
+      setJobs((prev) => [formattedCreatedJob, ...prev.filter(job => job.id !== createdJob.id)]);
       Alert.alert('Success', 'Your service request post has been published.');
       setPostModal(false);
       setTitle('');
@@ -216,10 +228,10 @@ export default function JobsScreen({ navigation, route }) {
       setDescription('');
       setPhotoUri(null);
       setPhotoAsset(null);
-      loadJobs();
     } catch (err) {
-      Alert.alert('Post Failed', err.message);
+      if (err.name !== 'AbortError') Alert.alert('Post Failed', err.message);
     } finally {
+      postingLock.current = false;
       setPosting(false);
     }
   };
@@ -265,7 +277,7 @@ export default function JobsScreen({ navigation, route }) {
       jobTitle: applyModalJob.title,
       posterName: applyModalJob.poster_name || 'Household Client',
       offeredRate: finalRate,
-      location: applyModalJob.location || 'Dhaka, Bangladesh',
+      location: applyModalJob.location || '',
     });
 
       setApplyModalJob(null);
@@ -275,7 +287,7 @@ export default function JobsScreen({ navigation, route }) {
   };
 
   const openMapForJob = (loc) => {
-    setMapLocation(loc || 'Dhaka, Bangladesh');
+    setMapLocation(loc || '');
     setMapModal(true);
   };
 
@@ -383,7 +395,7 @@ export default function JobsScreen({ navigation, route }) {
                       >
                         <Ionicons name="location-sharp" size={13} color="#0d9488" />
                         <Text style={styles.jobLocationText} numberOfLines={1} ellipsizeMode="tail">
-                          {item.location || 'Dhaka, Bangladesh'}
+                          {item.location || 'Location not provided'}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -414,7 +426,7 @@ export default function JobsScreen({ navigation, route }) {
                       setSelectedClientProfile({
                         id: item.poster_id || item.user_id,
                         name: item.poster_name || 'Household Customer',
-                        location: item.location || 'Dhaka, Bangladesh',
+                        location: item.location || '',
                       });
                     }}
                   >
@@ -631,7 +643,7 @@ export default function JobsScreen({ navigation, route }) {
                       setSelectedClientProfile({
                         id: selectedJob?.poster_id || selectedJob?.user_id,
                         name: selectedJob?.poster_name || 'Household Customer',
-                        location: selectedJob?.location || 'Dhaka, Bangladesh',
+                        location: selectedJob?.location || '',
                       });
                     }}
                   >
@@ -677,7 +689,7 @@ export default function JobsScreen({ navigation, route }) {
                   <View style={{ flex: 1, marginRight: 6 }}>
                     <Text style={{ fontSize: 11, color: '#64748b', fontWeight: '600' }}>Location</Text>
                     <Text style={{ fontSize: 13.5, fontWeight: '700', color: '#0f172a' }}>
-                      {selectedJob?.location || 'Dhaka, Bangladesh'}
+                      {selectedJob?.location || 'Location not provided'}
                     </Text>
                   </View>
                   <TouchableOpacity
@@ -888,7 +900,7 @@ export default function JobsScreen({ navigation, route }) {
       </Modal>
 
       {/* First-Time Worker Service Profile Setup Modal */}
-      <Modal visible={workerSetupModal} transparent animationType="slide">
+      <Modal visible={workerSetupModal} transparent animationType="slide" onRequestClose={() => setWorkerSetupModal(false)}>
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { padding: 22 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>

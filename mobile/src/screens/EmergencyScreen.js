@@ -1,5 +1,5 @@
 import { Alert } from '../components/Feedback';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, Linking } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
@@ -13,17 +13,19 @@ export default function EmergencyScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState('');
+  const request = useRef(0);
   const load = useCallback(async () => {
-    try { setRequests(await emergencyAPI.list()); setError(''); }
-    catch (err) { setError(err.message); }
-    finally { setLoading(false); }
+    const id = ++request.current;
+    try { const rows = await emergencyAPI.list(); if (id === request.current) { setRequests(rows); setError(''); } }
+    catch (err) { if (id === request.current && err.name !== 'AbortError') setError(err.message); }
+    finally { if (id === request.current) setLoading(false); }
   }, [activeRole]);
   useFocusEffect(useCallback(() => {
     load();
-    const timer = setInterval(load, 5000);
-    return () => clearInterval(timer);
+    // Time-based expiry also needs recovery when no database revision changes.
+    const timer = setInterval(load, 30000);
+    return () => { request.current++; clearInterval(timer); };
   }, [load,revision]));
-  // Focus polling already loads on mount; revisions trigger focused recovery.
   useEffect(() => { setRequests([]); setLoading(true); }, [activeRole]);
 
   const act = async (id, action) => {
