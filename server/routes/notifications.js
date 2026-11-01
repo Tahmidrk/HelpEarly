@@ -19,8 +19,9 @@ router.put('/:id/read', async (req,res,next) => {
 router.post('/devices', async (req,res,next) => {
   const {device_id,token,platform}=req.body;
   if (!uuid.test(String(device_id)) || !/^(ExponentPushToken|ExpoPushToken)\[[A-Za-z0-9_-]{10,200}\]$/.test(String(token)) || !['android','ios'].includes(platform)) return res.status(400).json({message:'Valid device ID, Expo push token and platform are required'});
-  const db=await pool.connect();
+  let db;
   try {
+    db=await pool.connect();
     await db.query('BEGIN');
     await db.query('SELECT pg_advisory_xact_lock(hashtext($1))',[token]);
     // Token rotation is scoped to this installation. Another installation cannot take its token.
@@ -31,8 +32,13 @@ router.post('/devices', async (req,res,next) => {
       updated_at=CASE WHEN push_devices.user_id=EXCLUDED.user_id AND push_devices.token=EXCLUDED.token AND push_devices.audience=EXCLUDED.audience AND push_devices.active THEN push_devices.updated_at ELSE CURRENT_TIMESTAMP END`,[req.user.id,device_id,token,platform,req.activeRole]);
     await db.query('COMMIT');
     res.status(201).json({registered:true});
-  } catch (error) { await db.query('ROLLBACK'); next(error); }
-  finally { db.release(); }
+  } catch (error) {
+    if (db) {
+      try { await db.query('ROLLBACK'); }
+      catch (cleanupError) { db.release(cleanupError); db=null; }
+    }
+    next(error);
+  } finally { db?.release(); }
 });
 router.delete('/devices/:deviceId', async (req,res,next) => {
   if (!uuid.test(req.params.deviceId)) return res.status(400).json({message:'Invalid device ID'});

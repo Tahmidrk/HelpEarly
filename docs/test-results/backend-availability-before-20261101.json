@@ -1,0 +1,53 @@
+{
+  "executed_at": "2026-11-01T13:17:24.440Z",
+  "phase": "before",
+  "scope": "Local real PostgreSQL connection termination; controlled worker unlock failures; two real TCP connections to actual server startup with startup dependencies isolated. Not hosted incident proof or native UI testing.",
+  "results": [
+    {
+      "case": "checked-out-connection-loss",
+      "status": "FAIL",
+      "exitCode": 1,
+      "ms": 215,
+      "detail": "",
+      "failure": "error: terminating connection due to administrator command\r"
+    },
+    {
+      "case": "notification-unlock-failure",
+      "status": "FAIL",
+      "exitCode": 1,
+      "ms": 1155,
+      "detail": "",
+      "failure": "AssertionError [ERR_ASSERTION]: Failed advisory unlock leaked its checked-out pool connection"
+    },
+    {
+      "case": "media-unlock-failure",
+      "status": "FAIL",
+      "exitCode": 1,
+      "ms": 173,
+      "detail": "",
+      "failure": "AssertionError [ERR_ASSERTION]: Failed advisory unlock leaked its checked-out pool connection"
+    },
+    {
+      "case": "proxy-keep-alive",
+      "status": "FAIL",
+      "exitCode": 1,
+      "ms": 6616,
+      "detail": "",
+      "failure": "AssertionError [ERR_ASSERTION]: Origin closed both proxy connections after the default 5-second idle window"
+    },
+    {
+      "case": "push-registration-checkout-failure",
+      "status": "FAIL",
+      "exitCode": 1,
+      "ms": 217,
+      "failure": "Error: Injected checkout timeout\r"
+    },
+    {
+      "case": "push-registration-rollback-failure",
+      "status": "FAIL",
+      "exitCode": 1,
+      "ms": 209,
+      "failure": "Error: Injected connection loss and rollback failure\r"
+    }
+  ]
+}

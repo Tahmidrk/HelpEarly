@@ -1,0 +1,5 @@
+{
+  "executed_at": "2026-11-01T13:23:56.122Z",
+  "exitCode": 0,
+  "scope": "Fresh isolated local database; existing report JSON files preserved; no live migrations or original data changes"
+}

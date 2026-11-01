@@ -32,6 +32,13 @@ const poolConfig = process.env.DATABASE_URL
 const pool = new Pool({ ...poolConfig, max:Number(process.env.DB_POOL_MAX || 5), connectionTimeoutMillis: 10000, idleTimeoutMillis:30000,
   statement_timeout:10000, lock_timeout:5000, idle_in_transaction_session_timeout:15000 });
 
+// pg-pool handles idle errors only. A checked-out connection can also fail while
+// a worker awaits an external provider; its error event must not crash the API.
+// Queries still reject, and their owner's finally block releases the bad client.
+pool.on('connect', client => {
+  client.on('error', err => console.error('PostgreSQL client connection failed:', err.code || err.name));
+});
+
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err.code || err.name);
 });

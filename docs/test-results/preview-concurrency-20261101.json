@@ -1,0 +1,800 @@
+{
+  "executed_at": "2026-11-01T13:30:15.886Z",
+  "checks": {
+    "independentModuleState": true,
+    "sameAccountTokenIsolation": {
+      "a": "8cacc3d0b58d",
+      "web": "3f445bb69676",
+      "different": true
+    },
+    "authenticatedSocketIds": [
+      {
+        "client": "native-api-A",
+        "id": "3FOn8XmJKNtAZrkBAAAF"
+      },
+      {
+        "client": "native-api-B",
+        "id": "B8EKGDGGXgeWSL4fAAAG"
+      },
+      {
+        "client": "web-api",
+        "id": "4IpajvcYAr1SB0OXAAAH"
+      }
+    ],
+    "concurrentChatPersistence": true,
+    "roleIsolation": true,
+    "logoutIsolation": true,
+    "separateHouseholdPrivateHistoryAndRoleDenied": true
+  },
+  "writes": [
+    {
+      "booking": 74,
+      "job": 62
+    },
+    {
+      "booking": 75,
+      "job": 63
+    },
+    {
+      "booking": 76,
+      "job": 64
+    },
+    {
+      "booking": 77,
+      "job": 65
+    },
+    {
+      "booking": 78,
+      "job": 66
+    }
+  ],
+  "samples": [
+    {
+      "client": "web-api",
+      "operation": "login",
+      "ms": 205.30689999999998,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "login",
+      "ms": 207.94880000000003,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "login",
+      "ms": 208.66340000000002,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/auth/me",
+      "ms": 12.18300000000005,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/helpers?limit=50",
+      "ms": 13.171699999999987,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/jobs?limit=1000",
+      "ms": 32.97789999999998,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/messages/conversations",
+      "ms": 32.53409999999997,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/notifications",
+      "ms": 35.24940000000004,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/jobs?limit=1000",
+      "ms": 36.41760000000005,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/helpers?limit=50",
+      "ms": 38.461900000000014,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/notifications",
+      "ms": 40.158000000000015,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/messages/conversations",
+      "ms": 40.644499999999994,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/helpers?limit=50",
+      "ms": 44.80580000000003,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/jobs?limit=1000",
+      "ms": 46.532399999999996,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/notifications",
+      "ms": 47.1653,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/auth/me",
+      "ms": 50.378300000000024,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/sync",
+      "ms": 48.39580000000001,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/messages/conversations",
+      "ms": 48.78339999999997,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/sync",
+      "ms": 52.75029999999998,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/auth/me",
+      "ms": 50.87389999999999,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/sync",
+      "ms": 51.86959999999999,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "worker browsing during writes",
+      "ms": 12.319500000000005,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "job posting",
+      "ms": 14.86650000000003,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "booking creation",
+      "ms": 22.061000000000035,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/notifications",
+      "ms": 17.694999999999993,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/jobs?limit=1000",
+      "ms": 19.74279999999999,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/helpers?limit=50",
+      "ms": 20.855700000000013,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/messages/conversations",
+      "ms": 20.8168,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/notifications",
+      "ms": 21.596499999999992,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/helpers?limit=50",
+      "ms": 23.324899999999957,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/jobs?limit=1000",
+      "ms": 24.737600000000043,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/helpers?limit=50",
+      "ms": 26.765600000000006,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/messages/conversations",
+      "ms": 27.50970000000001,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/jobs?limit=1000",
+      "ms": 29.168600000000026,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/auth/me",
+      "ms": 31.195099999999968,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/notifications",
+      "ms": 30.314099999999996,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/messages/conversations",
+      "ms": 30.42579999999998,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/sync",
+      "ms": 32.10430000000002,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/sync",
+      "ms": 31.928499999999985,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/auth/me",
+      "ms": 32.73540000000003,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/auth/me",
+      "ms": 32.37130000000002,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/sync",
+      "ms": 32.24399999999997,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "worker browsing during writes",
+      "ms": 5.598100000000045,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "job posting",
+      "ms": 7.680999999999983,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "booking creation",
+      "ms": 10.739300000000014,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/notifications",
+      "ms": 19.074299999999994,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/jobs?limit=1000",
+      "ms": 20.525699999999915,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/helpers?limit=50",
+      "ms": 21.864199999999983,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/messages/conversations",
+      "ms": 22.138199999999983,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/jobs?limit=1000",
+      "ms": 23.779999999999973,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/helpers?limit=50",
+      "ms": 24.57529999999997,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/notifications",
+      "ms": 25.43610000000001,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/auth/me",
+      "ms": 26.958499999999958,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/messages/conversations",
+      "ms": 26.215900000000033,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/helpers?limit=50",
+      "ms": 27.854600000000005,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/auth/me",
+      "ms": 29.13250000000005,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/sync",
+      "ms": 29.950000000000045,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/sync",
+      "ms": 29.648399999999924,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/jobs?limit=1000",
+      "ms": 30.336900000000014,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/notifications",
+      "ms": 30.720899999999915,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/messages/conversations",
+      "ms": 31.06970000000001,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/auth/me",
+      "ms": 32.182199999999966,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/sync",
+      "ms": 32.039999999999964,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "worker browsing during writes",
+      "ms": 5.671699999999987,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "job posting",
+      "ms": 7.2146999999999935,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "booking creation",
+      "ms": 13.053199999999947,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/notifications",
+      "ms": 19.42319999999995,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/jobs?limit=1000",
+      "ms": 20.597399999999993,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/helpers?limit=50",
+      "ms": 23.183899999999994,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/messages/conversations",
+      "ms": 23.236800000000017,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/notifications",
+      "ms": 24.62289999999996,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/helpers?limit=50",
+      "ms": 28.074400000000082,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/jobs?limit=1000",
+      "ms": 28.706300000000056,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/messages/conversations",
+      "ms": 28.799699999999916,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/helpers?limit=50",
+      "ms": 30.596400000000017,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/notifications",
+      "ms": 31.935100000000034,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/auth/me",
+      "ms": 34.04609999999991,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/sync",
+      "ms": 33.87559999999996,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/sync",
+      "ms": 34.14570000000003,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/jobs?limit=1000",
+      "ms": 35.1173,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/messages/conversations",
+      "ms": 35.351600000000076,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/auth/me",
+      "ms": 36.94710000000009,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/auth/me",
+      "ms": 36.84770000000003,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/sync",
+      "ms": 36.718200000000024,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "worker browsing during writes",
+      "ms": 5.8352000000001,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "job posting",
+      "ms": 7.187199999999962,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "booking creation",
+      "ms": 9.619400000000041,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/notifications",
+      "ms": 16.047000000000025,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/helpers?limit=50",
+      "ms": 17.87620000000004,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/jobs?limit=1000",
+      "ms": 18.625800000000027,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/messages/conversations",
+      "ms": 18.695299999999975,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/notifications",
+      "ms": 19.146799999999985,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/jobs?limit=1000",
+      "ms": 20.749700000000075,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/helpers?limit=50",
+      "ms": 21.61349999999993,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/auth/me",
+      "ms": 23.168699999999944,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/messages/conversations",
+      "ms": 22.328200000000038,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/jobs?limit=1000",
+      "ms": 25.21029999999996,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/helpers?limit=50",
+      "ms": 25.90020000000004,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/notifications",
+      "ms": 26.799999999999955,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "/sync",
+      "ms": 28.729799999999955,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/sync",
+      "ms": 28.385599999999954,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/sync",
+      "ms": 27.92999999999995,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/messages/conversations",
+      "ms": 28.204600000000028,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "/auth/me",
+      "ms": 29.720299999999952,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "/auth/me",
+      "ms": 29.369199999999978,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "worker browsing during writes",
+      "ms": 4.598700000000008,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "job posting",
+      "ms": 5.745800000000031,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "booking creation",
+      "ms": 7.921699999999987,
+      "ok": true
+    },
+    {
+      "client": "native-api-B",
+      "operation": "chat send",
+      "ms": 10.642400000000066,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "chat send",
+      "ms": 12.857899999999972,
+      "ok": true
+    },
+    {
+      "client": "web-api",
+      "operation": "chat send",
+      "ms": 13.580500000000029,
+      "ok": true
+    },
+    {
+      "client": "native-api-A",
+      "operation": "login",
+      "ms": 63.1801999999999,
+      "ok": true
+    }
+  ],
+  "timings": {
+    "login": {
+      "n": 4,
+      "median_ms": 207.94880000000003,
+      "min_ms": 63.1801999999999,
+      "max_ms": 208.66340000000002
+    },
+    "/auth/me": {
+      "n": 15,
+      "median_ms": 32.182199999999966,
+      "min_ms": 12.18300000000005,
+      "max_ms": 50.87389999999999
+    },
+    "/helpers?limit=50": {
+      "n": 15,
+      "median_ms": 24.57529999999997,
+      "min_ms": 13.171699999999987,
+      "max_ms": 44.80580000000003
+    },
+    "/jobs?limit=1000": {
+      "n": 15,
+      "median_ms": 25.21029999999996,
+      "min_ms": 18.625800000000027,
+      "max_ms": 46.532399999999996
+    },
+    "/messages/conversations": {
+      "n": 15,
+      "median_ms": 28.204600000000028,
+      "min_ms": 18.695299999999975,
+      "max_ms": 48.78339999999997
+    },
+    "/notifications": {
+      "n": 15,
+      "median_ms": 25.43610000000001,
+      "min_ms": 16.047000000000025,
+      "max_ms": 47.1653
+    },
+    "/sync": {
+      "n": 15,
+      "median_ms": 32.10430000000002,
+      "min_ms": 27.92999999999995,
+      "max_ms": 52.75029999999998
+    },
+    "worker browsing during writes": {
+      "n": 5,
+      "median_ms": 5.671699999999987,
+      "min_ms": 4.598700000000008,
+      "max_ms": 12.319500000000005
+    },
+    "job posting": {
+      "n": 5,
+      "median_ms": 7.2146999999999935,
+      "min_ms": 5.745800000000031,
+      "max_ms": 14.86650000000003
+    },
+    "booking creation": {
+      "n": 5,
+      "median_ms": 10.739300000000014,
+      "min_ms": 7.921699999999987,
+      "max_ms": 22.061000000000035
+    },
+    "chat send": {
+      "n": 3,
+      "median_ms": 12.857899999999972,
+      "min_ms": 10.642400000000066,
+      "max_ms": 13.580500000000029
+    }
+  },
+  "pool": {
+    "maxConnections": 5,
+    "peakWaiting": 15,
+    "maximumCheckoutWait_ms": 12.59689999999864,
+    "checkoutErrors": 0
+  },
+  "scope": "Three independent module/storage/session instances, two actual Android API modules and one actual Web API module in Node/V8 against the same running local backend and isolated shared PostgreSQL. Actual authenticated Socket.IO connections. NOT fresh Android emulator sessions or browser rendering; prior native cohort remains separately documented."
+}

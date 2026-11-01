@@ -1,0 +1,12 @@
+{
+  "executed_at": "2026-11-01T13:19:15.662Z",
+  "results": {
+    "readDeduplicationAndHeaders": "PASS",
+    "hungTransportDeadline": "PASS: timeout settles even when transport ignores abort",
+    "sessionChangeCancellation": "PASS",
+    "callerCancellation": "PASS",
+    "verifiedSessionRateIsolation": "PASS: same-account JWT sessions independent; forged tokens share IP budget",
+    "checkoutFailureReturnsResponse": "PASS"
+  },
+  "scope": "Actual Web API module, JWT limiter and controllers; controlled transport/pool failures. Independent native integration measured separately."
+}

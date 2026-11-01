@@ -1,0 +1,49 @@
+{
+  "executed_at": "2026-11-01T13:23:43.682Z",
+  "phase": "after",
+  "scope": "Local real PostgreSQL connection termination; controlled worker unlock failures; two real TCP connections to actual server startup with startup dependencies isolated. Not hosted incident proof or native UI testing.",
+  "results": [
+    {
+      "case": "checked-out-connection-loss",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 378,
+      "detail": "{\"case\":\"checked-out-connection-loss\",\"status\":\"PASS\",\"concurrentReads\":2,\"poolMax\":1,\"waiting\":0}"
+    },
+    {
+      "case": "notification-unlock-failure",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 532,
+      "detail": "{\"case\":\"notification-unlock-failure\",\"status\":\"PASS\",\"concurrentReads\":2,\"poolMax\":1,\"waiting\":0}"
+    },
+    {
+      "case": "media-unlock-failure",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 230,
+      "detail": "{\"case\":\"media-unlock-failure\",\"status\":\"PASS\",\"concurrentReads\":2,\"poolMax\":1,\"waiting\":0}"
+    },
+    {
+      "case": "proxy-keep-alive",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 6615,
+      "detail": "{\"case\":\"proxy-keep-alive\",\"status\":\"PASS\",\"connectionsReused\":2,\"idle_ms\":6500,\"keepAliveTimeout\":120000,\"headersTimeout\":125000}"
+    },
+    {
+      "case": "push-registration-checkout-failure",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 350,
+      "detail": "{\"case\":\"push-registration-checkout-failure\",\"status\":\"PASS\",\"failedWriteStatus\":500,\"subsequentHealth\":200,\"released\":false,\"discarded\":false}"
+    },
+    {
+      "case": "push-registration-rollback-failure",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 348,
+      "detail": "{\"case\":\"push-registration-rollback-failure\",\"status\":\"PASS\",\"failedWriteStatus\":500,\"subsequentHealth\":200,\"released\":true,\"discarded\":true}"
+    }
+  ]
+}

@@ -80,7 +80,8 @@ async function flushNotifications() {
     }
     await db.query("UPDATE push_deliveries SET status='failed',last_error='Retry limit reached' WHERE status='pending' AND attempts>=5");
   } finally {
-    if(locked) await db.query('SELECT pg_advisory_unlock(724032)');
+    try { if(locked) await db.query('SELECT pg_advisory_unlock(724032)'); }
+    catch(error) { db.release(error); throw error; }
     db.release();
   }
 }

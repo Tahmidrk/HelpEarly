@@ -93,6 +93,10 @@ async function cleanupOrphans() {
       AND NOT EXISTS(SELECT 1 FROM bookings WHERE photos LIKE '%/uploads/'||m.key||'%')
       AND NOT EXISTS(SELECT 1 FROM jobs WHERE photos LIKE '%/uploads/'||m.key||'%') ORDER BY created_at LIMIT 20`);
     for (const { key } of rows.rows) { await getStorage().remove(key); await db.query('DELETE FROM media_uploads WHERE key=$1', [key]); }
-  } finally { if (locked) await db.query('SELECT pg_advisory_unlock(724034)'); db.release(); }
+  } finally {
+    try { if (locked) await db.query('SELECT pg_advisory_unlock(724034)'); }
+    catch(error) { db.release(error); throw error; }
+    db.release();
+  }
 }
 module.exports = { createStorage, getStorage, decorateMedia, cleanupOrphans, validKey };

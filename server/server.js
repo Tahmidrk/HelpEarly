@@ -9,6 +9,10 @@ if(process.env.NODE_ENV==='production' && (!process.env.JWT_SECRET || process.en
 }
 
 const server = http.createServer(app);
+// Keep origin connections alive longer than Render's edge connection reuse.
+// This changes idle HTTP socket lifetime, not application request deadlines.
+server.keepAliveTimeout = 120000;
+server.headersTimeout = 125000;
 const shutdown=()=>{ server.close(()=>require('./config/db').end().finally(()=>process.exit(0))); setTimeout(()=>process.exit(1),10000).unref(); };
 process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
 

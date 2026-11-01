@@ -1,0 +1,75 @@
+PASS Production startup refuses unmigrated database without changing schema
+Migration rolled back: 23505
+PASS Migration rollback on legacy conflict
+PASS Live schema replica migration: records preserved, repeatable
+PASS RLS, Data API grants and RPC execution denied for non-owner
+PASS HTTP CORS allowlist
+CreateBooking error: Error
+{"authentication":"PASS","adminAuthorization":"PASS","helperDiscovery":"PASS","workerCategoryWithoutDefaults":"PASS","directBookingLifecycle":"PASS","overlapConflict":"PASS","reviews":"PASS","complaints":"PASS","photoUploadPersistence":"PASS","chatPersistence":"PASS","proposalToBooking":"PASS","proposalClosure":"PASS","emergencyLifecycle":"PASS","databasePersistence":"PASS"}
+PASS 14 database-backed MVP groups
+UpdateBooking error: Error
+Request failed: Error
+{"roleIsolationAndPublicPrivacy":"PASS","workerSettingsAndDiscoveryFilters":"PASS","requestValidation":"PASS","bookingIdempotency":"PASS","rescheduleConflictAndDuration":"PASS","completedBookingImmutability":"PASS","atomicProposalAcceptanceAndJobCompletion":"PASS","emergencyEligibilityAndAtomicAcceptance":"PASS","emergencyDeclineIsPerWorker":"PASS","emergencyCancellationAndExpiry":"PASS","emergencyAvailabilityAndExpiryNotifications":"PASS","emergencySelfExclusion":"PASS","pushTokenOwnershipRotationAndDeactivation":"PASS","chatRealtimePersistenceAuthorizationAndConversationRace":"PASS","bannedAccountSocketAndRestProtection":"PASS","notificationTriggersAuthorizationDeduplicationAndRollback":"PASS","verificationAndComplaintNotifications":"PASS","aiDatabaseContextPrivacy":"PASS","reloginPersistence":"PASS","uploadContentValidation":"PASS"}
+PASS 20 authorization/concurrency/outbox groups
+PASS Two-way profiles through actual Web and Android API modules
+PASS Web job → Android proposal → Web acceptance → Android completion/review → Web state
+PASS Android booking → Web lifecycle → Android state; Web review → Android
+PASS Two-way saved chat through actual client modules
+PASS Two-way complaint records
+PASS Two-way emergency state in isolation; no alerts sent to real users
+PASS Two-way durable notification read state; not real FCM delivery
+AI provider status: 400
+AI provider status: 401
+AI provider status: 403
+AI provider status: 429
+AI provider status: 500
+AI provider status: 503
+AI request failed: TimeoutError
+PASS AI authenticated owner/role history isolation, real SQL persistence and sanitized provider failures with mocked provider
+PASS Android protocol relogin retains records
+PASS Next-phase two-way client workflows and isolated AI provider failures
+Request failed: Error
+Request failed: Error
+Request failed: Error
+Request failed: Error
+Request failed: Error
+Request failed: Error
+Request failed: Error
+Request failed: Error
+Request failed: Error
+PASS Every admin resource/mutation rejects non-admins; DB role overrides forged JWT; registration/profile cannot promote
+PASS Filtered counts, private-field exclusion, validation, self-lockout and destructive endpoint rejection
+PASS Web admin verification/profile changes reach actual Web/Android modules; authenticated Socket.IO hint and persisted revisions/inbox
+PASS Category creation/edit/visibility and service moderation synchronize; reconnect authority invalidates discovery without deleting relationships
+PASS Reversible jobs/reviews moderation preserves source and rating rows; complaint decision reaches mobile and durable inbox
+PASS All ten monitor queries execute on PostgreSQL; statistics match real records including inactive/history
+PASS Account suspension disconnects live socket and denies existing REST/token/reconnect access
+PASS Concurrent mutual demotion retains administrator under READ COMMITTED and REPEATABLE READ; DB rejects last-admin deactivation/deletion
+PASS Real PostgreSQL audit-write failure rolls back account mutation and surfaces 503
+HelpEarly schema version 4 ready
+PASS Audit actor/action/target/time/outcomes persist across migration rerun; append-only UPDATE/DELETE/TRUNCATE enforcement
+PASS Central web administration, audit, authorization and cross-platform integration
+PASS Password-session revocation and admin password safeguards
+PASS Password rotation revokes HTTP and Socket.IO sessions without schema changes
+UpdateProfile error: Error
+UpdateProfile error: Error
+PASS New-account chat works; opposite dual-role threads and REST authorization remain isolated; unrelated household discovery denied
+PASS Forged admin active mode denied for dual users, including public optional authentication; malformed/rollover/past job dates rejected
+PASS Worker contact search and first contact require real job interaction; no phone/address/email returned
+PASS Real SQL AI history and context scoped to active role; provider stub explicitly used, no fake live AI claim
+PASS Invalid/unconfirmed coordinates rejected; public map rounded; correcting address clears stale map without changing other records
+PASS Emergency audience/contact fallback, full authenticated details and wrong-role read/accept denial
+PASS Push registration timestamp stable, role audience switches, outbox tickets/receipts persisted; provider simulated, physical delivery NOT RUN
+PASS Logout device deactivation and fresh login retain scoped messages
+PASS Android physical-test fixes: isolated role, privacy, chat, AI, location and notification regressions
+PASS Actual web and Android API modules share persisted profiles and worker services
+PASS AI history and inbox read state synchronize across real APIs; unrelated user denied private history
+PASS Socket.IO browser origin allowlist
+PASS Web mutation to worker sync; private revision isolation; authenticated hints
+PASS Android mutation to web; missed updates recovered without socket
+PASS API restart preserves media, revisions and database records
+PASS Notification job survives process restart
+PASS Supabase private storage HTTP contract (mock provider, not live)
+PASS Storage failure surfaced, no fake success
+PASS Sync retries offline reads, deduplicates revisions, forces foreground refresh
+PASS Dedicated worker process restart preserves and deduplicates pending push jobs (delivery disabled)

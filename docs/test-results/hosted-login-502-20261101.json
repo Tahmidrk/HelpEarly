@@ -1,0 +1,805 @@
+{
+  "started_at": "2026-11-01T13:19:13.600Z",
+  "finished_at": "2026-11-01T13:19:34.570Z",
+  "status": "PASS",
+  "scope": "Existing hosted backend and synthetic accounts; two actual Android API modules and one Web API module independently loaded on Node. No record writes, deployment, migrations or automatic retries. Warm/unknown platform state; NOT physical phones or proven Render cold start.",
+  "checks": {
+    "concurrentLogins": [
+      {
+        "client": "Android-A-API-on-Node",
+        "status": "fulfilled"
+      },
+      {
+        "client": "Android-B-API-on-Node",
+        "status": "fulfilled"
+      },
+      {
+        "client": "Web-API-on-Node",
+        "status": "fulfilled"
+      }
+    ],
+    "distinctSessions": [
+      {
+        "client": "Android-A-API-on-Node",
+        "tokenFingerprint": "294ba36c9a4c"
+      },
+      {
+        "client": "Android-B-API-on-Node",
+        "tokenFingerprint": "a0bd3ae4372f"
+      },
+      {
+        "client": "Web-API-on-Node",
+        "tokenFingerprint": "2629d771d461"
+      }
+    ],
+    "distinctSockets": 3,
+    "roleIsolation": true,
+    "logoutIsolation": true,
+    "separateHouseholdLogin": true
+  },
+  "requests": 94,
+  "peakConcurrentFetches": 21,
+  "statusCounts": {
+    "200": 93,
+    "401": 1
+  },
+  "successfulHeaderLatency_ms": {
+    "median": 1165,
+    "p95": 1750,
+    "max": 2835
+  },
+  "samples": [
+    {
+      "route": "/api/auth/login",
+      "method": "POST",
+      "status": 200,
+      "ms": 1830,
+      "requestId": "41388637-3908-41d7-a064-a8834d3eb950",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/login",
+      "method": "POST",
+      "status": 200,
+      "ms": 2712,
+      "requestId": "b3fc5cf2-1a62-4ed1-b400-5910d514dc29",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/login",
+      "method": "POST",
+      "status": 200,
+      "ms": 2835,
+      "requestId": "37240008-6364-4bc6-a287-7b06fa01cc89",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 634,
+      "requestId": "9db1a7bd-7201-48b7-b9f6-2d004c48c4fa",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 937,
+      "requestId": "c128061e-c7b9-4fc1-9688-6e93f43e6f35",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 945,
+      "requestId": "610e3bbe-a62b-4811-87e5-ae31db365f18",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 1019,
+      "requestId": "c161374a-2c54-4dd3-ac6e-7e5c96acdeaf",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 1050,
+      "requestId": "c620247f-8140-4f18-a82a-a58c25a04653",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 1134,
+      "requestId": "a3533e8b-5f84-4d27-854d-2593fc6bc1cd",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 1152,
+      "requestId": "5cfb9193-453a-4006-99d9-d2332b27ffdb",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1165,
+      "requestId": "a5ba3aed-0ace-4ed7-a283-f797c34c43e8",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1236,
+      "requestId": "b7af94e7-f78c-4db6-9e60-3e57deef944c",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 1322,
+      "requestId": "343896f8-547a-4f31-9a14-ef615c3c9fe7",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 1341,
+      "requestId": "0071443a-7f3e-404c-a085-610aa03eb5bb",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 1520,
+      "requestId": "6b58f015-e365-435a-a146-e9a225a08802",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 1543,
+      "requestId": "ec22f884-60f1-46aa-9740-ca8de6540f78",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1620,
+      "requestId": "024b0b60-c9d2-47cf-8d25-3bdc2f88056f",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1633,
+      "requestId": "f3bd7f56-0f88-4d14-ac64-721d1cbe9287",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 1644,
+      "requestId": "64f7ee2c-5cd6-4a32-8d3d-829bf0424ce7",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 1642,
+      "requestId": "62cf4f4a-469d-4808-8e06-d2ffc0075822",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1661,
+      "requestId": "0b6580fd-b44f-49f9-b404-52f75b372db2",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1717,
+      "requestId": "5e0c5fcb-844f-4546-a916-369612e27aec",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 1750,
+      "requestId": "4e2c27a9-6e46-48b0-8a0d-63abdc29365b",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 1877,
+      "requestId": "078eac8f-1a8a-47de-8ff3-6ea9106c2c39",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 654,
+      "requestId": "fbcdf68f-11c7-48fc-ad4c-1ff4b260af28",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 851,
+      "requestId": "9bf454b5-bd39-45f7-9c9c-087cdcab78c5",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 876,
+      "requestId": "c0f5dcc4-e44f-4d93-bf12-da09006030b9",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 895,
+      "requestId": "f2d7f9c3-7cc0-44fe-8133-4d93c10e5393",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 904,
+      "requestId": "c30567e4-c860-4c60-9d9b-978fba8e7f90",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 941,
+      "requestId": "a8e6526e-1ae8-4748-ba72-3f36b0157e85",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 971,
+      "requestId": "bb9e42ef-9908-48ca-b98c-bb5baa563c8a",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 1049,
+      "requestId": "a6d1cd2a-abc8-4e0d-be8b-8c8408a010e9",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 1055,
+      "requestId": "3121d899-96ae-4692-8944-f2042a8a7eeb",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1056,
+      "requestId": "d822c46e-ecb1-4e5f-8285-8e4eb8dcc798",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 1055,
+      "requestId": "0c1099e6-6cc7-47fd-b54e-bf152b600c4c",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 1163,
+      "requestId": "b0ce6a50-c844-405f-8251-03ada7d81a5d",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 1168,
+      "requestId": "0062f0cf-76d2-47a2-b08e-827e79d7f0d1",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 1173,
+      "requestId": "91bde16f-fc3f-48a0-823b-05e3a59342b3",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 1184,
+      "requestId": "e4f6b044-ccd9-4c54-8421-fb857444288f",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1260,
+      "requestId": "1b22ab9e-64ac-4771-8f78-86ed1f7043c2",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1265,
+      "requestId": "f9b3d63f-d927-46f6-9b46-2f3a0353c4c2",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1352,
+      "requestId": "05724582-bdf1-40cf-8a18-ce626250b7a0",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1359,
+      "requestId": "e820fef8-3d10-4e2e-82fa-c0520efb70a3",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1368,
+      "requestId": "970788e6-2584-4f01-80a6-8fea7bf8c0df",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 1383,
+      "requestId": "65a77eef-f2cf-4df9-b283-203eaf60afb0",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 755,
+      "requestId": "f8c028bd-2e9a-4605-aa66-bd129de68c52",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 755,
+      "requestId": "8ffada05-1b8e-4a00-832e-01aaeb9af236",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 876,
+      "requestId": "6d7974e1-b1ca-4de2-aa14-b7c8ab3455ea",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 947,
+      "requestId": "20211afe-f53d-44a8-8f04-6aa0f921bfd2",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 967,
+      "requestId": "f21e27e1-c7d7-49f3-8d75-6837eb215912",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 1063,
+      "requestId": "508a4527-4f88-4da4-80c4-12dc78a24f4d",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 1067,
+      "requestId": "e78331eb-5853-4e7e-a169-3492bdad1b7e",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 1068,
+      "requestId": "24f64f1a-bfa8-4454-a339-1ceea2d8886a",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 1146,
+      "requestId": "cb76cfa6-fec6-4cad-854d-efd81adabef5",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1162,
+      "requestId": "ebc0eec9-1502-475f-961a-afdf3198a416",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 1158,
+      "requestId": "3581f92d-0761-481c-8b3a-f0e696d9891a",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 1259,
+      "requestId": "f6d76e76-f89c-4d33-81ca-d772d07476ce",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 1262,
+      "requestId": "bb955410-9f43-4c14-8a6d-63c42b0d514f",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1266,
+      "requestId": "cb4175fb-c6c3-494a-922b-9397fecba23e",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1344,
+      "requestId": "b7073004-3d7b-44cb-a9cb-05a0dd917f8a",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1348,
+      "requestId": "62529797-dae3-42b5-8171-8c4ee70a71a3",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 1363,
+      "requestId": "b5f281cb-449a-4f18-9f47-737a7c799932",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 1367,
+      "requestId": "f987c901-3178-46c1-b0b5-686059137ac9",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1478,
+      "requestId": "30ce05bf-ef31-40fe-a828-07e7df32c70b",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1570,
+      "requestId": "423c7002-78fa-47f0-b8ad-6e5730447208",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 1576,
+      "requestId": "7a38d0f6-0c25-4e95-8144-7a361a51aa24",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 772,
+      "requestId": "42441b19-746c-4b87-a538-c714378613a5",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 862,
+      "requestId": "f07586de-7629-464e-a218-61ae36957ca4",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 865,
+      "requestId": "7e4bc68c-2fdd-4a98-8d24-dd8baa837866",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 866,
+      "requestId": "5cab3aae-e718-478a-82e3-dde981001a3d",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 883,
+      "requestId": "ae3cb9bb-b482-495d-97ba-17cf74449fb6",
+      "render": "Render"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "GET",
+      "status": 200,
+      "ms": 967,
+      "requestId": "cca675fd-d8b6-4d2c-8f78-6bc22150efe3",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 978,
+      "requestId": "1061c5a6-49c2-4f25-9c1a-d4de4db925ca",
+      "render": "Render"
+    },
+    {
+      "route": "/api/bookings",
+      "method": "GET",
+      "status": 200,
+      "ms": 987,
+      "requestId": "3fdbdf4b-9717-437b-b19e-0f793f117e67",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 1071,
+      "requestId": "f9e9e091-b758-4e8b-963f-57eed82aa1f2",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 1087,
+      "requestId": "db3c70b9-d996-4834-ab17-12ede152efa7",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1277,
+      "requestId": "3ecae63b-f309-4ba5-953a-e879ea4121d0",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1279,
+      "requestId": "aa185024-ebee-4c58-958e-7f0171bd4668",
+      "render": "Render"
+    },
+    {
+      "route": "/api/helpers",
+      "method": "GET",
+      "status": 200,
+      "ms": 1286,
+      "requestId": "bcdb6abb-4b7d-484a-b132-df2e37c9b479",
+      "render": "Render"
+    },
+    {
+      "route": "/api/messages/conversations",
+      "method": "GET",
+      "status": 200,
+      "ms": 1289,
+      "requestId": "92785615-4a40-46fc-bb82-656953fda18d",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 1301,
+      "requestId": "f71e6dd3-838f-48ff-b800-9353e88c33a0",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 1306,
+      "requestId": "85f37795-c7cd-4e3c-9c09-76d5cd889108",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1356,
+      "requestId": "4ccdc0ae-0a48-43d6-abf2-96ec79b3f8ff",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 1379,
+      "requestId": "ac4d3fcb-cf79-424d-ab81-0afbf49bdff2",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1384,
+      "requestId": "ce9242f0-9d45-444c-9cdf-370595426a3c",
+      "render": "Render"
+    },
+    {
+      "route": "/api/sync",
+      "method": "GET",
+      "status": 200,
+      "ms": 1390,
+      "requestId": "704182e6-1cdb-4a7f-bc70-9d26f8a07e5e",
+      "render": "Render"
+    },
+    {
+      "route": "/api/jobs",
+      "method": "GET",
+      "status": 200,
+      "ms": 1495,
+      "requestId": "d6588ddb-f542-4ff1-ae8d-067b3c4dbaf2",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 548,
+      "requestId": "f03dad84-be5b-4d46-b817-bbf9e9506acc",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 573,
+      "requestId": "e3e5724a-d541-4c95-a0b4-04b3f3d41ccf",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 401,
+      "ms": 263,
+      "requestId": "1e8a360a-6d66-4f6b-846f-db937f8982ce",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 543,
+      "requestId": "63c461f4-054b-4972-9fd8-1312e9d517c3",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 550,
+      "requestId": "13033ab6-cdd4-433b-bdd2-028dd1d3dc67",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/login",
+      "method": "POST",
+      "status": 200,
+      "ms": 848,
+      "requestId": "5b54b2b1-bd98-4e00-928c-ffd0a02153d4",
+      "render": "Render"
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "ms": 442,
+      "requestId": "86eb34ef-ece6-4fd2-8b78-4a65a26375b7",
+      "render": "Render"
+    }
+  ]
+}

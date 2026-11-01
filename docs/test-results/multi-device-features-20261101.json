@@ -1,0 +1,72 @@
+{
+  "executed_at": "2026-11-01T13:30:15.064Z",
+  "status": "PASS",
+  "checks": {
+    "Simultaneous same-account and separate-account login": "PASS",
+    "Concurrent registration without changing existing sessions": "PASS",
+    "Parallel dashboard, discovery and every major resource read": "PASS",
+    "Concurrent profile and worker settings persist across clients": "PASS",
+    "Concurrent booking creation, job posting and worker browsing": "PASS",
+    "Booking confirmation, completion and review synchronize": "PASS",
+    "Proposal acceptance creates one shared booking and job completion": "PASS",
+    "Three-way simultaneous chat and unrelated-user privacy": "PASS",
+    "Concurrent household/worker complaints and private history": "PASS",
+    "Concurrent emergency broadcasts, per-worker decline, acceptance and cancellation": "PASS",
+    "Inbox read state and independent installation registration": "PASS",
+    "Role switching, reconnect and logout leave peers authorized": "PASS",
+    "actualAuthenticatedSockets": 4,
+    "platformPushDelivery": "NOT RUN: simulated provider tests are separate; no physical devices",
+    "liveAIReply": "NOT RUN: provider failure/privacy tests are separate"
+  },
+  "samples": [
+    {
+      "feature": "Simultaneous same-account and separate-account login",
+      "ms": 347
+    },
+    {
+      "feature": "Concurrent registration without changing existing sessions",
+      "ms": 176
+    },
+    {
+      "feature": "Parallel dashboard, discovery and every major resource read",
+      "ms": 118
+    },
+    {
+      "feature": "Concurrent profile and worker settings persist across clients",
+      "ms": 37
+    },
+    {
+      "feature": "Concurrent booking creation, job posting and worker browsing",
+      "ms": 50
+    },
+    {
+      "feature": "Booking confirmation, completion and review synchronize",
+      "ms": 27
+    },
+    {
+      "feature": "Proposal acceptance creates one shared booking and job completion",
+      "ms": 39
+    },
+    {
+      "feature": "Three-way simultaneous chat and unrelated-user privacy",
+      "ms": 35
+    },
+    {
+      "feature": "Concurrent household/worker complaints and private history",
+      "ms": 15
+    },
+    {
+      "feature": "Concurrent emergency broadcasts, per-worker decline, acceptance and cancellation",
+      "ms": 76
+    },
+    {
+      "feature": "Inbox read state and independent installation registration",
+      "ms": 69
+    },
+    {
+      "feature": "Role switching, reconnect and logout leave peers authorized",
+      "ms": 23
+    }
+  ],
+  "scope": "Four independent real API module instances and authenticated Socket.IO sessions, one shared isolated local PostgreSQL database. Native Platform/storage bindings simulated; not four Android phones, rendered native forms, live FCM, live AI, or hosted deployment proof."
+}
